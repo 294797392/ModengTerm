@@ -32,6 +32,21 @@ namespace ModengTerm.Addon
         /// </summary>
         TAB_CLOSED,
 
+        /// <summary>
+        /// 打开Shell会话之后触发
+        /// </summary>
+        TAB_SHELL_OPENED,
+
+        /// <summary>
+        /// 关闭Shell会话之后触发
+        /// </summary>
+        TAB_SHELL_CLOSED,
+
+        /// <summary>
+        /// 选中Shell会话之后触发
+        /// </summary>
+        TAB_SHELL_CHANGED,
+
         // 301 - 500 ShellTab事件
 
         /// <summary>
@@ -40,14 +55,9 @@ namespace ModengTerm.Addon
         SHELL_RENDERED = 301,
 
         /// <summary>
-        /// 每当发送数据的时候触发
+        /// 每当发送用户输入的数据的时候触发
         /// </summary>
-        SHELL_SENDDATA = 302,
-
-        /// <summary>
-        /// 打开Shell会话之后触发
-        /// </summary>
-        SHELL_OPENED = 303
+        SHELL_SEND_USER_INPUT,
     }
 
     public abstract class TabEventArgs : EventArgsBase
@@ -90,6 +100,30 @@ namespace ModengTerm.Addon
         public IClientTab OpenedTab { get; set; }
     }
 
+    public class TabEventTabShellOpened : TabEventArgs
+    {
+        public override TabEvent Type => TabEvent.TAB_SHELL_OPENED;
+
+        /// <summary>
+        /// 打开的Tab
+        /// </summary>
+        public IClientShellTab OpenedTab { get; set; }
+    }
+
+    public class TabEventTabShellClosed : TabEventArgs
+    {
+        public override TabEvent Type => TabEvent.TAB_SHELL_CLOSED;
+    }
+
+    public class TabEventTabShellChanged : TabEventArgs
+    {
+        public override TabEvent Type => TabEvent.TAB_SHELL_CHANGED;
+
+        /// <summary>
+        /// 被选中的Shell会话
+        /// </summary>
+        public IClientShellTab ActiveTab { get; set; }
+    }
 
 
 
@@ -124,9 +158,9 @@ namespace ModengTerm.Addon
         }
     }
 
-    public class TabEventShellSendData : TabEventArgs
+    public class TabEventShellSendUserInput : TabEventArgs
     {
-        public override TabEvent Type => TabEvent.SHELL_SENDDATA;
+        public override TabEvent Type => TabEvent.SHELL_SEND_USER_INPUT;
 
         /// <summary>
         /// 发送的数据缓冲区
@@ -134,13 +168,4 @@ namespace ModengTerm.Addon
         public byte[] Buffer { get; set; }
     }
 
-    public class TabEventShellOpened : TabEventArgs
-    {
-        public override TabEvent Type => TabEvent.SHELL_OPENED;
-
-        /// <summary>
-        /// 打开的Tab
-        /// </summary>
-        public IClientShellTab OpenedTab { get; set; }
-    }
 }

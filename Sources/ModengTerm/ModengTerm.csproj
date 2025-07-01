@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Remove="Addon\WindowImpl.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
+    <Compile Remove="OfficialAddons\BroadcastInput\BroadcastInputManagerWindow.xaml.cs" />
     <Compile Remove="OfficialAddons\BroadcastInput\BroadcastSession.cs" />
     <Compile Remove="OfficialAddons\BroadcastInput\BroadcastSessionVM.cs" />
     <Compile Remove="OfficialAddons\BroadcastInput\Utility.cs" />
@@ -81,6 +82,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="OfficialAddons\BroadcastInput\BroadcastInputManagerWindow.xaml" />
     <Page Remove="OfficialAddons\QuickInput\CommandManagerWindow.xaml" />
     <Page Remove="OfficialAddons\Record\PlaybackUserControl.xaml" />
     <Page Remove="Themes\Themes.Default.xaml" />

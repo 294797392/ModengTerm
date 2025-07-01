@@ -19,15 +19,15 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
-            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.TAB_SHELL_OPENED, this.OnTabShellOpened);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_SEND_USER_INPUT, this.OnShellSendUserInput);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.TAB_SHELL_OPENED, this.OnTabShellOpened);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_SEND_USER_INPUT, this.OnShellSendUserInput);
         }
 
         #endregion
@@ -40,32 +40,40 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            BroadcastInputManagerWindow broadcastInputManagerWindow = new BroadcastInputManagerWindow(e.ActiveTab as IClientShellTab, this);
-            broadcastInputManagerWindow.Owner = Application.Current.MainWindow;
-            if ((bool)broadcastInputManagerWindow.ShowDialog())
-            {
-                e.ActiveTab.SetData(this, KEY_BROADCAST_LIST, broadcastInputManagerWindow.BroadcastList);
-            }
+            ISidePanel sidePanel = this.GetSidePanel("5A7D79FD-3C0E-44B2-80AE-B0FEE9F3ECAB");
+            sidePanel.SwitchStatus();
         }
 
-        private void OnShellOpened(TabEventArgs e)
+        private void OnTabShellOpened(TabEventArgs e)
         {
-            TabEventShellOpened tabOpened = e as TabEventShellOpened;
+            TabEventTabShellOpened tabOpened = e as TabEventTabShellOpened;
         }
 
-        private void OnShellSendData(TabEventArgs e)
+        private void OnTabShellClosed(TabEventArgs e)
         {
-            TabEventShellSendData sendData = e as TabEventShellSendData;
+            TabEventTabShellClosed tabClosed = e as TabEventTabShellClosed;
+        }
 
-            List<IClientShellTab> broadcastTabs = e.Sender.GetData<List<IClientShellTab>>(this, KEY_BROADCAST_LIST);
+        private void OnShellSendUserInput(TabEventArgs e)
+        {
+            TabEventShellSendUserInput sendData = e as TabEventShellSendUserInput;
+
+            List<ShellTabVM> broadcastTabs = e.Sender.GetData<List<ShellTabVM>>(this, KEY_BROADCAST_LIST);
 
             if (broadcastTabs == null)
             {
                 return;
             }
 
-            foreach (IClientShellTab shellTab in broadcastTabs)
+            foreach (ShellTabVM shellTabVM in broadcastTabs)
             {
+                if (!shellTabVM.IsChecked)
+                {
+                    continue;
+                }
+
+                IClientShellTab shellTab = shellTabVM.Tab;
+
                 if (shellTab.Status != SessionStatusEnum.Connected)
                 {
                     continue;

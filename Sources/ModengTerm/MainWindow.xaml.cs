@@ -192,6 +192,8 @@ namespace ModengTerm
                     sidePanel.ID = definition.ID;
                     sidePanel.Name = definition.Name;
                     sidePanel.IconURI = definition.Icon;
+                    sidePanel.OwnerAddon = toActive.OwnerAddon;
+                    sidePanel.Initialize();
                     this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
 
                     toActive.Panel = sidePanel;
@@ -575,9 +577,11 @@ namespace ModengTerm
 
             if (selectedSession is OpenSessionVM)
             {
+                // 此时点击的是打开Session按钮
+
                 if (e.RemovedItems.Count > 0)
                 {
-                    // 点击的是打开Session按钮，返回到上一个选中的SessionTabItem
+                    // 返回到上一个选中的SessionTabItem
                     ListBoxOpenedSession.SelectedItem = e.RemovedItems[0];
                 }
                 else
@@ -599,30 +603,35 @@ namespace ModengTerm
             if (e.RemovedItems.Count > 0)
             {
                 removedSession = e.RemovedItems[0] as OpenedSessionVM;
-                if (removedSession != null)
-                {
-                    removedSession.OnUnload();
-                }
             }
 
             if (e.AddedItems.Count > 0)
             {
                 addedSession = e.AddedItems[0] as OpenedSessionVM;
-                if (addedSession != null)
-                {
-                    addedSession.OnLoaded();
-                }
             }
 
             #endregion
 
-            // 触发Tab选中改变事件
-            ClientEventActiveTabChanged activeTabChanged = new ClientEventActiveTabChanged()
+            if (selectedSession is OpenedSessionVM)
             {
-                AddedTab = addedSession,
-                RemovedTab = removedSession,
-            };
-            this.PublishEvent(activeTabChanged);
+                // 触发Tab选中改变事件
+                ClientEventTabChanged tabChanged = new ClientEventTabChanged()
+                {
+                    AddedTab = addedSession,
+                    RemovedTab = removedSession,
+                };
+                this.PublishEvent(tabChanged);
+
+                if (VTBaseUtils.IsTerminal(addedSession.Type))
+                {
+                    TabEventTabShellChanged tabShellChanged = new TabEventTabShellChanged()
+                    {
+                        Sender = addedSession,
+                        ActiveTab = addedSession as IClientShellTab
+                    };
+                    this.PublishTabEvent(tabShellChanged);
+                }
+            }
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -895,7 +904,7 @@ namespace ModengTerm
 
             if (VTBaseUtils.IsTerminal((SessionTypeEnum)session.Type))
             {
-                TabEventShellOpened shellOpened = new TabEventShellOpened()
+                TabEventTabShellOpened shellOpened = new TabEventTabShellOpened()
                 {
                     Sender = openedSessionVM,
                     OpenedTab = openedSessionVM as IClientShellTab,

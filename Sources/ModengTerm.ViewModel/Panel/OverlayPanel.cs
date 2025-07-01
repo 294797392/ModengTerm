@@ -71,7 +71,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public override void Open()
         {
-            PanelContent content = this.GetOrCreateContent();
+            PanelContent content = this.Content;
 
             if (this.firstOpen)
             {

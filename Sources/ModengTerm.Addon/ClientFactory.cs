@@ -26,8 +26,6 @@ namespace ModengTerm.Addon
 
         public abstract IClientEventRegistry GetEventRegistry();
 
-        public abstract List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions);
-
         public abstract IOverlayPanel CreateOverlayPanel(PanelDefinition definition);
 
         public static ClientFactory GetFactory() 

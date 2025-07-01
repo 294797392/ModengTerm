@@ -74,7 +74,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         private List<ScriptItem> scriptItems;
 
-        private TabEventShellSendData tabEventSendData;
+        private TabEventShellSendUserInput tabEventSendUserInput;
         private TabEventShellRendered tabEventShellRendered;
         private TabEventStatusChanged tabEventStatusChanged;
 
@@ -236,7 +236,7 @@ namespace ModengTerm.ViewModel.Terminal
             base(session)
         {
             this.OverlayPanels = new BindableCollection<OverlayPanel>();
-            this.tabEventSendData = new TabEventShellSendData() { Sender = this };
+            this.tabEventSendUserInput = new TabEventShellSendUserInput() { Sender = this };
             this.tabEventShellRendered = new TabEventShellRendered() { Sender = this };
             this.tabEventStatusChanged = new TabEventStatusChanged() { Sender = this };
         }
@@ -422,9 +422,6 @@ namespace ModengTerm.ViewModel.Terminal
             VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
 
             this.videoTerminal.ProcessWrite(bytes);
-
-            this.tabEventSendData.Buffer = bytes;
-            base.RaiseTabEvent(this.tabEventSendData);
         }
 
         private void HandleScript()
@@ -695,6 +692,9 @@ namespace ModengTerm.ViewModel.Terminal
             kbdInput.SendBytes = bytes;
 
             this.PerformSend(bytes);
+
+            this.tabEventSendUserInput.Buffer = bytes;
+            base.RaiseTabEvent(this.tabEventSendUserInput);
         }
 
         public int Control(int command, object parameter, out object result)

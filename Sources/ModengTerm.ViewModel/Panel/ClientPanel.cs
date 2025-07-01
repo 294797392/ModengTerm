@@ -1,14 +1,8 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
+using ModengTerm.Addons;
 using ModengTerm.Base.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
@@ -71,20 +65,67 @@ namespace ModengTerm.ViewModel.Panel
                 }
             }
         }
+        
+        /// <summary>
+        /// Panel所属的插件
+        /// </summary>
+        public AddonModule OwnerAddon { get; set; }
+
+        #endregion
+
+        #region 实例方法
+
+        private void InitializeContent()
+        {
+            PanelContent content = null;
+
+            try
+            {
+                content = ConfigFactory<PanelContent>.CreateInstance(this.Definition.ClassName);
+                content.OwnerPanel = this;
+                content.OwnerAddon = this.OwnerAddon;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("加载PanelContent异常", ex);
+            }
+
+            this.Content = content;
+        }
 
         #endregion
 
         #region 公开接口
 
+        /// <summary>
+        /// 在第一次Active之后，OnLoad之前触发
+        /// </summary>
         public void Initialize()
         {
             this.initialized = true;
 
+            this.InitializeContent();
+
             // init
+            this.content.OnInitialize();
 
             this.OnInitialize();
+        }
 
-            this.content.OnInitialize();
+        public void Release() 
+        {
+            if (!this.initialized)
+            {
+                return;
+            }
+
+            this.content.OnRelease();
+
+            this.OnRelease();
+
+            // release
+
+            this.initialized = false;
         }
 
         /// <summary>
@@ -103,22 +144,6 @@ namespace ModengTerm.ViewModel.Panel
             this.content.OnUnload();
         }
 
-        public void Release()
-        {
-            if (!this.initialized)
-            {
-                return;
-            }
-
-            this.content.OnRelease();
-
-            this.OnRelease();
-
-            // release
-
-            this.initialized = false;
-        }
-
         public void SwitchStatus()
         {
             if (this.isOpened)
@@ -129,37 +154,6 @@ namespace ModengTerm.ViewModel.Panel
             {
                 this.Open();
             }
-        }
-
-        /// <summary>
-        /// 加载内容控件
-        /// </summary>
-        /// <returns></returns>
-        public PanelContent GetOrCreateContent()
-        {
-            if (this.content != null) 
-            {
-                return this.content;
-            }
-
-            PanelContent content = null;
-
-            try
-            {
-                content = ConfigFactory<PanelContent>.CreateInstance(this.Definition.ClassName);
-                content.OwnerPanel = this;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("加载PanelContent异常", ex);
-                return null;
-            }
-
-            this.Content = content;
-
-            this.Initialize();
-
-            return content;
         }
 
         #endregion

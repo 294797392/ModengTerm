@@ -34,23 +34,6 @@ namespace ModengTerm.Addon
             return eventRegistory;
         }
 
-        public override List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions)
-        {
-            List<ISidePanel> sidePanels = new List<ISidePanel>();
-
-            foreach (PanelDefinition definition in definitions)
-            {
-                SidePanel sidePanel = new SidePanel();
-                sidePanel.Definition = definition;
-                sidePanel.ID = definition.ID;
-                sidePanel.Name = definition.Name;
-                sidePanel.IconURI = definition.Icon;
-                sidePanels.Add(sidePanel);
-            }
-
-            return sidePanels;
-        }
-
         public override IOverlayPanel CreateOverlayPanel(PanelDefinition definition)
         {
             OverlayPanel overlayPanel = new OverlayPanel();

@@ -46,7 +46,7 @@ namespace ModengTerm.Addon
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
-    public class ClientEventActiveTabChanged : ClientEventArgs
+    public class ClientEventTabChanged : ClientEventArgs
     {
         public override string Name => "onClientTabChanged";
         public override string FullName => string.Format("onClientTabChanged:{0}", this.AddedTab.Type.ToString().ToLower());
@@ -63,4 +63,15 @@ namespace ModengTerm.Addon
         /// </summary>
         public IClientTab AddedTab { get; set; }
     }
+
+    public class ClientEventTabChangedShell : ClientEventTabChanged 
+    {
+
+    }
 }
+
+
+
+
+
+

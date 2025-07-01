@@ -109,6 +109,7 @@ namespace ModengTerm.ViewModel
             this.OnRelease();
 
             // release
+            this.dataMap.Clear();
         }
 
         public int Open()
@@ -120,20 +121,6 @@ namespace ModengTerm.ViewModel
         public void Close()
         {
             OnClose();
-        }
-
-        /// <summary>
-        /// 当显示到界面上之后触发
-        /// </summary>
-        public void OnLoaded()
-        {
-        }
-
-        /// <summary>
-        /// 当从界面上移除之后触发
-        /// </summary>
-        public void OnUnload()
-        {
         }
 
         #endregion
@@ -206,19 +193,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 事件处理器
-
-        /// <summary>
-        /// 在PanelContentVM初始化之前触发
-        /// </summary>
-        /// <param name="menuItemVM"></param>
-        /// <param name="viewModel"></param>
-        private void PanelItem_ContentInitializing(MenuItemVM menuItemVM, ViewModelBase viewModel, DependencyObject view)
-        {
-            throw new RefactorImplementedException();
-            //SessionPanel sessionPanelContentVM = viewModel as SessionPanel;
-            //sessionPanelContentVM.Session = Session;
-            //sessionPanelContentVM.ServiceAgent = ServiceAgent;
-        }
 
         #endregion
     }

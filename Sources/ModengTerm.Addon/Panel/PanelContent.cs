@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,17 @@ namespace ModengTerm.Addon.Panel
         public IClientPanel OwnerPanel { get; set; }
 
         /// <summary>
-        /// 面板初始化的时候触发
+        /// 所属的插件
+        /// </summary>
+        public AddonModule OwnerAddon { get; set; }
+
+        /// <summary>
+        /// 当面板第一次被激活的时候触发
         /// </summary>
         public abstract void OnInitialize();
 
         /// <summary>
-        /// 释放面板资源的时候触发
+        /// 当不需要面板的时候触发
         /// </summary>
         public abstract void OnRelease();
 

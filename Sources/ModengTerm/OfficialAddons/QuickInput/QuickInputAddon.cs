@@ -14,13 +14,11 @@ namespace ModengTerm.OfficialAddons.QuickInput
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
             this.RegisterCommand("QuickInputAddon.ShowQuickInputPanel", this.ShowQuickInputPanel);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
         }
 
         #region 事件处理器
@@ -29,11 +27,6 @@ namespace ModengTerm.OfficialAddons.QuickInput
         {
             ISidePanel sidePanel = this.GetSidePanel("QuickInputSidePanel");
             sidePanel.SwitchStatus();
-        }
-
-        private void OnClientInitialized(ClientEventArgs e) 
-        {
-
         }
 
         #endregion
