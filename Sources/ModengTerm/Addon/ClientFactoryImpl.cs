@@ -33,15 +33,5 @@ namespace ModengTerm.Addon
         {
             return eventRegistory;
         }
-
-        public override IOverlayPanel CreateOverlayPanel(PanelDefinition definition)
-        {
-            OverlayPanel overlayPanel = new OverlayPanel();
-            overlayPanel.Definition = definition;
-            overlayPanel.ID = definition.ID;
-            overlayPanel.Name = definition.Name;
-            overlayPanel.IconURI = definition.Icon;
-            return overlayPanel;
-        }
     }
 }

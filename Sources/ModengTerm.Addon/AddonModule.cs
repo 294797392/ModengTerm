@@ -128,29 +128,6 @@ namespace ModengTerm.Addons
             return this.activeSidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
-        /// <summary>
-        /// 先查找指定的OverlayPanel是否存在，如果不存在则创建并加到指定的shellTab里
-        /// </summary>
-        /// <param name="panelId"></param>
-        /// <param name="shellTab"></param>
-        /// <returns>OverlayPanel的实例</returns>
-        protected IOverlayPanel EnsureOverlayPanel(string panelId, IClientShellTab shellTab)
-        {
-            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel(panelId);
-            if (overlayPanel == null)
-            {
-                overlayPanel = this.CreateOverlayPanel(panelId);
-                if (overlayPanel == null)
-                {
-                    return null;
-                }
-
-                shellTab.AddOverlayPanel(overlayPanel);
-            }
-
-            return overlayPanel;
-        }
-
         protected string GetObjectId()
         {
             return Guid.NewGuid().ToString();
@@ -173,18 +150,6 @@ namespace ModengTerm.Addons
         #endregion
 
         #region 实例方法
-
-        private IOverlayPanel CreateOverlayPanel(string id)
-        {
-            PanelDefinition definition = this.definition.OverlayPanels.FirstOrDefault(v => v.ID == id);
-            if (definition == null)
-            {
-                logger.ErrorFormat("没找到指定的OverlayPanel, {0}", id);
-                return null;
-            }
-
-            return this.factory.CreateOverlayPanel(definition);
-        }
 
         #endregion
     }

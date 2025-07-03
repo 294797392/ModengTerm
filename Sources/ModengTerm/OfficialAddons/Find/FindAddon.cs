@@ -9,8 +9,6 @@ namespace ModengTerm.OfficialAddons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistry.RegisterHotkey(this, "Esc", HotkeyScopes.ClientShellTab, this.OnEscKeyDown);
-            this.eventRegistry.RegisterHotkey(this, "Ctrl+F", HotkeyScopes.ClientShellTab, this.OnAltFKeyDown);
             this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
         }
 
@@ -22,32 +20,7 @@ namespace ModengTerm.OfficialAddons.Find
         private void FindCommandExecuted(CommandArgs e)
         {
             IClientShellTab shellTab = e.ActiveTab as IClientShellTab;
-            IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
-            overlayPanel.Dock = OverlayPanelDocks.RightTop;
-            overlayPanel.SwitchStatus();
-        }
-
-        private void OnEscKeyDown(object userData)
-        {
-            IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
             IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
-
-            if (overlayPanel == null)
-            {
-                return;
-            }
-
-            if (overlayPanel.IsOpened)
-            {
-                overlayPanel.Close();
-            }
-        }
-
-        private void OnAltFKeyDown(object userData) 
-        {
-            IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
-            IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
-            overlayPanel.Dock = OverlayPanelDocks.RightTop;
             overlayPanel.SwitchStatus();
         }
     }

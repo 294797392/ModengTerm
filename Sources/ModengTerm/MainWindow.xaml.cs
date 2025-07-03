@@ -16,6 +16,7 @@ using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -158,26 +159,41 @@ namespace ModengTerm
         {
             foreach (PanelDefinition definition in addonDefinition.SidePanels)
             {
-                PanelState panelState = new PanelState(addon, definition);
+                SidePanelContext spc = new SidePanelContext(addon, definition);
 
-                foreach (HotkeyDefinition hotkeyDefinition in definition.HotkeyShowEvents)
+                foreach (string hkey in definition.OpenHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition.Key, hotkeyDefinition.Scope, this.OnHotkeyShowPanelEvent, panelState);
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnOpenSidePanelEvent, spc);
                 }
 
-                foreach (HotkeyDefinition hotkeyDefinition1 in definition.HotkeyHideEvents)
+                foreach (string hkey in definition.CloseHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition1.Key, hotkeyDefinition1.Scope, this.OnHotkeyHidePanelEvent, panelState);
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnCloseSidePanelEvent, spc);
                 }
 
-                foreach (string evid in definition.ShowEvents)
+                foreach (string evid in definition.AttachEvents)
                 {
-                    this.eventRegistry.SubscribeEvent(evid, this.OnClientShowPanelEvent, panelState);
+                    this.eventRegistry.SubscribeEvent(evid, this.OnAttachSidePanelEvent, spc);
                 }
 
-                foreach (string evid in definition.HideEvents)
+                foreach (string evid in definition.DetachEvents)
                 {
-                    this.eventRegistry.SubscribeEvent(evid, this.OnClientHidePanelEvent, panelState);
+                    this.eventRegistry.SubscribeEvent(evid, this.OnDetachSidePanelEvent, spc);
+                }
+            }
+
+            foreach (PanelDefinition definition in addonDefinition.OverlayPanels)
+            {
+                OverlayPanelContext opc = new OverlayPanelContext(addon, definition);
+
+                foreach (string hkey in definition.OpenHotkeys)
+                {
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnOpenOverlayPanelEvent, opc);
+                }
+
+                foreach (string hkey in definition.CloseHotkeys)
+                {
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnCloseOverlayPanelEvent, opc);
                 }
             }
         }
@@ -448,61 +464,116 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OnHotkeyShowPanelEvent(object userData)
+        private void OnOpenOverlayPanelEvent(object userData) 
         {
-        }
+            OverlayPanelContext opc = userData as OverlayPanelContext;
+            PanelDefinition definition = opc.Definition;
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
 
-        private void OnHotkeyHidePanelEvent(object userData)
-        {
-        }
-
-        private void OnClientShowPanelEvent(ClientEventArgs e, object userData) 
-        {
-            PanelState toShow = userData as PanelState;
-
-            if (toShow.Panel == null)
+            if (overlayPanel == null)
             {
-                PanelDefinition definition = toShow.Definition;
+                overlayPanel = new OverlayPanel();
+                overlayPanel.Definition = definition;
+                overlayPanel.ID = definition.ID;
+                overlayPanel.Name = definition.Name;
+                overlayPanel.IconURI = definition.Icon;
+                overlayPanel.OwnerTab = shellSession;
+                overlayPanel.OwnerAddon = opc.OwnerAddon;
+                overlayPanel.Initialize();
+                shellSession.OverlayPanels.Add(overlayPanel);
+            }
+
+            overlayPanel.Open();
+        }
+
+        private void OnCloseOverlayPanelEvent(object userData)
+        {
+            OverlayPanelContext opc = userData as OverlayPanelContext;
+            PanelDefinition definition = opc.Definition;
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
+
+            if (overlayPanel == null)
+            {
+                return;
+            }
+
+            overlayPanel.Close();
+        }
+
+
+        private void OnOpenSidePanelEvent(object userData)
+        {
+            SidePanelContext spc = userData as SidePanelContext;
+
+            if (spc.Panel == null || !spc.IsAttached)
+            {
+                return;
+            }
+
+            spc.Panel.Open();
+        }
+
+        private void OnCloseSidePanelEvent(object userData)
+        {
+            SidePanelContext spc = userData as SidePanelContext;
+
+            if (spc.Panel == null || !spc.IsAttached)
+            {
+                return;
+            }
+
+            spc.Panel.Close();
+        }
+
+        private void OnAttachSidePanelEvent(ClientEventArgs e, object userData) 
+        {
+            SidePanelContext spc = userData as SidePanelContext;
+
+            if (spc.Panel == null)
+            {
+                PanelDefinition definition = spc.Definition;
 
                 SidePanel sidePanel = new SidePanel();
                 sidePanel.Definition = definition;
                 sidePanel.ID = definition.ID;
                 sidePanel.Name = definition.Name;
                 sidePanel.IconURI = definition.Icon;
-                sidePanel.OwnerAddon = toShow.OwnerAddon;
+                sidePanel.OwnerAddon = spc.OwnerAddon;
                 sidePanel.Initialize();
                 this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
 
-                toShow.Panel = sidePanel;
-                toShow.AddToWindow = true;
-                toShow.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                spc.Panel = sidePanel;
+                spc.IsAttached = true;
+                spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
             }
             else
             {
-                if (!toShow.AddToWindow)
+                if (!spc.IsAttached)
                 {
-                    SidePanel sidePanel = toShow.Panel;
+                    SidePanel sidePanel = spc.Panel;
                     this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-                    toShow.AddToWindow = true;
-                    toShow.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                    spc.IsAttached = true;
+                    spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
                 }
             }
         }
 
-        private void OnClientHidePanelEvent(ClientEventArgs e, object userData)
+        private void OnDetachSidePanelEvent(ClientEventArgs e, object userData)
         {
-            PanelState toHide = userData as PanelState;
+            SidePanelContext spc = userData as SidePanelContext;
 
-            if (!toHide.AddToWindow)
+            if (!spc.IsAttached)
             {
                 return;
             }
 
-            SidePanel sidePanel = toHide.Panel;
+            SidePanel sidePanel = spc.Panel;
             this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Remove(sidePanel);
 
-            toHide.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
-            toHide.AddToWindow = false;
+            spc.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
+            spc.IsAttached = false;
         }
 
         private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs e)

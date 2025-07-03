@@ -90,10 +90,6 @@ namespace ModengTerm.Addon.Interactive
 
         void ClearScreen();
 
-        void AddOverlayPanel(IOverlayPanel panel);
-
-        void RemoveOverlayPanel(IOverlayPanel panel);
-
         IOverlayPanel GetOverlayPanel(string id);
 
         /// <summary>

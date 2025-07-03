@@ -107,9 +107,13 @@ namespace ModengTerm.ViewModel.Panel
             this.InitializeContent();
 
             // init
-            this.content.OnInitialize();
 
             this.OnInitialize();
+
+            // 最后调用content.OnInitialize
+            // OverlayPanel OnInitialize的时候需要OverlayPanelContent的OwnerTab赋值
+            // OverlayPanelContent.OnInitialize里可能会用到OwnerTab
+            this.content.OnInitialize();
         }
 
         public void Release() 

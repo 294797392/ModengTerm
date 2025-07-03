@@ -2,15 +2,6 @@
 
 namespace ModengTerm.Base.Definitions
 {
-    public class HotkeyDefinition
-    {
-        [JsonProperty("scope")]
-        public HotkeyScopes Scope { get; set; }
-
-        [JsonProperty("key")]
-        public string Key { get; set; }
-    }
-
     public class PanelDefinition
     {
         //
@@ -44,24 +35,30 @@ namespace ModengTerm.Base.Definitions
         /// onTabOpened:terminal - 在打开terminal类型的tab的时候显示
         /// 这些事件保持与TabEvent和ClientEvent一致
         /// </summary>
-        [JsonProperty("showEvents")]
-        public List<string> ShowEvents { get; private set; }
+        [JsonProperty("attachEvents")]
+        public List<string> AttachEvents { get; private set; }
 
-        [JsonProperty("hideEvents")]
-        public List<string> HideEvents { get; private set; }
+        [JsonProperty("detachEvents")]
+        public List<string> DetachEvents { get; private set; }
 
-        [JsonProperty("keyShowEvents")]
-        public List<HotkeyDefinition> HotkeyShowEvents { get; private set; }
+        /// <summary>
+        /// 打开该面板的快捷键
+        /// </summary>
+        [JsonProperty("openHotkeys")]
+        public List<string> OpenHotkeys { get; private set; }
 
-        [JsonProperty("keyHideEvents")]
-        public List<HotkeyDefinition> HotkeyHideEvents { get; private set; }
+        /// <summary>
+        /// 关闭该面板的快捷键
+        /// </summary>
+        [JsonProperty("closeHotkeys")]
+        public List<string> CloseHotkeys { get; private set; }
 
         public PanelDefinition()
         {
-            this.ShowEvents = new List<string>();
-            this.HideEvents = new List<string>();
-            this.HotkeyShowEvents = new List<HotkeyDefinition>();
-            this.HotkeyHideEvents = new List<HotkeyDefinition>();
+            this.AttachEvents = new List<string>();
+            this.DetachEvents = new List<string>();
+            this.OpenHotkeys = new List<string>();
+            this.CloseHotkeys = new List<string>();
         }
     }
 }

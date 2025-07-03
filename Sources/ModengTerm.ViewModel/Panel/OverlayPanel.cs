@@ -20,7 +20,6 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 实例变量
 
-        private bool firstOpen = true;
         private OverlayPanelDocks dock;
         private ClientFactory factory;
 
@@ -72,14 +71,6 @@ namespace ModengTerm.ViewModel.Panel
         public override void Open()
         {
             PanelContent content = this.Content;
-
-            if (this.firstOpen)
-            {
-                OverlayPanelContent overlayPanelContent = content as OverlayPanelContent;
-                overlayPanelContent.OwnerTab = this.OwnerTab;
-
-                this.firstOpen = false;
-            }
 
             this.IsOpened = true;
 

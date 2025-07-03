@@ -982,20 +982,6 @@ namespace ModengTerm.ViewModel.Terminal
             document.RequestInvalidate();
         }
 
-        public void AddOverlayPanel(IOverlayPanel panel)
-        {
-            OverlayPanel overlayPanel = panel as OverlayPanel;
-            overlayPanel.OwnerTab = this;
-
-            this.OverlayPanels.Add(overlayPanel);
-        }
-
-        public void RemoveOverlayPanel(IOverlayPanel panel)
-        {
-            OverlayPanel overlayPanel = panel as OverlayPanel;
-            this.OverlayPanels.Remove(overlayPanel);
-        }
-
         public IOverlayPanel GetOverlayPanel(string id)
         {
             return this.OverlayPanels.FirstOrDefault(v => v.ID.ToString() == id);
