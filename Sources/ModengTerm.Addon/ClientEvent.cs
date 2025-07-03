@@ -23,15 +23,29 @@ namespace ModengTerm.Addon
 
         /// <summary>
         /// 当前显示的Tab变化之后触发
+        /// onClientTabChanged:ssh|local|serial|tcp
         /// </summary>
         CLIENT_TAB_CHANGED,
+
+        /// <summary>
+        /// onClientTabOpened:ssh|local|serial|tcp
+        /// </summary>
+        CLIENT_TAB_OPENED,
+
+        /// <summary>
+        /// onClientTabClosed:ssh|local|serial|tcp
+        /// </summary>
+        CLIENT_TAB_CLOSED
     }
 
     public abstract class EventArgsBase
     {
         public virtual string Name { get { return string.Empty; } }
 
-        public virtual string FullName { get { return string.Empty; } }
+        public virtual bool MatchCondition(string cond) 
+        {
+            return true;
+        }
     }
 
     public abstract class ClientEventArgs : EventArgsBase
@@ -46,27 +60,63 @@ namespace ModengTerm.Addon
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
+    /// <summary>
+    /// onClientTabChanged:ssh|local|serial|tcp
+    /// </summary>
     public class ClientEventTabChanged : ClientEventArgs
     {
         public override string Name => "onClientTabChanged";
-        public override string FullName => string.Format("onClientTabChanged:{0}", this.AddedTab.Type.ToString().ToLower());
 
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_CHANGED;
 
         /// <summary>
         /// 选中之前的Tab页面
         /// </summary>
-        public IClientTab RemovedTab { get; set; }
+        public IClientTab OldTab { get; set; }
 
         /// <summary>
         /// 选中之后的Tab页面
         /// </summary>
-        public IClientTab AddedTab { get; set; }
+        public IClientTab NewTab { get; set; }
+
+        public override bool MatchCondition(string cond)
+        {
+            return cond.Contains(this.NewTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
     }
 
-    public class ClientEventTabChangedShell : ClientEventTabChanged 
+    /// <summary>
+    /// onTabOpened:ssh|local|serial|tcp
+    /// </summary>
+    public class ClientEventTabOpened : ClientEventArgs
     {
+        public override string Name => "onClientTabOpened";
 
+        public override ClientEvent Type => ClientEvent.CLIENT_TAB_OPENED;
+
+        /// <summary>
+        /// 被打开的Tab页面
+        /// </summary>
+        public IClientTab OpenedTab { get; set; }
+
+        public override bool MatchCondition(string cond)
+        {
+            return cond.Contains(this.OpenedTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    public class ClientEventTabClosed : ClientEventArgs
+    {
+        public override string Name => "onClientTabClosed";
+
+        public override ClientEvent Type => ClientEvent.CLIENT_TAB_CLOSED;
+
+        public IClientTab ClosedTab { get; set; }
+
+        public override bool MatchCondition(string cond)
+        {
+            return cond.Contains(this.ClosedTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
 

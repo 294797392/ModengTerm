@@ -11,60 +11,84 @@ namespace ModengTerm.Addon
     {
         private class Registry<TDelegate> where TDelegate : Delegate
         {
-            private Dictionary<string, List<TDelegate>> eventRegistry;
+            private class EventData
+            {
+                public string Condition { get; set; }
+
+                public TDelegate Delegate { get; set; }
+            }
+
+            private Dictionary<string, List<EventData>> eventRegistry;
 
             public Registry()
             {
-                this.eventRegistry = new Dictionary<string, List<TDelegate>>();
+                this.eventRegistry = new Dictionary<string, List<EventData>>();
             }
 
-            public void Subscribe(string ev, TDelegate @delegate)
+            public void Subscribe(string evid, TDelegate @delegate)
             {
-                List<TDelegate> delegates;
-                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                // 此时ev里可能有条件字符串
+                // 解析出真正的事件名字
+                string ev, cond;
+                this.ParseEvid(evid, out ev, out cond);
+
+                List<EventData> evds;
+                if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
-                    delegates = new List<TDelegate>();
-                    this.eventRegistry[ev] = delegates;
+                    evds = new List<EventData>();
+                    this.eventRegistry[ev] = evds;
                 }
 
-                delegates.Add(@delegate);
+                EventData evdata = new EventData();
+                evdata.Delegate = @delegate;
+                evdata.Condition = cond;
+
+                evds.Add(evdata);
             }
 
-            public void Unsubscribe(string ev, TDelegate @delegate)
+            public void Unsubscribe(string evid, TDelegate @delegate)
             {
-                List<TDelegate> delegates;
-                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                string ev, cond;
+                this.ParseEvid(evid, out ev, out cond);
+
+                List<EventData> evds;
+                if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
                     return;
                 }
 
                 // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
-                List<TDelegate> newDelegates = delegates.ToList();
-                newDelegates.Remove(@delegate);
-                this.eventRegistry[ev] = newDelegates;
+                List<EventData> newEvds = evds.ToList();
+                EventData evd = newEvds.FirstOrDefault(v => v.Delegate == @delegate);
+                newEvds.Remove(evd);
+                this.eventRegistry[ev] = newEvds;
             }
 
             public void Publish(EventArgsBase ev)
             {
-                List<TDelegate> delegates;
-                if (this.eventRegistry.TryGetValue(ev.Name, out delegates))
+                List<EventData> evds;
+                if (this.eventRegistry.TryGetValue(ev.Name, out evds))
                 {
-                    foreach (TDelegate @delegate in delegates)
+                    foreach (EventData evd in evds)
                     {
-                        @delegate.DynamicInvoke(ev);
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(ev.FullName))
-                {
-                    if (this.eventRegistry.TryGetValue(ev.FullName, out delegates))
-                    {
-                        foreach (TDelegate @delegate in delegates)
+                        if (!string.IsNullOrEmpty(evd.Condition))
                         {
-                            @delegate.DynamicInvoke(ev);
+                            if (!ev.MatchCondition(evd.Condition))
+                            {
+                                continue;
+                            }
                         }
+
+                        evd.Delegate.DynamicInvoke(ev);
                     }
                 }
+            }
+
+            private void ParseEvid(string evid, out string ev, out string cond)
+            {
+                string[] items = evid.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                ev = items[0];
+                cond = items.Length > 1 ? items[1] : string.Empty;
             }
         }
 
@@ -93,6 +117,8 @@ namespace ModengTerm.Addon
             this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEventDelegate>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
         }
+
+
 
         public void SubscribeEvent(string ev, ClientEventDelegate @delegate)
         {

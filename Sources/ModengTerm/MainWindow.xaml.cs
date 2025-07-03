@@ -171,7 +171,7 @@ namespace ModengTerm
             // TODO：优化show和hide事件的执行逻辑
             // 如果插件数量很大的话可能会卡顿
 
-            if (string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.FullName))
+            if (string.IsNullOrEmpty(e.Name))
             {
                 return;
             }
@@ -179,10 +179,7 @@ namespace ModengTerm
             List<PanelState> showPanels;
             if (!this.showPanels.TryGetValue(e.Name, out showPanels))
             {
-                if (!this.showPanels.TryGetValue(e.FullName, out showPanels))
-                {
-                    return;
-                }
+                return;
             }
 
             foreach (PanelState toShow in showPanels)
@@ -222,7 +219,7 @@ namespace ModengTerm
             // TODO：优化Deactive和Active事件的执行逻辑
             // 如果插件数量很大的话可能会卡顿
 
-            if (string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.FullName))
+            if (string.IsNullOrEmpty(e.Name))
             {
                 return;
             }
@@ -230,10 +227,7 @@ namespace ModengTerm
             List<PanelState> hidePanels;
             if (!this.hidePanels.TryGetValue(e.Name, out hidePanels))
             {
-                if (!this.hidePanels.TryGetValue(e.FullName, out hidePanels))
-                {
-                    return;
-                }
+                return;
             }
 
             foreach (PanelState toHide in hidePanels)
@@ -646,8 +640,8 @@ namespace ModengTerm
                 // 触发Tab选中改变事件
                 ClientEventTabChanged tabChanged = new ClientEventTabChanged()
                 {
-                    AddedTab = addedSession,
-                    RemovedTab = removedSession,
+                    NewTab = addedSession,
+                    OldTab = removedSession,
                 };
                 this.PublishEvent(tabChanged);
             }
@@ -913,12 +907,11 @@ namespace ModengTerm
             }
 
             // 触发打开事件
-            TabEventTabOpened tabOpened = new TabEventTabOpened()
+            ClientEventTabOpened tabOpened = new ClientEventTabOpened()
             {
-                Sender = openedSessionVM,
                 OpenedTab = openedSessionVM,
             };
-            this.PublishTabEvent(tabOpened);
+            this.PublishEvent(tabOpened);
         }
 
         /// <summary>

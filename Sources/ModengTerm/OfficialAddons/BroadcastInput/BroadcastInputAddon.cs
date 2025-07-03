@@ -19,14 +19,14 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.eventRegistry.SubscribeTabEvent("onTabOpened:ssh|local|serial|tcp", this.OnTabOpened);
+            this.eventRegistry.SubscribeTabEvent("onClientTabOpened:ssh|local|serial|tcp", this.OnClientTabOpened);
             this.eventRegistry.SubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.UnsubscribeTabEvent("onTabOpened", this.OnTabOpened);
+            this.eventRegistry.UnsubscribeTabEvent("onClientTabOpened", this.OnClientTabOpened);
             this.eventRegistry.UnsubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
         }
 
@@ -44,9 +44,8 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             sidePanel.SwitchStatus();
         }
 
-        private void OnTabOpened(TabEventArgs e)
+        private void OnClientTabOpened(TabEventArgs e)
         {
-            TabEventTabOpened tabOpened = e as TabEventTabOpened;
         }
 
         private void OnShellSendUserInput(TabEventArgs e)

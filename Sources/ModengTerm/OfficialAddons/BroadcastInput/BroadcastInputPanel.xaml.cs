@@ -54,12 +54,12 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             this.eventRegistory = this.factory.GetEventRegistry();
             this.client = this.factory.GetClient();
 
-            this.eventRegistory.SubscribeTabEvent("onTabChanged:ssh|local|serial|tcp", this.OnTabEventShellActived);
+            this.eventRegistory.SubscribeEvent("onClientTabChanged:ssh|local|serial|tcp", this.OnTabChangedEvent);
         }
 
         public override void OnRelease()
         {
-            this.eventRegistory.UnsubscribeTabEvent("onTabChanged", this.OnTabEventShellActived);
+            this.eventRegistory.UnsubscribeEvent("onClientTabChanged", this.OnTabChangedEvent);
         }
 
         public override void OnLoaded()
@@ -74,9 +74,9 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 事件处理器
 
-        private void OnTabEventShellActived(TabEventArgs e)
+        private void OnTabChangedEvent(ClientEventArgs e)
         {
-            TabEventTabChanged tabChanged = e as TabEventTabChanged;
+            ClientEventTabChanged tabChanged = e as ClientEventTabChanged;
             List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
             shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
 

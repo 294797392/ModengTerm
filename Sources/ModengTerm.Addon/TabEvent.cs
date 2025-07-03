@@ -22,29 +22,16 @@ namespace ModengTerm.Addon
         /// </summary>
         TAB_STATUS_CHANGED,
 
-        /// <summary>
-        /// 会话被打开之后触发的事件
-        /// </summary>
-        TAB_OPENED,
-
-        /// <summary>
-        /// 会话被关闭之后触发的事件
-        /// </summary>
-        TAB_CLOSED,
-
-        /// <summary>
-        /// 选项卡选中项改变之后触发
-        /// </summary>
-        TAB_CHANGED,
-
         // 301 - 500 ShellTab事件
 
         /// <summary>
+        /// onTabShellRendered
         /// 每次渲染完之后触发
         /// </summary>
         SHELL_RENDERED = 301,
 
         /// <summary>
+        /// OnTabShellSendUserInput
         /// 每当发送用户输入的数据的时候触发
         /// </summary>
         SHELL_SEND_USER_INPUT,
@@ -70,45 +57,6 @@ namespace ModengTerm.Addon
 
         public IClientTab Tab { get; set; }
     }
-    public class TabEventTabOpened : TabEventArgs
-    {
-        public override string Name => "onTabOpened";
-        public override string FullName => string.Format("onTabOpened:{0}", this.OpenedTab.Type);
-
-        public override TabEvent Type => TabEvent.TAB_OPENED;
-
-        /// <summary>
-        /// 被打开的Tab页面
-        /// </summary>
-        public IClientTab OpenedTab { get; set; }
-    }
-    public class TabEventTabClosed : TabEventArgs
-    {
-        public override string Name => "onTabClosed";
-        public override string FullName => string.Format("onTabClosed:{0}", this.ClosedTab.Type);
-
-        public override TabEvent Type => TabEvent.TAB_CLOSED;
-
-        public IClientTab ClosedTab { get; set; }
-    }
-    public class TabEventTabChanged : TabEventArgs
-    {
-        public override string Name => "onTabChanged";
-        public override string FullName => string.Format("onTabChanged:{0}", this.NewTab.Type);
-
-        public override TabEvent Type => TabEvent.TAB_CHANGED;
-
-        /// <summary>
-        /// 选中之前的Tab
-        /// </summary>
-        public IClientTab OldTab { get; set; }
-
-        /// <summary>
-        /// 选中之后的Tab
-        /// </summary>
-        public IClientTab NewTab { get; set; }
-    }
-
 
     public class TabEventShellRendered : TabEventArgs
     {
