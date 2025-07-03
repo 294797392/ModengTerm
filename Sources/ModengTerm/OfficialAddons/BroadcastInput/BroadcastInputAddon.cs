@@ -19,15 +19,15 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.eventRegistry.SubscribeTabEvent(TabEvent.TAB_SHELL_OPENED, this.OnTabShellOpened);
-            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_SEND_USER_INPUT, this.OnShellSendUserInput);
+            this.eventRegistry.SubscribeTabEvent("onTabOpened:ssh|local|serial|tcp", this.OnTabOpened);
+            this.eventRegistry.SubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.TAB_SHELL_OPENED, this.OnTabShellOpened);
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_SEND_USER_INPUT, this.OnShellSendUserInput);
+            this.eventRegistry.UnsubscribeTabEvent("onTabOpened", this.OnTabOpened);
+            this.eventRegistry.UnsubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
         }
 
         #endregion
@@ -44,14 +44,9 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             sidePanel.SwitchStatus();
         }
 
-        private void OnTabShellOpened(TabEventArgs e)
+        private void OnTabOpened(TabEventArgs e)
         {
-            TabEventTabShellOpened tabOpened = e as TabEventTabShellOpened;
-        }
-
-        private void OnTabShellClosed(TabEventArgs e)
-        {
-            TabEventTabShellClosed tabClosed = e as TabEventTabShellClosed;
+            TabEventTabOpened tabOpened = e as TabEventTabOpened;
         }
 
         private void OnShellSendUserInput(TabEventArgs e)

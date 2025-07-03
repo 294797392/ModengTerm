@@ -33,19 +33,9 @@ namespace ModengTerm.Addon
         TAB_CLOSED,
 
         /// <summary>
-        /// 打开Shell会话之后触发
+        /// 选项卡选中项改变之后触发
         /// </summary>
-        TAB_SHELL_OPENED,
-
-        /// <summary>
-        /// 关闭Shell会话之后触发
-        /// </summary>
-        TAB_SHELL_CLOSED,
-
-        /// <summary>
-        /// 选中Shell会话之后触发
-        /// </summary>
-        TAB_SHELL_CHANGED,
+        TAB_CHANGED,
 
         // 301 - 500 ShellTab事件
 
@@ -80,55 +70,50 @@ namespace ModengTerm.Addon
 
         public IClientTab Tab { get; set; }
     }
-
     public class TabEventTabOpened : TabEventArgs
     {
         public override string Name => "onTabOpened";
-
-        public override string FullName => string.Format("onTabOpened:{0}", this.SessionType.ToString().ToLower());
+        public override string FullName => string.Format("onTabOpened:{0}", this.OpenedTab.Type);
 
         public override TabEvent Type => TabEvent.TAB_OPENED;
-
-        /// <summary>
-        /// 会话类型
-        /// </summary>
-        public SessionTypeEnum SessionType { get; set; }
 
         /// <summary>
         /// 被打开的Tab页面
         /// </summary>
         public IClientTab OpenedTab { get; set; }
     }
-
-    public class TabEventTabShellOpened : TabEventArgs
+    public class TabEventTabClosed : TabEventArgs
     {
-        public override TabEvent Type => TabEvent.TAB_SHELL_OPENED;
+        public override string Name => "onTabClosed";
+        public override string FullName => string.Format("onTabClosed:{0}", this.ClosedTab.Type);
+
+        public override TabEvent Type => TabEvent.TAB_CLOSED;
+
+        public IClientTab ClosedTab { get; set; }
+    }
+    public class TabEventTabChanged : TabEventArgs
+    {
+        public override string Name => "onTabChanged";
+        public override string FullName => string.Format("onTabChanged:{0}", this.NewTab.Type);
+
+        public override TabEvent Type => TabEvent.TAB_CHANGED;
 
         /// <summary>
-        /// 打开的Tab
+        /// 选中之前的Tab
         /// </summary>
-        public IClientShellTab OpenedTab { get; set; }
-    }
-
-    public class TabEventTabShellClosed : TabEventArgs
-    {
-        public override TabEvent Type => TabEvent.TAB_SHELL_CLOSED;
-    }
-
-    public class TabEventTabShellChanged : TabEventArgs
-    {
-        public override TabEvent Type => TabEvent.TAB_SHELL_CHANGED;
+        public IClientTab OldTab { get; set; }
 
         /// <summary>
-        /// 被选中的Shell会话
+        /// 选中之后的Tab
         /// </summary>
-        public IClientShellTab ActiveTab { get; set; }
+        public IClientTab NewTab { get; set; }
     }
-
 
 
     public class TabEventShellRendered : TabEventArgs
     {
+        public override string Name => "onTabShellRendered";
+
         public override TabEvent Type => TabEvent.SHELL_RENDERED;
 
         /// <summary>
@@ -160,6 +145,8 @@ namespace ModengTerm.Addon
 
     public class TabEventShellSendUserInput : TabEventArgs
     {
+        public override string Name => "OnTabShellSendUserInput";
+
         public override TabEvent Type => TabEvent.SHELL_SEND_USER_INPUT;
 
         /// <summary>
@@ -167,5 +154,4 @@ namespace ModengTerm.Addon
         /// </summary>
         public byte[] Buffer { get; set; }
     }
-
 }

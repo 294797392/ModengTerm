@@ -12,7 +12,7 @@ namespace ModengTerm.Addon.Interactive
 
     public delegate void TabEventDelegate(TabEventArgs e);
 
-    public delegate void ClientHotkeyDelegate();
+    public delegate void ClientHotkeyDelegate(object userData);
 
     public interface IClientEventRegistry
     {
@@ -21,16 +21,16 @@ namespace ModengTerm.Addon.Interactive
         /// <summary>
         /// 订阅客户端的事件
         /// </summary>
-        /// <param name="evType"></param>
+        /// <param name="ev"></param>
         /// <param name="delegate"></param>
-        void SubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate);
+        void SubscribeEvent(string ev, ClientEventDelegate @delegate);
 
         /// <summary>
         /// 取消订阅客户端事件
         /// </summary>
-        /// <param name="evType"></param>
+        /// <param name="ev"></param>
         /// <param name="delegate"></param>
-        void UnsubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate);
+        void UnsubscribeEvent(string ev, ClientEventDelegate @delegate);
 
         /// <summary>
         /// 发布一个事件
@@ -48,9 +48,9 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="evType">要订阅的事件</param>
         /// <param name="delegate"></param>
         /// <param name="tab">要订阅的标签页，如果为空，则订阅所有标签页的事件</param>
-        void SubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null);
+        void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null);
 
-        void UnsubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null);
+        void UnsubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null);
 
         /// <summary>
         /// 取消指定tab的所有订阅的事件
@@ -87,6 +87,8 @@ namespace ModengTerm.Addon.Interactive
         /// </param>
         /// <param name="delegate">快捷键回调</param>
         void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate);
+
+        void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate, object userData);
 
         /// <summary>
         /// 取消注册快捷键

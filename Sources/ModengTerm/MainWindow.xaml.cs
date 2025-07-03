@@ -251,17 +251,7 @@ namespace ModengTerm
             }
         }
 
-        private void TryDispatchHotkeyShowEvent(string hkey) 
-        {
-
-        }
-
-        private void TryDispatchHotkeyHideEvent(string hkey) 
-        {
-
-        }
-
-        private void InitializePanelStates(AddonModule addon, AddonDefinition addonDefinition)
+        private void SubscribePanelEvent(AddonModule addon, AddonDefinition addonDefinition)
         {
             foreach (PanelDefinition definition in addonDefinition.SidePanels)
             {
@@ -332,24 +322,24 @@ namespace ModengTerm
 
                 #endregion
 
-                this.InitializePanelStates(addon, definition);
+                this.SubscribePanelEvent(addon, definition);
 
-                //#region 注册快捷键打开关闭面板功能
+                #region 注册快捷键打开关闭面板功能
 
-                //foreach (PanelDefinition panelDefinition in definition.SidePanels)
-                //{
-                //    foreach (HotkeyDefinition hotkeyDefinition in panelDefinition.HotkeyShowEvents)
-                //    {
-                //        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition.Key, hotkeyDefinition.Scope, this.OnHotkeyShowPanelEvent);
-                //    }
+                foreach (PanelDefinition panelDefinition in definition.SidePanels)
+                {
+                    foreach (HotkeyDefinition hotkeyDefinition in panelDefinition.HotkeyShowEvents)
+                    {
+                        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition.Key, hotkeyDefinition.Scope, this.OnHotkeyShowPanelEvent, panelDefinition);
+                    }
 
-                //    foreach (HotkeyDefinition hotkeyDefinition1 in panelDefinition.HotkeyHideEvents)
-                //    {
-                //        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition1.Key, hotkeyDefinition1.Scope, this.OnHotkeyHidePanelEvent);
-                //    }
-                //}
+                    foreach (HotkeyDefinition hotkeyDefinition1 in panelDefinition.HotkeyHideEvents)
+                    {
+                        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition1.Key, hotkeyDefinition1.Scope, this.OnHotkeyHidePanelEvent, panelDefinition);
+                    }
+                }
 
-                //#endregion
+                #endregion
             }
 
             #endregion
@@ -580,11 +570,11 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OnHotkeyShowPanelEvent()
+        private void OnHotkeyShowPanelEvent(object userData)
         {
         }
 
-        private void OnHotkeyHidePanelEvent()
+        private void OnHotkeyHidePanelEvent(object userData)
         {
         }
 
@@ -660,16 +650,6 @@ namespace ModengTerm
                     RemovedTab = removedSession,
                 };
                 this.PublishEvent(tabChanged);
-
-                if (VTBaseUtils.IsTerminal(addedSession.Type))
-                {
-                    TabEventTabShellChanged tabShellChanged = new TabEventTabShellChanged()
-                    {
-                        Sender = addedSession,
-                        ActiveTab = addedSession as IClientShellTab
-                    };
-                    this.PublishTabEvent(tabShellChanged);
-                }
             }
         }
 
@@ -937,19 +917,8 @@ namespace ModengTerm
             {
                 Sender = openedSessionVM,
                 OpenedTab = openedSessionVM,
-                SessionType = (SessionTypeEnum)session.Type,
             };
             this.PublishTabEvent(tabOpened);
-
-            if (VTBaseUtils.IsTerminal((SessionTypeEnum)session.Type))
-            {
-                TabEventTabShellOpened shellOpened = new TabEventTabShellOpened()
-                {
-                    Sender = openedSessionVM,
-                    OpenedTab = openedSessionVM as IClientShellTab,
-                };
-                this.PublishTabEvent(shellOpened);
-            }
         }
 
         /// <summary>

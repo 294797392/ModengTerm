@@ -27,7 +27,7 @@ namespace ModengTerm.OfficialAddons.Find
             overlayPanel.SwitchStatus();
         }
 
-        private void OnEscKeyDown()
+        private void OnEscKeyDown(object userData)
         {
             IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
             IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
@@ -43,7 +43,7 @@ namespace ModengTerm.OfficialAddons.Find
             }
         }
 
-        private void OnAltFKeyDown() 
+        private void OnAltFKeyDown(object userData) 
         {
             IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
             IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);

@@ -54,12 +54,12 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             this.eventRegistory = this.factory.GetEventRegistry();
             this.client = this.factory.GetClient();
 
-            this.eventRegistory.SubscribeTabEvent(TabEvent.TAB_SHELL_CHANGED, this.OnTabEventShellActived);
+            this.eventRegistory.SubscribeTabEvent("onTabChanged:ssh|local|serial|tcp", this.OnTabEventShellActived);
         }
 
         public override void OnRelease()
         {
-            this.eventRegistory.UnsubscribeTabEvent(TabEvent.TAB_SHELL_CHANGED, this.OnTabEventShellActived);
+            this.eventRegistory.UnsubscribeTabEvent("onTabChanged", this.OnTabEventShellActived);
         }
 
         public override void OnLoaded()
@@ -76,11 +76,11 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OnTabEventShellActived(TabEventArgs e)
         {
-            TabEventTabShellChanged shellActived = e as TabEventTabShellChanged;
+            TabEventTabChanged tabChanged = e as TabEventTabChanged;
             List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
-            shellTabs.Remove(shellActived.ActiveTab);
+            shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
 
-            List<ShellTabVM> broadcastTabs = shellActived.ActiveTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST);
+            List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST);
 
             if (broadcastTabs == null)
             {
@@ -97,7 +97,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
                     broadcastTabs.Add(vm);
                 }
 
-                shellActived.ActiveTab.SetData(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST, broadcastTabs);
+                tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST, broadcastTabs);
             }
             else
             {

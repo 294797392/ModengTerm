@@ -9,16 +9,16 @@ namespace ModengTerm.Addon
 {
     public class ClientEventRegistryImpl : IClientEventRegistry
     {
-        private class Registry<TEvent, TDelegate> where TDelegate : Delegate
+        private class Registry<TDelegate> where TDelegate : Delegate
         {
-            private Dictionary<TEvent, List<TDelegate>> eventRegistry;
+            private Dictionary<string, List<TDelegate>> eventRegistry;
 
             public Registry()
             {
-                this.eventRegistry = new Dictionary<TEvent, List<TDelegate>>();
+                this.eventRegistry = new Dictionary<string, List<TDelegate>>();
             }
 
-            public void Subscribe(TEvent ev, TDelegate @delegate)
+            public void Subscribe(string ev, TDelegate @delegate)
             {
                 List<TDelegate> delegates;
                 if (!this.eventRegistry.TryGetValue(ev, out delegates))
@@ -30,7 +30,7 @@ namespace ModengTerm.Addon
                 delegates.Add(@delegate);
             }
 
-            public void Unsubscribe(TEvent ev, TDelegate @delegate)
+            public void Unsubscribe(string ev, TDelegate @delegate)
             {
                 List<TDelegate> delegates;
                 if (!this.eventRegistry.TryGetValue(ev, out delegates))
@@ -44,17 +44,26 @@ namespace ModengTerm.Addon
                 this.eventRegistry[ev] = newDelegates;
             }
 
-            public void Publish(TEvent ev, object e)
+            public void Publish(EventArgsBase ev)
             {
                 List<TDelegate> delegates;
-                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                if (this.eventRegistry.TryGetValue(ev.Name, out delegates))
                 {
-                    return;
+                    foreach (TDelegate @delegate in delegates)
+                    {
+                        @delegate.DynamicInvoke(ev);
+                    }
                 }
 
-                foreach (TDelegate @delegate in delegates)
+                if (!string.IsNullOrEmpty(ev.FullName))
                 {
-                    @delegate.DynamicInvoke(e);
+                    if (this.eventRegistry.TryGetValue(ev.FullName, out delegates))
+                    {
+                        foreach (TDelegate @delegate in delegates)
+                        {
+                            @delegate.DynamicInvoke(ev);
+                        }
+                    }
                 }
             }
         }
@@ -66,105 +75,76 @@ namespace ModengTerm.Addon
             public ClientHotkeyDelegate Delegate { get; set; }
 
             public HotkeyScopes Scope { get; set; }
+
+            public object UserData { get; set; }
         }
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientEventRegistoryImpl");
 
-        private Registry<ClientEvent, ClientEventDelegate> clientRegistry;
-        private Registry<TabEvent, TabEventDelegate> tabRegistry;
-        private Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>> tabEventRegistry;
+        private Registry<ClientEventDelegate> clientRegistry;
+        private Registry<TabEventDelegate> tabRegistry;
+        private Dictionary<IClientTab, Registry<TabEventDelegate>> tabEventRegistry;
         private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
 
         public ClientEventRegistryImpl()
         {
-            this.clientRegistry = new Registry<ClientEvent, ClientEventDelegate>();
-            this.tabRegistry = new Registry<TabEvent, TabEventDelegate>();
-            this.tabEventRegistry = new Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>>();
+            this.clientRegistry = new Registry<ClientEventDelegate>();
+            this.tabRegistry = new Registry<TabEventDelegate>();
+            this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEventDelegate>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
         }
 
-        public void SubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
+        public void SubscribeEvent(string ev, ClientEventDelegate @delegate)
         {
-            this.clientRegistry.Subscribe(evType, @delegate);
+            this.clientRegistry.Subscribe(ev, @delegate);
         }
 
-        public void UnsubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
+        public void UnsubscribeEvent(string ev, ClientEventDelegate @delegate)
         {
-            this.clientRegistry.Unsubscribe(evType, @delegate);
+            this.clientRegistry.Unsubscribe(ev, @delegate);
         }
 
-        public void PublishEvent(ClientEventArgs evArgs)
+        public void PublishEvent(ClientEventArgs e)
         {
-            this.clientRegistry.Publish(evArgs.Type, evArgs);
+            this.clientRegistry.Publish(e);
         }
 
 
 
-        public void SubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null)
+        public void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null)
         {
             if (tab == null)
             {
-                this.tabRegistry.Subscribe(evType, @delegate);
+                this.tabRegistry.Subscribe(ev, @delegate);
             }
             else
             {
-                Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
-                if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+                Registry<TabEventDelegate> registry;
+                if (!this.tabEventRegistry.TryGetValue(tab, out registry))
                 {
-                    eventLists = new Dictionary<TabEvent, List<TabEventDelegate>>();
-                    this.tabEventRegistry[tab] = eventLists;
+                    registry = new Registry<TabEventDelegate>();
+                    this.tabEventRegistry[tab] = registry;
                 }
 
-                List<TabEventDelegate> delegates;
-                if (!eventLists.TryGetValue(evType, out delegates))
-                {
-                    delegates = new List<TabEventDelegate>();
-                    eventLists[evType] = delegates;
-                }
-
-                delegates.Add(@delegate);
+                registry.Subscribe(ev, @delegate);
             }
         }
 
-        public void UnsubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null)
+        public void UnsubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null)
         {
             if (tab == null)
             {
-                this.tabRegistry.Unsubscribe(evType, @delegate);
+                this.tabRegistry.Unsubscribe(ev, @delegate);
             }
             else
             {
-                Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
-                if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+                Registry<TabEventDelegate> registry;
+                if (!this.tabEventRegistry.TryGetValue(tab, out registry))
                 {
                     return;
                 }
 
-                if (eventLists.Count == 0)
-                {
-                    this.tabEventRegistry.Remove(tab);
-                    return;
-                }
-
-                List<TabEventDelegate> delegates;
-                if (!eventLists.TryGetValue(evType, out delegates))
-                {
-                    return;
-                }
-
-                // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
-                List<TabEventDelegate> newDelegates = delegates.ToList();
-                newDelegates.Remove(@delegate);
-                eventLists[evType] = newDelegates;
-
-                if (newDelegates.Count == 0)
-                {
-                    eventLists.Remove(evType);
-                    if (eventLists.Count == 0)
-                    {
-                        this.tabEventRegistry.Remove(tab);
-                    }
-                }
+                registry.Unsubscribe(ev, @delegate);
             }
         }
 
@@ -173,35 +153,31 @@ namespace ModengTerm.Addon
             this.tabEventRegistry.Remove(tab);
         }
 
-        public void PublishTabEvent(TabEventArgs evArgs)
+        public void PublishTabEvent(TabEventArgs e)
         {
-            IClientTab tab = evArgs.Sender;
+            IClientTab tab = e.Sender;
 
             // 先发布全局Tab事件
-            this.tabRegistry.Publish(evArgs.Type, evArgs);
+            this.tabRegistry.Publish(e);
 
             // 再发布针对于单个订阅的Tab事件
-            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
-            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            Registry<TabEventDelegate> registry;
+            if (!this.tabEventRegistry.TryGetValue(tab, out registry))
             {
                 return;
             }
 
-            List<TabEventDelegate> delegates;
-            if (!eventLists.TryGetValue(evArgs.Type, out delegates))
-            {
-                return;
-            }
-
-            foreach (TabEventDelegate @delegate in delegates)
-            {
-                @delegate.Invoke(evArgs);
-            }
+            registry.Publish(e);
         }
 
 
 
         public void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate)
+        {
+            this.RegisterHotkey(addon, hotkey, scope, @delegate, null);
+        }
+
+        public void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate, object userData)
         {
             List<HotkeyEvent> events;
             if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
@@ -214,7 +190,8 @@ namespace ModengTerm.Addon
             {
                 Addon = addon,
                 Delegate = @delegate,
-                Scope = scope
+                Scope = scope,
+                UserData = userData
             });
         }
 
@@ -287,7 +264,7 @@ namespace ModengTerm.Addon
                 {
                     try
                     {
-                        ev.Delegate();
+                        ev.Delegate(ev.UserData);
                     }
                     catch (Exception ex)
                     {

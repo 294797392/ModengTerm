@@ -86,8 +86,8 @@ namespace ModengTerm.OfficialAddons.Record
 
             tab.SetData(this, KEY_CONTEXT, context);
 
-            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, tab);
-            this.eventRegistry.SubscribeTabEvent(TabEvent.TAB_CLOSED, this.OnShellClosed, tab);
+            this.eventRegistry.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
+            this.eventRegistry.SubscribeTabEvent("onTabClosed", this.OnShellClosed, tab);
 
             return context;
         }
@@ -106,8 +106,8 @@ namespace ModengTerm.OfficialAddons.Record
 
             tab.SetData(this, KEY_CONTEXT, null);
 
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, tab);
-            this.eventRegistry.UnsubscribeTabEvent(TabEvent.TAB_CLOSED, this.OnShellClosed, tab);
+            this.eventRegistry.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
+            this.eventRegistry.UnsubscribeTabEvent("onTabClosed", this.OnShellClosed, tab);
         }
 
         #endregion
