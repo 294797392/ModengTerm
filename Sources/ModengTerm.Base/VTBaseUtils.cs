@@ -179,6 +179,20 @@ namespace ModengTerm.Base
             return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
         }
 
+        public static string GetSessionTypeName(SessionTypeEnum sessionType)
+        {
+            switch (sessionType)
+            {
+                case SessionTypeEnum.Localhost: return "local";
+                case SessionTypeEnum.SerialPort: return "serial";
+                case SessionTypeEnum.Tcp: return "tcp";
+                case SessionTypeEnum.SFTP: return "sftp";
+                case SessionTypeEnum.SSH: return "ssh";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #region UnitValue
 
         /// <summary>

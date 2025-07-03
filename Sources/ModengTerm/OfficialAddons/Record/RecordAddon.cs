@@ -39,6 +39,7 @@ namespace ModengTerm.OfficialAddons.Record
 
         protected override void OnActive(ActiveContext e)
         {
+            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed);
             this.RegisterCommand("RecordAddon.StartRecord", ExecuteStartRecordCommand);
             this.RegisterCommand("RecordAddon.StopRecord", ExecuteStopRecordCommand);
             this.RegisterCommand("RecordAddon.OpenRecord", ExecuteOpenRecordCommand);
@@ -46,6 +47,7 @@ namespace ModengTerm.OfficialAddons.Record
 
         protected override void OnDeactive()
         {
+            this.eventRegistry.UnsubscribeEvent("onClientTabClosed", this.OnClientTabClosed);
         }
 
         #endregion
@@ -87,7 +89,6 @@ namespace ModengTerm.OfficialAddons.Record
             tab.SetData(this, KEY_CONTEXT, context);
 
             this.eventRegistry.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
-            this.eventRegistry.SubscribeTabEvent("onTabClosed", this.OnShellClosed, tab);
 
             return context;
         }
@@ -107,7 +108,6 @@ namespace ModengTerm.OfficialAddons.Record
             tab.SetData(this, KEY_CONTEXT, null);
 
             this.eventRegistry.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
-            this.eventRegistry.UnsubscribeTabEvent("onTabClosed", this.OnShellClosed, tab);
         }
 
         #endregion
@@ -149,7 +149,7 @@ namespace ModengTerm.OfficialAddons.Record
             openRecordWindow.Show();
         }
 
-        private void OnShellRendered(TabEventArgs e)
+        private void OnShellRendered(TabEventArgs e, object userData)
         {
             TabEventShellRendered shellRendered = e as TabEventShellRendered;
 
@@ -161,9 +161,11 @@ namespace ModengTerm.OfficialAddons.Record
             context.Stream.WriteFrame(shellRendered.Timestamp, frameData);
         }
 
-        private void OnShellClosed(TabEventArgs e) 
+        private void OnClientTabClosed(ClientEventArgs e, object userData) 
         {
-            this.StopRecord(e.Sender);
+            ClientEventTabClosed tabClosed = e as ClientEventTabClosed;
+
+            this.StopRecord(tabClosed.ClosedTab);
         }
 
         #endregion

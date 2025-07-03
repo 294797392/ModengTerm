@@ -147,7 +147,7 @@ namespace ModengTerm.OfficialAddons.Find
 
         #region TabEvent
 
-        private void OnShellRendered(TabEventArgs e)
+        private void OnShellRendered(TabEventArgs e, object userData)
         {
             if (this.OwnerPanel.IsOpened)
             {

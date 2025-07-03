@@ -1,22 +1,8 @@
-﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WPFToolkit.MVVM;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ModengTerm.OfficialAddons.BroadcastInput
 {
@@ -74,7 +60,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 事件处理器
 
-        private void OnTabChangedEvent(ClientEventArgs e)
+        private void OnTabChangedEvent(ClientEventArgs e, object userData)
         {
             ClientEventTabChanged tabChanged = e as ClientEventTabChanged;
             List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();

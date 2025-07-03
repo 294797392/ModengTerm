@@ -16,34 +16,40 @@ namespace ModengTerm.Addon
                 public string Condition { get; set; }
 
                 public TDelegate Delegate { get; set; }
+
+                public object UserData { get; set; }
+
+                public EventData Next { get; set; }
             }
 
-            private Dictionary<string, List<EventData>> eventRegistry;
+            // 为了防止在publish的时候subscribe或者unsubscribe，使用链表存储事件信息
+            private Dictionary<string, LinkedList<EventData>> eventRegistry;
 
             public Registry()
             {
-                this.eventRegistry = new Dictionary<string, List<EventData>>();
+                this.eventRegistry = new Dictionary<string, LinkedList<EventData>>();
             }
 
-            public void Subscribe(string evid, TDelegate @delegate)
+            public void Subscribe(string evid, TDelegate @delegate, object userData)
             {
                 // 此时ev里可能有条件字符串
                 // 解析出真正的事件名字
                 string ev, cond;
                 this.ParseEvid(evid, out ev, out cond);
 
-                List<EventData> evds;
+                LinkedList<EventData> evds;
                 if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
-                    evds = new List<EventData>();
+                    evds = new LinkedList<EventData>();
                     this.eventRegistry[ev] = evds;
                 }
 
-                EventData evdata = new EventData();
-                evdata.Delegate = @delegate;
-                evdata.Condition = cond;
+                EventData evd = new EventData();
+                evd.Delegate = @delegate;
+                evd.Condition = cond;
+                evd.UserData = userData;
 
-                evds.Add(evdata);
+                evds.AddLast(evd);
             }
 
             public void Unsubscribe(string evid, TDelegate @delegate)
@@ -51,35 +57,50 @@ namespace ModengTerm.Addon
                 string ev, cond;
                 this.ParseEvid(evid, out ev, out cond);
 
-                List<EventData> evds;
+                LinkedList<EventData> evds;
                 if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
                     return;
                 }
 
-                // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
-                List<EventData> newEvds = evds.ToList();
-                EventData evd = newEvds.FirstOrDefault(v => v.Delegate == @delegate);
-                newEvds.Remove(evd);
-                this.eventRegistry[ev] = newEvds;
+                LinkedListNode<EventData> current = evds.First;
+
+                while (current != null)
+                {
+                    EventData evd = current.Value;
+
+                    if (evd.Delegate == @delegate)
+                    {
+                        evds.Remove(current);
+                        break;
+                    }
+                }
             }
 
             public void Publish(EventArgsBase ev)
             {
-                List<EventData> evds;
+                LinkedList<EventData> evds;
                 if (this.eventRegistry.TryGetValue(ev.Name, out evds))
                 {
-                    foreach (EventData evd in evds)
+                    LinkedListNode<EventData> current = evds.First;
+
+                    while (current != null)
                     {
+                        EventData evd = current.Value;
+
                         if (!string.IsNullOrEmpty(evd.Condition))
                         {
                             if (!ev.MatchCondition(evd.Condition))
                             {
+                                current = current.Next;
+
                                 continue;
                             }
                         }
 
-                        evd.Delegate.DynamicInvoke(ev);
+                        evd.Delegate.DynamicInvoke(ev, evd.UserData);
+
+                        current = current.Next;
                     }
                 }
             }
@@ -122,7 +143,12 @@ namespace ModengTerm.Addon
 
         public void SubscribeEvent(string ev, ClientEventDelegate @delegate)
         {
-            this.clientRegistry.Subscribe(ev, @delegate);
+            this.clientRegistry.Subscribe(ev, @delegate, null);
+        }
+
+        public void SubscribeEvent(string evid, ClientEventDelegate @delegate, object userData)
+        {
+            this.clientRegistry.Subscribe(evid, @delegate, userData);
         }
 
         public void UnsubscribeEvent(string ev, ClientEventDelegate @delegate)
@@ -137,11 +163,11 @@ namespace ModengTerm.Addon
 
 
 
-        public void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null)
+        public void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null)
         {
             if (tab == null)
             {
-                this.tabRegistry.Subscribe(ev, @delegate);
+                this.tabRegistry.Subscribe(ev, @delegate, userData);
             }
             else
             {
@@ -152,7 +178,7 @@ namespace ModengTerm.Addon
                     this.tabEventRegistry[tab] = registry;
                 }
 
-                registry.Subscribe(ev, @delegate);
+                registry.Subscribe(ev, @delegate, userData);
             }
         }
 

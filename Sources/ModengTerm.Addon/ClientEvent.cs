@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ namespace ModengTerm.Addon
     {
         public virtual string Name { get { return string.Empty; } }
 
-        public virtual bool MatchCondition(string cond) 
+        public virtual bool MatchCondition(string cond)
         {
             return true;
         }
@@ -81,7 +82,7 @@ namespace ModengTerm.Addon
 
         public override bool MatchCondition(string cond)
         {
-            return cond.Contains(this.NewTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+            return cond.Contains(VTBaseUtils.GetSessionTypeName(this.NewTab.Type));
         }
     }
 
@@ -101,7 +102,7 @@ namespace ModengTerm.Addon
 
         public override bool MatchCondition(string cond)
         {
-            return cond.Contains(this.OpenedTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+            return cond.Contains(VTBaseUtils.GetSessionTypeName(this.OpenedTab.Type));
         }
     }
 
@@ -115,7 +116,7 @@ namespace ModengTerm.Addon
 
         public override bool MatchCondition(string cond)
         {
-            return cond.Contains(this.ClosedTab.Type.ToString(), StringComparison.OrdinalIgnoreCase);
+            return cond.Contains(VTBaseUtils.GetSessionTypeName(this.ClosedTab.Type));
         }
     }
 }

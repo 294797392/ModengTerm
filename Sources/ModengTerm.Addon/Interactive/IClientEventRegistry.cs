@@ -1,16 +1,11 @@
 ﻿using ModengTerm.Addons;
 using ModengTerm.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Interactive
 {
-    public delegate void ClientEventDelegate(ClientEventArgs e);
+    public delegate void ClientEventDelegate(ClientEventArgs e, object userData);
 
-    public delegate void TabEventDelegate(TabEventArgs e);
+    public delegate void TabEventDelegate(TabEventArgs e, object userData);
 
     public delegate void ClientHotkeyDelegate(object userData);
 
@@ -24,6 +19,8 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="ev"></param>
         /// <param name="delegate"></param>
         void SubscribeEvent(string ev, ClientEventDelegate @delegate);
+
+        void SubscribeEvent(string evid, ClientEventDelegate @delegate, object userData);
 
         /// <summary>
         /// 取消订阅客户端事件
@@ -48,7 +45,7 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="evType">要订阅的事件</param>
         /// <param name="delegate"></param>
         /// <param name="tab">要订阅的标签页，如果为空，则订阅所有标签页的事件</param>
-        void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null);
+        void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null);
 
         void UnsubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null);
 

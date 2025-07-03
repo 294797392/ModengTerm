@@ -151,7 +151,7 @@ namespace ModengTerm.OfficialAddons.Logger
             this.Stop(tab);
         }
 
-        private void OnShellRendered(TabEventArgs e)
+        private void OnShellRendered(TabEventArgs e, object userData)
         {
             TabEventShellRendered shellRendered = e as TabEventShellRendered;
             LoggerContext logger = e.Sender.GetData<LoggerContext>(this, KEY_LOGGER);
@@ -163,7 +163,7 @@ namespace ModengTerm.OfficialAddons.Logger
             }
         }
 
-        private void OnTabClosed(TabEventArgs e)
+        private void OnTabClosed(TabEventArgs e, object userData)
         {
             this.Stop(e.Sender);
         }
