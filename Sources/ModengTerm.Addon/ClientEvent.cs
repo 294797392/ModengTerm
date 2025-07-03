@@ -24,7 +24,7 @@ namespace ModengTerm.Addon
         /// <summary>
         /// 当前显示的Tab变化之后触发
         /// </summary>
-        CLIENT_TAB_CHANGED
+        CLIENT_TAB_CHANGED,
     }
 
     public abstract class EventArgsBase

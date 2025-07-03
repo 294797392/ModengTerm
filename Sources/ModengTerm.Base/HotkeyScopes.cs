@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addon.Interactive
+namespace ModengTerm.Base
 {
     /// <summary>
     /// 定义快捷键的范围

@@ -1,5 +1,7 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
+using ModengTerm.Base;
+using System.Drawing.Text;
 
 namespace ModengTerm.OfficialAddons.Find
 {
@@ -20,11 +22,6 @@ namespace ModengTerm.OfficialAddons.Find
         private void FindCommandExecuted(CommandArgs e)
         {
             IClientShellTab shellTab = e.ActiveTab as IClientShellTab;
-            if (shellTab == null)
-            {
-                return;
-            }
-
             IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
             overlayPanel.Dock = OverlayPanelDocks.RightTop;
             overlayPanel.SwitchStatus();

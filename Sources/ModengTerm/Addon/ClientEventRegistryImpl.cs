@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
+using ModengTerm.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -274,7 +275,7 @@ namespace ModengTerm.Addon
 
                     case HotkeyScopes.ClientSftpTab:
                         {
-                            canExecute = client is IClientSftpTab;
+                            canExecute = clientTab is IClientSftpTab;
                             break;
                         }
 

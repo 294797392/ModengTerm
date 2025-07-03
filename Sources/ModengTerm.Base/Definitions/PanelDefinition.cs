@@ -2,6 +2,15 @@
 
 namespace ModengTerm.Base.Definitions
 {
+    public class HotkeyDefinition
+    {
+        [JsonProperty("scope")]
+        public HotkeyScopes Scope { get; set; }
+
+        [JsonProperty("key")]
+        public string Key { get; set; }
+    }
+
     public class PanelDefinition
     {
         //
@@ -35,16 +44,24 @@ namespace ModengTerm.Base.Definitions
         /// onTabOpened:terminal - 在打开terminal类型的tab的时候显示
         /// 这些事件保持与TabEvent和ClientEvent一致
         /// </summary>
-        [JsonProperty("activeEvents")]
-        public List<string> ActiveEvents { get; private set; }
+        [JsonProperty("showEvents")]
+        public List<string> ShowEvents { get; private set; }
 
-        [JsonProperty("deactiveEvents")]
-        public List<string> DeactiveEvents { get; private set; }
+        [JsonProperty("hideEvents")]
+        public List<string> HideEvents { get; private set; }
+
+        [JsonProperty("keyShowEvents")]
+        public List<HotkeyDefinition> HotkeyShowEvents { get; private set; }
+
+        [JsonProperty("keyHideEvents")]
+        public List<HotkeyDefinition> HotkeyHideEvents { get; private set; }
 
         public PanelDefinition()
         {
-            this.ActiveEvents = new List<string>();
-            this.DeactiveEvents = new List<string>();
+            this.ShowEvents = new List<string>();
+            this.HideEvents = new List<string>();
+            this.HotkeyShowEvents = new List<HotkeyDefinition>();
+            this.HotkeyHideEvents = new List<HotkeyDefinition>();
         }
     }
 }

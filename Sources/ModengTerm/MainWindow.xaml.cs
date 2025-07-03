@@ -59,8 +59,10 @@ namespace ModengTerm
         /// <summary>
         /// 激活事件 -> 要激活的SidePanel
         /// </summary>
-        private Dictionary<string, List<PanelState>> activeEventPanels;
-        private Dictionary<string, List<PanelState>> deactiveEventPanels;
+        private Dictionary<string, List<PanelState>> showPanels;
+        private Dictionary<string, List<PanelState>> hidePanels;
+        private Dictionary<string, List<PanelState>> hkeyShowPanels;
+        private Dictionary<string, List<PanelState>> hkeyHidePanels;
 
         #endregion
 
@@ -83,8 +85,10 @@ namespace ModengTerm
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.pressedKeys = new List<Key>();
-            this.activeEventPanels = new Dictionary<string, List<PanelState>>();
-            this.deactiveEventPanels = new Dictionary<string, List<PanelState>>();
+            this.showPanels = new Dictionary<string, List<PanelState>>();
+            this.hidePanels = new Dictionary<string, List<PanelState>>();
+            this.hkeyShowPanels = new Dictionary<string, List<PanelState>>();
+            this.hkeyHidePanels = new Dictionary<string, List<PanelState>>();
 
             this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
@@ -162,9 +166,9 @@ namespace ModengTerm
             this.mainWindowVM.SessionList.Remove(session);
         }
 
-        private void TryDispatchActiveEvent(EventArgsBase e)
-        { 
-            // TODO：优化Deactive和Active事件的执行逻辑
+        private void TryDispatchShowEvent(EventArgsBase e)
+        {
+            // TODO：优化show和hide事件的执行逻辑
             // 如果插件数量很大的话可能会卡顿
 
             if (string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.FullName))
@@ -172,48 +176,48 @@ namespace ModengTerm
                 return;
             }
 
-            List<PanelState> toActives;
-            if (!this.activeEventPanels.TryGetValue(e.Name, out toActives))
+            List<PanelState> showPanels;
+            if (!this.showPanels.TryGetValue(e.Name, out showPanels))
             {
-                if (!this.activeEventPanels.TryGetValue(e.FullName, out toActives))
+                if (!this.showPanels.TryGetValue(e.FullName, out showPanels))
                 {
                     return;
                 }
             }
 
-            foreach (PanelState toActive in toActives)
+            foreach (PanelState toShow in showPanels)
             {
-                if (toActive.Panel == null)
+                if (toShow.Panel == null)
                 {
-                    PanelDefinition definition = toActive.Definition;
+                    PanelDefinition definition = toShow.Definition;
 
                     SidePanel sidePanel = new SidePanel();
                     sidePanel.Definition = definition;
                     sidePanel.ID = definition.ID;
                     sidePanel.Name = definition.Name;
                     sidePanel.IconURI = definition.Icon;
-                    sidePanel.OwnerAddon = toActive.OwnerAddon;
+                    sidePanel.OwnerAddon = toShow.OwnerAddon;
                     sidePanel.Initialize();
                     this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
 
-                    toActive.Panel = sidePanel;
-                    toActive.AddToWindow = true;
-                    toActive.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                    toShow.Panel = sidePanel;
+                    toShow.AddToWindow = true;
+                    toShow.OwnerAddon.ActiveSidePanels.Add(sidePanel);
                 }
                 else
                 {
-                    if (!toActive.AddToWindow)
+                    if (!toShow.AddToWindow)
                     {
-                        SidePanel sidePanel = toActive.Panel;
+                        SidePanel sidePanel = toShow.Panel;
                         this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-                        toActive.AddToWindow = true;
-                        toActive.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                        toShow.AddToWindow = true;
+                        toShow.OwnerAddon.ActiveSidePanels.Add(sidePanel);
                     }
                 }
             }
         }
 
-        private void TryDispatchDeactiveEvent(EventArgsBase e)
+        private void TryDispatchHideEvent(EventArgsBase e)
         {
             // TODO：优化Deactive和Active事件的执行逻辑
             // 如果插件数量很大的话可能会卡顿
@@ -223,55 +227,65 @@ namespace ModengTerm
                 return;
             }
 
-            List<PanelState> deactives;
-            if (!this.deactiveEventPanels.TryGetValue(e.Name, out deactives))
+            List<PanelState> hidePanels;
+            if (!this.hidePanels.TryGetValue(e.Name, out hidePanels))
             {
-                if (!this.deactiveEventPanels.TryGetValue(e.FullName, out deactives))
+                if (!this.hidePanels.TryGetValue(e.FullName, out hidePanels))
                 {
                     return;
                 }
             }
 
-            foreach (PanelState panelState in deactives)
+            foreach (PanelState toHide in hidePanels)
             {
-                if (!panelState.AddToWindow)
+                if (!toHide.AddToWindow)
                 {
                     return;
                 }
 
-                SidePanel sidePanel = panelState.Panel;
+                SidePanel sidePanel = toHide.Panel;
                 this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Remove(sidePanel);
 
-                panelState.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
-                panelState.AddToWindow = false;
+                toHide.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
+                toHide.AddToWindow = false;
             }
         }
 
-        private void InitializeActiveEventPanels(AddonModule addon, AddonDefinition addonDefinition)
+        private void TryDispatchHotkeyShowEvent(string hkey) 
+        {
+
+        }
+
+        private void TryDispatchHotkeyHideEvent(string hkey) 
+        {
+
+        }
+
+        private void InitializePanelStates(AddonModule addon, AddonDefinition addonDefinition)
         {
             foreach (PanelDefinition definition in addonDefinition.SidePanels)
             {
                 PanelState panelState = new PanelState(addon, definition);
 
-                foreach (string eventName in definition.ActiveEvents)
+                foreach (string eventName in definition.ShowEvents)
                 {
                     List<PanelState> panelStates;
-                    if (!this.activeEventPanels.TryGetValue(eventName, out panelStates))
+                    if (!this.showPanels.TryGetValue(eventName, out panelStates))
                     {
                         panelStates = new List<PanelState>();
-                        this.activeEventPanels[eventName] = panelStates;
+                        this.showPanels[eventName] = panelStates;
                     }
 
                     panelStates.Add(panelState);
                 }
 
-                foreach (string eventName in definition.DeactiveEvents)
+                foreach (string eventName in definition.HideEvents)
                 {
                     List<PanelState> panelStates;
-                    if (!this.deactiveEventPanels.TryGetValue(eventName, out panelStates))
+                    if (!this.hidePanels.TryGetValue(eventName, out panelStates))
                     {
                         panelStates = new List<PanelState>();
-                        this.deactiveEventPanels[eventName] = panelStates;
+                        this.hidePanels[eventName] = panelStates;
                     }
 
                     panelStates.Add(panelState);
@@ -318,7 +332,24 @@ namespace ModengTerm
 
                 #endregion
 
-                this.InitializeActiveEventPanels(addon, definition);
+                this.InitializePanelStates(addon, definition);
+
+                //#region 注册快捷键打开关闭面板功能
+
+                //foreach (PanelDefinition panelDefinition in definition.SidePanels)
+                //{
+                //    foreach (HotkeyDefinition hotkeyDefinition in panelDefinition.HotkeyShowEvents)
+                //    {
+                //        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition.Key, hotkeyDefinition.Scope, this.OnHotkeyShowPanelEvent);
+                //    }
+
+                //    foreach (HotkeyDefinition hotkeyDefinition1 in panelDefinition.HotkeyHideEvents)
+                //    {
+                //        this.eventRegistry.RegisterHotkey(addon, hotkeyDefinition1.Key, hotkeyDefinition1.Scope, this.OnHotkeyHidePanelEvent);
+                //    }
+                //}
+
+                //#endregion
             }
 
             #endregion
@@ -347,15 +378,15 @@ namespace ModengTerm
 
         private void PublishTabEvent(TabEventArgs e)
         {
-            this.TryDispatchDeactiveEvent(e);
-            this.TryDispatchActiveEvent(e);
+            this.TryDispatchHideEvent(e);
+            this.TryDispatchShowEvent(e);
             this.eventRegistry.PublishTabEvent(e);
         }
 
         private void PublishEvent(ClientEventArgs e)
         {
-            this.TryDispatchDeactiveEvent(e);
-            this.TryDispatchActiveEvent(e);
+            this.TryDispatchHideEvent(e);
+            this.TryDispatchShowEvent(e);
             this.eventRegistry.PublishEvent(e);
         }
 
@@ -548,6 +579,14 @@ namespace ModengTerm
         #endregion
 
         #region 事件处理器
+
+        private void OnHotkeyShowPanelEvent()
+        {
+        }
+
+        private void OnHotkeyHidePanelEvent()
+        {
+        }
 
         private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs e)
         {

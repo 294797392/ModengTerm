@@ -31,20 +31,4 @@ namespace ModengTerm.Addon
             this.Definition = definition;
         }
     }
-
-    /// <summary>
-    /// 存储当一个事件被激活之后，该事件所要激活的信息
-    /// </summary>
-    public class StartupEvent
-    {
-        public List<PanelState> SidePanels { get; private set; }
-
-        public List<PanelState> OverlayPanels { get; private set; }
-
-        public StartupEvent()
-        {
-            this.SidePanels = new List<PanelState>();
-            this.OverlayPanels = new List<PanelState>();
-        }
-    }
 }
