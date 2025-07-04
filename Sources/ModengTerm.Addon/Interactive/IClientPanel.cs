@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Panel;
+using ModengTerm.Base.Addon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,22 +8,6 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Interactive
 {
-    /// <summary>
-    /// 指定SidePanel要显示的位置
-    /// </summary>
-    public enum SidePanelDocks
-    {
-        /// <summary>
-        /// 显示在左边
-        /// </summary>
-        Left,
-
-        /// <summary>
-        /// 显示在右边
-        /// </summary>
-        Right
-    }
-
     /// <summary>
     /// 向插件公开Panel的接口
     /// </summary>
@@ -63,16 +48,6 @@ namespace ModengTerm.Addon.Interactive
         /// Panel显示的位置
         /// </summary>
         SidePanelDocks Dock { get; }
-    }
-
-    public enum OverlayPanelDocks
-    {
-        LeftTop,
-        LeftBottom,
-        FillTop,
-        FillBottom,
-        RightTop,
-        RightBottom,
     }
 
     /// <summary>

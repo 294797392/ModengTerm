@@ -369,7 +369,8 @@
                     "className": "ModengTerm.OfficialAddons.Find.FindOverlayPanel, ModengTerm",
                     "openHotkeys": [ "Ctrl+F" ],
                     "closeHotkeys": [ "Esc" ],
-                    "commands": [ "OpenFindPanel" ]
+                    "commands": [ "OpenFindPanel" ],
+                    "dock": "RightTop"
                 }
             ]
         },

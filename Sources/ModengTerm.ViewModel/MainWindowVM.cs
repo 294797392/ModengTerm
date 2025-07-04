@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
+using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panel;

@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.Addon;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel

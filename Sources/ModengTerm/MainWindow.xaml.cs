@@ -157,7 +157,7 @@ namespace ModengTerm
 
         private void SubscribePanelEvent(AddonModule addon, AddonDefinition addonDefinition)
         {
-            foreach (PanelDefinition definition in addonDefinition.SidePanels)
+            foreach (SidePanelDefinition definition in addonDefinition.SidePanels)
             {
                 SidePanelContext spc = new SidePanelContext(addon, definition);
 
@@ -187,7 +187,7 @@ namespace ModengTerm
                 }
             }
 
-            foreach (PanelDefinition definition in addonDefinition.OverlayPanels)
+            foreach (OverlayPanelDefinition definition in addonDefinition.OverlayPanels)
             {
                 OverlayPanelContext opc = new OverlayPanelContext(addon, definition);
 
@@ -477,7 +477,7 @@ namespace ModengTerm
 
         private OverlayPanel EnsureOverlayPanel(OverlayPanelContext opc)
         {
-            PanelDefinition definition = opc.Definition;
+            OverlayPanelDefinition definition = opc.Definition as OverlayPanelDefinition;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
 
@@ -490,6 +490,7 @@ namespace ModengTerm
                 overlayPanel.IconURI = definition.Icon;
                 overlayPanel.OwnerTab = shellSession;
                 overlayPanel.OwnerAddon = opc.OwnerAddon;
+                overlayPanel.Dock = definition.Dock;
                 overlayPanel.Initialize();
                 shellSession.OverlayPanels.Add(overlayPanel);
             }
@@ -531,7 +532,7 @@ namespace ModengTerm
         {
             if (spc.Panel == null)
             {
-                PanelDefinition definition = spc.Definition;
+                SidePanelDefinition definition = spc.Definition as SidePanelDefinition;
 
                 SidePanel sidePanel = new SidePanel();
                 sidePanel.Definition = definition;
@@ -539,6 +540,7 @@ namespace ModengTerm
                 sidePanel.Name = definition.Name;
                 sidePanel.IconURI = definition.Icon;
                 sidePanel.OwnerAddon = spc.OwnerAddon;
+                sidePanel.Dock = definition.Dock;
                 sidePanel.Initialize();
                 this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
 

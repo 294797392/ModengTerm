@@ -2,6 +2,7 @@
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
+using ModengTerm.Base.Addon;
 using System.Windows;
 using System.Windows.Threading;
 

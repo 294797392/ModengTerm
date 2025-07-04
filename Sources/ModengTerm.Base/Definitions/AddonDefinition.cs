@@ -47,20 +47,20 @@ namespace ModengTerm.Base.Definitions
         /// 侧边栏面板
         /// </summary>
         [JsonProperty("sidePanels")]
-        public List<PanelDefinition> SidePanels { get; private set; }
+        public List<SidePanelDefinition> SidePanels { get; private set; }
 
         /// <summary>
         /// 悬浮面板
         /// </summary>
         [JsonProperty("overlayPanels")]
-        public List<PanelDefinition> OverlayPanels { get; private set; }
+        public List<OverlayPanelDefinition> OverlayPanels { get; private set; }
 
         public AddonDefinition()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
-            this.SidePanels = new List<PanelDefinition>();
-            this.OverlayPanels = new List<PanelDefinition>();
+            this.SidePanels = new List<SidePanelDefinition>();
+            this.OverlayPanels = new List<OverlayPanelDefinition>();
         }
     }
 }
