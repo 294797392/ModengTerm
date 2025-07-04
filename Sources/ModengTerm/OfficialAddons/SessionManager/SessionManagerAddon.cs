@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addons;
+﻿using ModengTerm.Addon;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Windows;

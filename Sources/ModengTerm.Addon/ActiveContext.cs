@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Service;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addons
+namespace ModengTerm.Addon
 {
     /// <summary>
     /// 保存插件激活时候的上下文信息

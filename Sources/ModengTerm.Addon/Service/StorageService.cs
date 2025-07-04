@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation.Provider;
 
-namespace ModengTerm.Addons
+namespace ModengTerm.Addon.Service
 {
     public abstract class StorageObject
     {
@@ -34,7 +34,7 @@ namespace ModengTerm.Addons
         {
             foreach (T obj in objects)
             {
-                this.AddObject(obj);
+                AddObject(obj);
             }
 
             return ResponseCode.SUCCESS;
@@ -67,7 +67,7 @@ namespace ModengTerm.Addons
         {
             foreach (string objectId in objectIds)
             {
-                this.DeleteObject(objectId);
+                DeleteObject(objectId);
             }
 
             return ResponseCode.SUCCESS;

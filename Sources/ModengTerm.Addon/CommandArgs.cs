@@ -4,17 +4,16 @@ using ModengTerm.Base.ServiceAgents;
 using System.Collections.Generic;
 using System.Windows;
 
-namespace ModengTerm.Addons
+namespace ModengTerm.Addon
 {
     public class CommandArgs
     {
         public static readonly CommandArgs Instance = new CommandArgs();
 
         /// <summary>
-        /// 事件参数
-        /// 不同的事件拥有不同类型的参数
+        /// 在注册命令的时候传递的用户数据
         /// </summary>
-        public object Argument { get; set; }
+        public object UserData { get; set; }
 
         /// <summary>
         /// 要执行的命令

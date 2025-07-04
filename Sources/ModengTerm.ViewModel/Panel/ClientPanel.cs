@@ -1,7 +1,7 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
-using ModengTerm.Addons;
 using ModengTerm.Base.Definitions;
 using WPFToolkit.MVVM;
 

@@ -1,12 +1,12 @@
 ﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
 
-namespace ModengTerm.Addons
+namespace ModengTerm.Addon
 {
     public delegate void AddonCommandDelegate(CommandArgs e);
 
@@ -33,7 +33,7 @@ namespace ModengTerm.Addons
 
         private AddonDefinition definition;
 
-        private Dictionary<string, AddonCommandDelegate> registerCommands;
+        private Dictionary<string, Command> registerCommands;
 
         private List<ISidePanel> activeSidePanels;
         private List<IOverlayPanel> overlayPanels;
@@ -52,7 +52,7 @@ namespace ModengTerm.Addons
         /// <summary>
         /// 插件注册的所有命令
         /// </summary>
-        public Dictionary<string, AddonCommandDelegate> RegisteredCommand { get { return this.registerCommands; } }
+        public Dictionary<string, Command> RegisteredCommand { get { return this.registerCommands; } }
 
         /// <summary>
         /// 获取当前已经激活了的侧边栏面板
@@ -73,7 +73,7 @@ namespace ModengTerm.Addons
         {
             this.ID = context.Definition.ID;
             this.factory = context.Factory;
-            this.registerCommands = new Dictionary<string, AddonCommandDelegate>();
+            this.registerCommands = new Dictionary<string, Command>();
             this.overlayPanels = new List<IOverlayPanel>();
             this.activeSidePanels = new List<ISidePanel>();
             this.definition = context.Definition;
@@ -93,17 +93,6 @@ namespace ModengTerm.Addons
             this.registerCommands.Clear();
         }
 
-        public void DispatchCommand(CommandArgs e)
-        {
-            AddonCommandDelegate handler;
-            if (!this.registerCommands.TryGetValue(e.Command, out handler))
-            {
-                return;
-            }
-
-            handler(e);
-        }
-
         #endregion
 
         #region 受保护方法
@@ -113,14 +102,20 @@ namespace ModengTerm.Addons
         /// </summary>
         /// <param name="command"></param>
         /// <param name="handler"></param>
-        protected void RegisterCommand(string command, AddonCommandDelegate handler)
+        public void RegisterCommand(string command, AddonCommandDelegate handler, object userData = null)
         {
             if (this.registerCommands.ContainsKey(command))
             {
                 return;
             }
 
-            this.registerCommands[command] = handler;
+            Command cmd = new Command()
+            {
+                Delegate = handler,
+                UserData = userData
+            };
+
+            this.registerCommands[command] = cmd;
         }
 
         protected ISidePanel GetSidePanel(string id)

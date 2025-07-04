@@ -53,12 +53,19 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("closeHotkeys")]
         public List<string> CloseHotkeys { get; private set; }
 
+        /// <summary>
+        /// 用来打开或关闭Panel的Command
+        /// </summary>
+        [JsonProperty("commands")]
+        public List<string> Commands { get; private set; }
+
         public PanelDefinition()
         {
             this.AttachEvents = new List<string>();
             this.DetachEvents = new List<string>();
             this.OpenHotkeys = new List<string>();
             this.CloseHotkeys = new List<string>();
+            this.Commands = new List<string>();
         }
     }
 }

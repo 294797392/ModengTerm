@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addons;
 using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Windows;
@@ -20,7 +19,6 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         protected override void OnActive(ActiveContext context)
         {
             this.eventRegistry.SubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
-            this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
@@ -35,12 +33,6 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         #endregion
 
         #region 事件处理器
-
-        private void OpenBroadcastInputWindow(CommandArgs e)
-        {
-            ISidePanel sidePanel = this.GetSidePanel("5A7D79FD-3C0E-44B2-80AE-B0FEE9F3ECAB");
-            sidePanel.SwitchStatus();
-        }
 
         private void OnShellSendUserInput(TabEventArgs e, object userData)
         {

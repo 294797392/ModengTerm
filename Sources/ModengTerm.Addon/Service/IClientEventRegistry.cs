@@ -1,7 +1,7 @@
-﻿using ModengTerm.Addons;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 
-namespace ModengTerm.Addon.Interactive
+namespace ModengTerm.Addon.Service
 {
     public delegate void ClientEventDelegate(ClientEventArgs e, object userData);
 

@@ -13,13 +13,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>portable</DebugType>
     <Optimize>False</Optimize>
-    <NoWarn>1701;1702;8618</NoWarn>
+    <NoWarn>1701;1702;8618;8601</NoWarn>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>portable</DebugType>
     <Optimize>True</Optimize>
-    <NoWarn>1701;1702;8618</NoWarn>
+    <NoWarn>1701;1702;8618;8601</NoWarn>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
 
   <ItemGroup>

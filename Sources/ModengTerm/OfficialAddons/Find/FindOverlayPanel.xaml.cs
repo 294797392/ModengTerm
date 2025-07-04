@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
+using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;

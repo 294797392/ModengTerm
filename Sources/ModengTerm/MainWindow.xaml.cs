@@ -3,7 +3,7 @@ using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addons;
+using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -180,6 +180,11 @@ namespace ModengTerm
                 {
                     this.eventRegistry.SubscribeEvent(evid, this.OnDetachSidePanelEvent, spc);
                 }
+
+                foreach (string command in definition.Commands)
+                {
+                    addon.RegisterCommand(command, this.OnSwitchSidePanelEvent, spc);
+                }
             }
 
             foreach (PanelDefinition definition in addonDefinition.OverlayPanels)
@@ -194,6 +199,11 @@ namespace ModengTerm
                 foreach (string hkey in definition.CloseHotkeys)
                 {
                     this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnCloseOverlayPanelEvent, opc);
+                }
+
+                foreach (string command in definition.Commands)
+                {
+                    addon.RegisterCommand(command, this.OnSwitchOverlayPanelEvent, opc);
                 }
             }
         }
@@ -245,23 +255,24 @@ namespace ModengTerm
             this.addons = addons;
         }
 
-        private void DispatchAddonCommand(CommandArgs cmdArgs)
+        private void DispatchCommand(CommandArgs e)
         {
-            AddonModule addon = this.addons.FirstOrDefault(v => v.ID == cmdArgs.AddonId);
+            AddonModule addon = this.addons.FirstOrDefault(v => v.ID == e.AddonId);
             if (addon == null)
             {
-                logger.ErrorFormat("查找插件失败, {0}", cmdArgs.AddonId);
+                logger.ErrorFormat("查找插件失败, {0}", e.AddonId);
                 return;
             }
 
-            AddonCommandDelegate handler;
-            if (!addon.RegisteredCommand.TryGetValue(cmdArgs.Command, out handler))
+            Command command;
+            if (!addon.RegisteredCommand.TryGetValue(e.Command, out command))
             {
-                logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, cmdArgs.Command);
+                logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, e.Command);
                 return;
             }
 
-            handler.Invoke(cmdArgs);
+            e.UserData = command.UserData;
+            command.Delegate(e);
         }
 
         private void PublishTabEvent(TabEventArgs e)
@@ -464,9 +475,8 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OnOpenOverlayPanelEvent(object userData) 
+        private OverlayPanel EnsureOverlayPanel(OverlayPanelContext opc)
         {
-            OverlayPanelContext opc = userData as OverlayPanelContext;
             PanelDefinition definition = opc.Definition;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
@@ -484,6 +494,13 @@ namespace ModengTerm
                 shellSession.OverlayPanels.Add(overlayPanel);
             }
 
+            return overlayPanel;
+        }
+
+        private void OnOpenOverlayPanelEvent(object userData) 
+        {
+            OverlayPanelContext opc = userData as OverlayPanelContext;
+            OverlayPanel overlayPanel = this.EnsureOverlayPanel(opc);
             overlayPanel.Open();
         }
 
@@ -502,6 +519,46 @@ namespace ModengTerm
             overlayPanel.Close();
         }
 
+        private void OnSwitchOverlayPanelEvent(CommandArgs e)
+        {
+            OverlayPanelContext opc = e.UserData as OverlayPanelContext;
+            OverlayPanel overlayPanel = this.EnsureOverlayPanel(opc);
+            overlayPanel.SwitchStatus();
+        }
+
+
+        private SidePanel EnsureAttacted(SidePanelContext spc)
+        {
+            if (spc.Panel == null)
+            {
+                PanelDefinition definition = spc.Definition;
+
+                SidePanel sidePanel = new SidePanel();
+                sidePanel.Definition = definition;
+                sidePanel.ID = definition.ID;
+                sidePanel.Name = definition.Name;
+                sidePanel.IconURI = definition.Icon;
+                sidePanel.OwnerAddon = spc.OwnerAddon;
+                sidePanel.Initialize();
+                this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
+
+                spc.Panel = sidePanel;
+                spc.IsAttached = true;
+                spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+            }
+            else
+            {
+                if (!spc.IsAttached)
+                {
+                    SidePanel sidePanel = spc.Panel;
+                    this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
+                    spc.IsAttached = true;
+                    spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                }
+            }
+
+            return spc.Panel;
+        }
 
         private void OnOpenSidePanelEvent(object userData)
         {
@@ -530,34 +587,7 @@ namespace ModengTerm
         private void OnAttachSidePanelEvent(ClientEventArgs e, object userData) 
         {
             SidePanelContext spc = userData as SidePanelContext;
-
-            if (spc.Panel == null)
-            {
-                PanelDefinition definition = spc.Definition;
-
-                SidePanel sidePanel = new SidePanel();
-                sidePanel.Definition = definition;
-                sidePanel.ID = definition.ID;
-                sidePanel.Name = definition.Name;
-                sidePanel.IconURI = definition.Icon;
-                sidePanel.OwnerAddon = spc.OwnerAddon;
-                sidePanel.Initialize();
-                this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-
-                spc.Panel = sidePanel;
-                spc.IsAttached = true;
-                spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
-            }
-            else
-            {
-                if (!spc.IsAttached)
-                {
-                    SidePanel sidePanel = spc.Panel;
-                    this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-                    spc.IsAttached = true;
-                    spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
-                }
-            }
+            this.EnsureAttacted(spc);
         }
 
         private void OnDetachSidePanelEvent(ClientEventArgs e, object userData)
@@ -576,6 +606,16 @@ namespace ModengTerm
             spc.IsAttached = false;
         }
 
+        private void OnSwitchSidePanelEvent(CommandArgs e) 
+        {
+            SidePanelContext spc = e.UserData as SidePanelContext;
+            SidePanel sidePanel = this.EnsureAttacted(spc);
+            sidePanel.SwitchStatus();
+        }
+
+
+
+
         private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs e)
         {
             this.PublishTabEvent(e);
@@ -583,7 +623,7 @@ namespace ModengTerm
 
         private void SessionContent_ExecuteCommand(CommandArgs e)
         {
-            this.DispatchAddonCommand(e);
+            this.DispatchCommand(e);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -725,7 +765,7 @@ namespace ModengTerm
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
             CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IClientTab;
-            this.DispatchAddonCommand(CommandArgs.Instance);
+            this.DispatchCommand(CommandArgs.Instance);
         }
 
 
@@ -1008,7 +1048,7 @@ namespace ModengTerm
         private void ExecuteAddonCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             CommandArgs args = e.Parameter as CommandArgs;
-            this.DispatchAddonCommand(args);
+            this.DispatchCommand(args);
         }
 
         #endregion

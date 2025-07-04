@@ -2,7 +2,6 @@
 using Microsoft.Win32;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addons;
 using ModengTerm.Document.Enumerations;
 using System;
 

@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addons;
+﻿using ModengTerm.Addon;
 using ModengTerm.Terminal;
 using System.Windows;
 
