@@ -25,9 +25,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataModels\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <EmbeddedResource Remove="DataModels\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <None Remove="DataModels\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Page Remove="DataModels\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
   </ItemGroup>
 
@@ -178,7 +182,6 @@
 
   <ItemGroup>
     <Folder Include="Controls\" />
-    <Folder Include="DataModels\" />
   </ItemGroup>
 
   <ItemGroup>
