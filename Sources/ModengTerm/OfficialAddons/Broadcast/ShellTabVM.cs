@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.OfficialAddons.BroadcastInput
+namespace ModengTerm.OfficialAddons.Broadcast
 {
     public class ShellTabVM : ViewModelBase
     {

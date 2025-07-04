@@ -4,9 +4,9 @@ using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Windows;
 
-namespace ModengTerm.OfficialAddons.BroadcastInput
+namespace ModengTerm.OfficialAddons.Broadcast
 {
-    public class BroadcastInputAddon : AddonModule
+    public class BroadcastAddon : AddonModule
     {
         public const string KEY_BROADCAST_LIST = "broadcasts";
 

@@ -77,6 +77,7 @@ namespace ModengTerm.OfficialAddons.Snippet
 
         public override void OnInitialize()
         {
+
         }
 
         public override void OnRelease()

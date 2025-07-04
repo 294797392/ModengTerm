@@ -21,7 +21,7 @@
                 </Trigger>
             </Style.Triggers>
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
-            <Setter Property="Width" Value="30"/>
+            <Setter Property="Width" Value="40"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="IsSelected" Value="{Binding Path=IsOpened, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Setter Property="BorderThickness" Value="0,0,2,0"/>

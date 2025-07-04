@@ -5,12 +5,12 @@ using ModengTerm.Addon.Service;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModengTerm.OfficialAddons.BroadcastInput
+namespace ModengTerm.OfficialAddons.Broadcast
 {
     /// <summary>
     /// BroadcastInputPanel.xaml 的交互逻辑
     /// </summary>
-    public partial class BroadcastInputPanel : SidePanelContent
+    public partial class BroadcastPanel : SidePanelContent
     {
         #region 实例变量
 
@@ -22,7 +22,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 构造方法
 
-        public BroadcastInputPanel()
+        public BroadcastPanel()
         {
             InitializeComponent();
         }
@@ -67,7 +67,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
             shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
 
-            List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST);
+            List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST);
 
             if (broadcastTabs == null)
             {
@@ -84,7 +84,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
                     broadcastTabs.Add(vm);
                 }
 
-                tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastInputAddon.KEY_BROADCAST_LIST, broadcastTabs);
+                tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST, broadcastTabs);
             }
             else
             {
