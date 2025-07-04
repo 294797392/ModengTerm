@@ -215,7 +215,7 @@
             <Border Grid.Row="1" Background="{DynamicResource ResourceKey=RES501001E}"/>
             <ContentControl Grid.Row="1" x:Name="ContentControl1" Background="{x:Null}"/>
 
-            <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource ResourceKey=RES501016E}"/>
+            <Border Grid.Row="0" Grid.RowSpan="999" x:Name="BorderContent" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource ResourceKey=RES501016E}"/>
 
         </Grid>
 

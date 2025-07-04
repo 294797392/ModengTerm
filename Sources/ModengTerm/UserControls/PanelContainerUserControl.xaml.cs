@@ -50,6 +50,8 @@ namespace ModengTerm.UserControls
                                 ColumnDefinition1.Width = new GridLength();
                                 ColumnDefinition2.Width = new GridLength(0, GridUnitType.Auto);
                                 ListBoxMenus.ItemContainerStyle = this.FindResource("StyleListBoxItemSessionPanel") as Style;
+                                ListBoxMenus.BorderThickness = new Thickness(1, 0, 0, 0);
+                                BorderContent.BorderThickness = new Thickness(1, 0, 0, 0);
                                 break;
                             }
 

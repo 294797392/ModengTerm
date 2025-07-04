@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace ModengTerm.Addon.Panel
     /// </summary>
     public abstract class PanelContent : UserControl
     {
+        protected ClientFactory factory;
+        protected IClientEventRegistry eventRegistry;
+
         /// <summary>
         /// 所属的Panel
         /// 在创建PanelContent实例的时候赋值
@@ -23,6 +27,12 @@ namespace ModengTerm.Addon.Panel
         /// 所属的插件
         /// </summary>
         public AddonModule OwnerAddon { get; set; }
+
+        public PanelContent() 
+        {
+            this.factory = ClientFactory.GetFactory();
+            this.eventRegistry = this.factory.GetEventRegistry();
+        }
 
         /// <summary>
         /// 当面板第一次被激活的时候触发

@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.OfficialAddons.QuickInput
+namespace ModengTerm.OfficialAddons.Snippet
 {
-    public class QuickInputAddon : AddonModule
+    public class SnippetAddon : AddonModule
     {
         protected override void OnActive(ActiveContext e)
         {

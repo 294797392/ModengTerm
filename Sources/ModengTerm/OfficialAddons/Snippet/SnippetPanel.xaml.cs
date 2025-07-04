@@ -5,12 +5,12 @@ using System.Windows;
 using System.Windows.Controls;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.OfficialAddons.QuickInput
+namespace ModengTerm.OfficialAddons.Snippet
 {
     /// <summary>
     /// QuickCommandUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class QuickInputPanel : SidePanelContent
+    public partial class SnippetPanel : SidePanelContent
     {
         #region 实例变量
 
@@ -18,7 +18,7 @@ namespace ModengTerm.OfficialAddons.QuickInput
 
         #region 构造方法
 
-        public QuickInputPanel()
+        public SnippetPanel()
         {
             InitializeComponent();
 
