@@ -23,11 +23,6 @@ namespace ModengTerm.Addon.Panel
         /// </summary>
         public IClientPanel OwnerPanel { get; set; }
 
-        /// <summary>
-        /// 所属的插件
-        /// </summary>
-        public AddonModule OwnerAddon { get; set; }
-
         public PanelContent() 
         {
             this.factory = ClientFactory.GetFactory();

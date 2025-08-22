@@ -31,7 +31,7 @@ namespace ModengTerm.Addon
 
         #region 实例变量
 
-        private AddonDefinition definition;
+        private AddonMetadata metadata;
 
         private Dictionary<string, Command> registerCommands;
 
@@ -48,6 +48,8 @@ namespace ModengTerm.Addon
         #region 属性
 
         public string ID { get; private set; }
+
+        public AddonMetadata Metadata { get { return this.metadata; } }
 
         /// <summary>
         /// 插件注册的所有命令
@@ -76,7 +78,7 @@ namespace ModengTerm.Addon
             this.registerCommands = new Dictionary<string, Command>();
             this.overlayPanels = new List<IOverlayPanel>();
             this.activeSidePanels = new List<ISidePanel>();
-            this.definition = context.Definition;
+            this.metadata = context.Definition;
 
             this.client = this.factory.GetClient();
             this.storageService = this.factory.GetStorageService();

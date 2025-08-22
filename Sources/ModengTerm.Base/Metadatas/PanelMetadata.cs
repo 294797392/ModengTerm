@@ -1,9 +1,10 @@
 ﻿using ModengTerm.Base.Addon;
+using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
 
 namespace ModengTerm.Base.Definitions
 {
-    public abstract class PanelDefinition
+    public abstract class PanelMetadata
     {
         //
         // 摘要:
@@ -47,7 +48,7 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("commands")]
         public List<string> Commands { get; private set; }
 
-        public PanelDefinition()
+        public PanelMetadata()
         {
             this.OpenHotkeys = new List<string>();
             this.CloseHotkeys = new List<string>();
@@ -55,32 +56,47 @@ namespace ModengTerm.Base.Definitions
         }
     }
 
-    public class SidePanelDefinition : PanelDefinition
+    public enum SidePanelScopes
     {
         /// <summary>
-        /// 指定面板什么时候显示
-        /// 参考vscode的activationEvents事件
-        /// onClientInitialize - 在客户端启动之后就显示
-        /// onTabOpened:terminal - 在打开terminal类型的tab的时候显示
-        /// 这些事件保持与TabEvent和ClientEvent一致
+        /// 侧边栏属于客户端，整个app运行期间只有一个实例
         /// </summary>
-        [JsonProperty("attachEvents")]
-        public List<string> AttachEvents { get; private set; }
+        Client,
 
-        [JsonProperty("detachEvents")]
-        public List<string> DetachEvents { get; private set; }
+        /// <summary>
+        /// 侧边栏属于会话
+        /// 每个会话都有一个单独的侧边栏实例
+        /// </summary>
+        Session,
+    }
 
+    public class SidePanelMetadata : PanelMetadata
+    {
+        /// <summary>
+        /// 侧边栏窗口所属者
+        /// </summary>
+        [JsonProperty("scope")]
+        public SidePanelScopes Scope { get; set; }
+
+        /// <summary>
+        /// 如果侧边栏所属者是Client，那么这个字段表示在打开哪些Session的时候显示侧边栏
+        /// </summary>
+        [JsonProperty("sessionTypes")]
+        public List<SessionTypeEnum> SessionTypes { get; private set; }
+
+        /// <summary>
+        /// 侧边栏窗口的位置
+        /// </summary>
         [JsonProperty("dock")]
         public SidePanelDocks Dock { get; set; }
 
-        public SidePanelDefinition()
+        public SidePanelMetadata()
         {
-            this.AttachEvents = new List<string>();
-            this.DetachEvents = new List<string>();
+            this.SessionTypes = new List<SessionTypeEnum>();
         }
     }
 
-    public class OverlayPanelDefinition : PanelDefinition
+    public class OverlayPanelMetadata : PanelMetadata
     {
         [JsonProperty("dock")]
         public OverlayPanelDocks Dock { get; set; }

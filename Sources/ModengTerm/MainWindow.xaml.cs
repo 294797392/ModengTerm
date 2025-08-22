@@ -20,7 +20,9 @@ using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -155,53 +157,49 @@ namespace ModengTerm
             this.mainWindowVM.SessionList.Remove(session);
         }
 
-        private void SubscribePanelEvent(AddonModule addon, AddonDefinition addonDefinition)
+        /// <summary>
+        /// 注册插件里的SidePanel相关的事件
+        /// </summary>
+        /// <param name="addon"></param>
+        private void SubscribePanelEvent(AddonModule addon)
         {
-            foreach (SidePanelDefinition definition in addonDefinition.SidePanels)
+            List<SidePanelMetadata> sidePanelMetadatas = addon.Metadata.SidePanels;
+
+            foreach (SidePanelMetadata metadata in sidePanelMetadatas)
             {
-                SidePanelContext spc = new SidePanelContext(addon, definition);
-
-                foreach (string hkey in definition.OpenHotkeys)
+                foreach (string hkey in metadata.OpenHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnOpenSidePanelEvent, spc);
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnOpenSidePanelEvent, metadata);
                 }
 
-                foreach (string hkey in definition.CloseHotkeys)
+                foreach (string hkey in metadata.CloseHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnCloseSidePanelEvent, spc);
+                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnCloseSidePanelEvent, metadata);
                 }
 
-                foreach (string evid in definition.AttachEvents)
+                foreach (string command in metadata.Commands)
                 {
-                    this.eventRegistry.SubscribeEvent(evid, this.OnAttachSidePanelEvent, spc);
-                }
-
-                foreach (string evid in definition.DetachEvents)
-                {
-                    this.eventRegistry.SubscribeEvent(evid, this.OnDetachSidePanelEvent, spc);
-                }
-
-                foreach (string command in definition.Commands)
-                {
-                    addon.RegisterCommand(command, this.OnSwitchSidePanelEvent, spc);
+                    addon.RegisterCommand(command, this.OnSwitchSidePanelEvent, metadata);
                 }
             }
 
-            foreach (OverlayPanelDefinition definition in addonDefinition.OverlayPanels)
-            {
-                OverlayPanelContext opc = new OverlayPanelContext(addon, definition);
+            List<OverlayPanelMetadata> overlayPanelMetadatas = addon.Metadata.OverlayPanels;
 
-                foreach (string hkey in definition.OpenHotkeys)
+            foreach (OverlayPanelMetadata metadata in overlayPanelMetadatas)
+            {
+                OverlayPanelContext opc = new OverlayPanelContext(addon, metadata);
+
+                foreach (string hkey in metadata.OpenHotkeys)
                 {
                     this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnOpenOverlayPanelEvent, opc);
                 }
 
-                foreach (string hkey in definition.CloseHotkeys)
+                foreach (string hkey in metadata.CloseHotkeys)
                 {
                     this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnCloseOverlayPanelEvent, opc);
                 }
 
-                foreach (string command in definition.Commands)
+                foreach (string command in metadata.Commands)
                 {
                     addon.RegisterCommand(command, this.OnSwitchOverlayPanelEvent, opc);
                 }
@@ -217,7 +215,7 @@ namespace ModengTerm
 
             #region 创建插件实例
 
-            foreach (AddonDefinition definition in VTApp.Context.Manifest.Addons)
+            foreach (AddonMetadata metadata in VTApp.Context.Manifest.Addons)
             {
                 #region 创建插件实例
 
@@ -225,11 +223,11 @@ namespace ModengTerm
 
                 try
                 {
-                    addon = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
+                    addon = ConfigFactory<AddonModule>.CreateInstance(metadata.ClassEntry);
 
                     ActiveContext context = new ActiveContext()
                     {
-                        Definition = definition,
+                        Definition = metadata,
                         StorageService = new SqliteStorageService(),
                         Factory = ClientFactory.GetFactory(),
                         HostWindow = this
@@ -247,7 +245,9 @@ namespace ModengTerm
 
                 #endregion
 
-                this.SubscribePanelEvent(addon, definition);
+                this.CreateClientSidePanel(addon);
+
+                this.SubscribePanelEvent(addon);
             }
 
             #endregion
@@ -351,7 +351,7 @@ namespace ModengTerm
                     {
                         if (Keyboard.Modifiers == this.firstPressedModKeys)
                         {
-                            // 没有按其他快捷键
+                            // 没有按其他修饰键
 
                             // 只处理数字键和字母键
                             if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
@@ -374,7 +374,7 @@ namespace ModengTerm
                         {
                             logger.DebugFormat("Key2 -> DoubleModKey");
 
-                            // 按了其他快捷键，变成双快捷键
+                            // 按了其他修饰键，变成双修饰键
                             this.secondPressedModKeys = Keyboard.Modifiers;
                             this.kstat = HotkeyState.DoubleModKey;
                         }
@@ -471,25 +471,39 @@ namespace ModengTerm
             return this.eventRegistry.PublishHotkeyEvent(hotKey);
         }
 
+        /// <summary>
+        /// 初始化客户端侧边栏
+        /// </summary>
+        private void CreateClientSidePanel(AddonModule addon)
+        {
+            AddonMetadata metadata = addon.Metadata;
+
+            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scope == SidePanelScopes.Client).ToList();
+
+            foreach (SidePanelMetadata panelMetadata in panelMetadatas)
+            {
+                this.mainWindowVM.CreateSidePanel(panelMetadata);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
 
         private OverlayPanel EnsureOverlayPanel(OverlayPanelContext opc)
         {
-            OverlayPanelDefinition definition = opc.Definition as OverlayPanelDefinition;
+            OverlayPanelMetadata definition = opc.Definition as OverlayPanelMetadata;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
+            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
 
             if (overlayPanel == null)
             {
                 overlayPanel = new OverlayPanel();
-                overlayPanel.Definition = definition;
+                overlayPanel.Metadata = definition;
                 overlayPanel.ID = definition.ID;
                 overlayPanel.Name = definition.Name;
                 overlayPanel.IconURI = definition.Icon;
                 overlayPanel.OwnerTab = shellSession;
-                overlayPanel.OwnerAddon = opc.OwnerAddon;
                 overlayPanel.Dock = definition.Dock;
                 overlayPanel.Initialize();
                 shellSession.OverlayPanels.Add(overlayPanel);
@@ -498,7 +512,7 @@ namespace ModengTerm
             return overlayPanel;
         }
 
-        private void OnOpenOverlayPanelEvent(object userData) 
+        private void OnOpenOverlayPanelEvent(object userData)
         {
             OverlayPanelContext opc = userData as OverlayPanelContext;
             OverlayPanel overlayPanel = this.EnsureOverlayPanel(opc);
@@ -508,9 +522,9 @@ namespace ModengTerm
         private void OnCloseOverlayPanelEvent(object userData)
         {
             OverlayPanelContext opc = userData as OverlayPanelContext;
-            PanelDefinition definition = opc.Definition;
+            PanelMetadata definition = opc.Definition;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Definition == definition);
+            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
 
             if (overlayPanel == null)
             {
@@ -528,91 +542,25 @@ namespace ModengTerm
         }
 
 
-        private SidePanel EnsureAttacted(SidePanelContext spc)
-        {
-            if (spc.Panel == null)
-            {
-                SidePanelDefinition definition = spc.Definition as SidePanelDefinition;
-
-                SidePanel sidePanel = new SidePanel();
-                sidePanel.Definition = definition;
-                sidePanel.ID = definition.ID;
-                sidePanel.Name = definition.Name;
-                sidePanel.IconURI = definition.Icon;
-                sidePanel.OwnerAddon = spc.OwnerAddon;
-                sidePanel.Dock = definition.Dock;
-                sidePanel.Initialize();
-                this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-
-                spc.Panel = sidePanel;
-                spc.IsAttached = true;
-                spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
-            }
-            else
-            {
-                if (!spc.IsAttached)
-                {
-                    SidePanel sidePanel = spc.Panel;
-                    this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
-                    spc.IsAttached = true;
-                    spc.OwnerAddon.ActiveSidePanels.Add(sidePanel);
-                }
-            }
-
-            return spc.Panel;
-        }
-
         private void OnOpenSidePanelEvent(object userData)
         {
-            SidePanelContext spc = userData as SidePanelContext;
-
-            if (spc.Panel == null || !spc.IsAttached)
-            {
-                return;
-            }
-
-            spc.Panel.Open();
+            SidePanelMetadata metadata = userData as SidePanelMetadata;
+            SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
+            spvm.Open();
         }
 
         private void OnCloseSidePanelEvent(object userData)
         {
-            SidePanelContext spc = userData as SidePanelContext;
-
-            if (spc.Panel == null || !spc.IsAttached)
-            {
-                return;
-            }
-
-            spc.Panel.Close();
+            SidePanelMetadata metadata = userData as SidePanelMetadata;
+            SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
+            spvm.Close();
         }
 
-        private void OnAttachSidePanelEvent(ClientEventArgs e, object userData) 
+        private void OnSwitchSidePanelEvent(CommandArgs e)
         {
-            SidePanelContext spc = userData as SidePanelContext;
-            this.EnsureAttacted(spc);
-        }
-
-        private void OnDetachSidePanelEvent(ClientEventArgs e, object userData)
-        {
-            SidePanelContext spc = userData as SidePanelContext;
-
-            if (!spc.IsAttached)
-            {
-                return;
-            }
-
-            SidePanel sidePanel = spc.Panel;
-            this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Remove(sidePanel);
-
-            spc.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
-            spc.IsAttached = false;
-        }
-
-        private void OnSwitchSidePanelEvent(CommandArgs e) 
-        {
-            SidePanelContext spc = e.UserData as SidePanelContext;
-            SidePanel sidePanel = this.EnsureAttacted(spc);
-            sidePanel.SwitchStatus();
+            SidePanelMetadata metadata = e.UserData as SidePanelMetadata;
+            SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
+            spvm.SwitchStatus();
         }
 
 

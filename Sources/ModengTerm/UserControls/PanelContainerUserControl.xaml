@@ -11,7 +11,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <Style x:Key="StyleListBoxItemSessionPanel" TargetType="{x:Type ListBoxItem}">
+
+        <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501007E}"/>
@@ -21,10 +22,9 @@
                 </Trigger>
             </Style.Triggers>
             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
-            <Setter Property="Width" Value="40"/>
+            <Setter Property="Width" Value="30"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="IsSelected" Value="{Binding Path=IsOpened, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Setter Property="BorderThickness" Value="0,0,2,0"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
@@ -39,6 +39,11 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+
+        </Style>
+        
+        <Style x:Key="StyleListBoxItemRightDock" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemLocal}">
+            <Setter Property="BorderThickness" Value="0,0,2,0"/>
         </Style>
 
         <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcsext:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
@@ -102,34 +107,8 @@
             </ListBox.Style>
 
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501007E}"/>
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501006E}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
-                    <Setter Property="Width" Value="40"/>
-                    <Setter Property="Height" Value="35"/>
-                    <Setter Property="IsSelected" Value="{Binding Path=IsOpened, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemLocal}">
                     <Setter Property="BorderThickness" Value="2,0,0,0"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
-                    <Setter Property="Cursor" Value="Hand"/>
-                    <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                <Grid>
-                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
-                                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0"/>
-                                    <ContentPresenter Margin="{TemplateBinding Padding}"/>
-                                </Grid>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
                 </Style>
             </ListBox.ItemContainerStyle>
 

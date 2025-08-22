@@ -5,6 +5,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Document;
+using ModengTerm.ViewModel.Panel;
 using ModengTerm.ViewModel.Session;
 using WPFToolkit.MVVM;
 
@@ -90,19 +91,6 @@ namespace ModengTerm.ViewModel
             return sessionTreeVM;
         }
 
-        private static void LoadSessionGroupNode(SessionGroupVM parentGroup, List<SessionGroup> groups)
-        {
-            // 先找到该分组的所有子节点
-            IEnumerable<SessionGroup> children = groups.Where(v => v.ParentId == parentGroup.ID.ToString());
-
-            foreach (SessionGroup child in children)
-            {
-                SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, parentGroup.Level + 1, child);
-                parentGroup.Add(groupVM);
-                LoadSessionGroupNode(groupVM, groups);
-            }
-        }
-
         public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)
         {
             List<AddonMenuDefinition> menuItems = new List<AddonMenuDefinition>();
@@ -114,7 +102,7 @@ namespace ModengTerm.ViewModel
             }
 
             // 再加载所有的插件菜单
-            foreach (AddonDefinition addon in VTApp.Context.Manifest.Addons)
+            foreach (AddonMetadata addon in VTApp.Context.Manifest.Addons)
             {
                 List<AddonMenuDefinition> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
 
@@ -149,6 +137,32 @@ namespace ModengTerm.ViewModel
             }
 
             return result;
+        }
+
+        public static SidePanelVM CreateSidePanelVM(SidePanelMetadata metadata)
+        {
+            SidePanelVM sidePanel = new SidePanelVM();
+            sidePanel.Metadata = metadata;
+            sidePanel.ID = metadata.ID;
+            sidePanel.Name = metadata.Name;
+            sidePanel.IconURI = metadata.Icon;
+            sidePanel.Dock = metadata.Dock;
+            return sidePanel;
+        }
+
+
+
+        private static void LoadSessionGroupNode(SessionGroupVM parentGroup, List<SessionGroup> groups)
+        {
+            // 先找到该分组的所有子节点
+            IEnumerable<SessionGroup> children = groups.Where(v => v.ParentId == parentGroup.ID.ToString());
+
+            foreach (SessionGroup child in children)
+            {
+                SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, parentGroup.Level + 1, child);
+                parentGroup.Add(groupVM);
+                LoadSessionGroupNode(groupVM, groups);
+            }
         }
 
         private static void LoadChildMenuItems(ContextMenuVM parentVM, List<AddonMenuDefinition> children)

@@ -62,7 +62,7 @@ namespace ModengTerm.Base
         /// 插件列表
         /// </summary>
         [JsonProperty("addons")]
-        public List<AddonDefinition> Addons { get; private set; }
+        public List<AddonMetadata> Addons { get; private set; }
 
 
         public VTManifest()
@@ -74,7 +74,7 @@ namespace ModengTerm.Base
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.DefaultThemes = new List<ThemePackage>();
-            this.Addons = new List<AddonDefinition>();
+            this.Addons = new List<AddonMetadata>();
         }
     }
 

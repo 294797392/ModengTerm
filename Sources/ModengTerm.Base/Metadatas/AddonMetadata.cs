@@ -11,7 +11,7 @@ namespace ModengTerm.Base.Definitions
     /// <summary>
     /// 定义一个插件的所有内容
     /// </summary>
-    public class AddonDefinition
+    public class AddonMetadata
     {
         /// <summary>
         /// 插件Id
@@ -47,20 +47,20 @@ namespace ModengTerm.Base.Definitions
         /// 侧边栏面板
         /// </summary>
         [JsonProperty("sidePanels")]
-        public List<SidePanelDefinition> SidePanels { get; private set; }
+        public List<SidePanelMetadata> SidePanels { get; private set; }
 
         /// <summary>
         /// 悬浮面板
         /// </summary>
         [JsonProperty("overlayPanels")]
-        public List<OverlayPanelDefinition> OverlayPanels { get; private set; }
+        public List<OverlayPanelMetadata> OverlayPanels { get; private set; }
 
-        public AddonDefinition()
+        public AddonMetadata()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
-            this.SidePanels = new List<SidePanelDefinition>();
-            this.OverlayPanels = new List<OverlayPanelDefinition>();
+            this.SidePanels = new List<SidePanelMetadata>();
+            this.OverlayPanels = new List<OverlayPanelMetadata>();
         }
     }
 }

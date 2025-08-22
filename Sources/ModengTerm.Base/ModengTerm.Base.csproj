@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
-    <Compile Remove="Definitions\OptionDefinition.cs" />
+    <Compile Remove="Metadatas\OptionDefinition.cs" />
     <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />
     <Compile Remove="ICloneable.cs" />
   </ItemGroup>

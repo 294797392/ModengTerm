@@ -10,38 +10,23 @@ namespace ModengTerm.Addon
 {
     public abstract class PanelContext
     {
-        public PanelDefinition Definition { get; private set; }
+        public PanelMetadata Definition { get; private set; }
 
         /// <summary>
         /// SidePanel所属的插件
         /// </summary>
         public AddonModule OwnerAddon { get; private set; }
 
-        public PanelContext(AddonModule ownerAddon, PanelDefinition definition)
+        public PanelContext(AddonModule ownerAddon, PanelMetadata definition)
         {
             this.OwnerAddon = ownerAddon;
             this.Definition = definition;
         }
     }
 
-    public class SidePanelContext : PanelContext
-    {
-        public SidePanel Panel { get; set; }
-
-        /// <summary>
-        /// 是否添加到了窗口里
-        /// </summary>
-        public bool IsAttached { get; set; }
-
-        public SidePanelContext(AddonModule ownerAddon, PanelDefinition definition) :
-            base(ownerAddon, definition)
-        {
-        }
-    }
-
     public class OverlayPanelContext : PanelContext
     {
-        public OverlayPanelContext(AddonModule ownerAddon, PanelDefinition definition) : base(ownerAddon, definition)
+        public OverlayPanelContext(AddonModule ownerAddon, PanelMetadata definition) : base(ownerAddon, definition)
         {
         }
     }

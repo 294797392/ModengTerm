@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panel;
 using ModengTerm.ViewModel.Terminal;
@@ -156,6 +157,32 @@ namespace ModengTerm.ViewModel
             RecentlyOpenedSession.Remove(recentlySession);
 
             serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
+        }
+
+        /// <summary>
+        /// 添加一个SidePanel到主界面
+        /// </summary>
+        /// <param name="spvm"></param>
+        public void AddSidePanel(SidePanelVM spvm)
+        {
+            this.PanelContainers[spvm.Dock].Panels.Add(spvm);
+        }
+
+        /// <summary>
+        /// 创建一个SidePanel实例并添加到界面
+        /// </summary>
+        /// <param name="metadata"></param>
+        public void CreateSidePanel(SidePanelMetadata metadata)
+        {
+            SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
+            spvm.Initialize();
+            this.AddSidePanel(spvm);
+        }
+
+        public SidePanelVM GetSidePanel(SidePanelMetadata metadata)
+        {
+            PanelContainer container = this.PanelContainers[metadata.Dock];
+            return container.Panels.FirstOrDefault(v => v.Metadata == metadata);
         }
 
         /// <summary>

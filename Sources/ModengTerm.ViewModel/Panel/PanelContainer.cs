@@ -9,15 +9,15 @@ namespace ModengTerm.ViewModel.Panel
         #region 实例变量
 
         private bool visible;
-        private SidePanel selectedItem;
+        private SidePanelVM selectedItem;
 
         #endregion
 
         #region 属性
 
-        public BindableCollection<SidePanel> Panels { get; private set; }
+        public BindableCollection<SidePanelVM> Panels { get; private set; }
 
-        public SidePanel SelectedItem
+        public SidePanelVM SelectedItem
         {
             get { return selectedItem; }
             set
@@ -38,7 +38,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelContainer()
         {
-            Panels = new BindableCollection<SidePanel>();
+            Panels = new BindableCollection<SidePanelVM>();
         }
 
         #endregion
@@ -51,7 +51,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public void VisiblePanel(string panelId)
         {
-            SidePanel panel = Panels.FirstOrDefault(v => v.ID == panelId);
+            SidePanelVM panel = Panels.FirstOrDefault(v => v.ID == panelId);
             if (panel == null)
             {
                 return;

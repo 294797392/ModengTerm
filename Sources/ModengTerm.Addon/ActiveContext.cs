@@ -24,6 +24,6 @@ namespace ModengTerm.Addon
         /// </summary>
         public StorageService StorageService { get; set; }
 
-        public AddonDefinition Definition { get; set; }
+        public AddonMetadata Definition { get; set; }
     }
 }

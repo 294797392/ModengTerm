@@ -4,6 +4,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.ViewModel.Panel;
 using System.Windows;
 using WPFToolkit.MVVM;
 
@@ -78,6 +79,11 @@ namespace ModengTerm.ViewModel
 
         public SessionTypeEnum Type { get { return (SessionTypeEnum)this.Session.Type; } }
 
+        /// <summary>
+        /// 该会话所拥有的侧边栏
+        /// </summary>
+        public List<SidePanelVM> SidePanels { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -86,6 +92,7 @@ namespace ModengTerm.ViewModel
         {
             this.Session = session;
             this.dataMap = new Dictionary<AddonModule, Dictionary<string, object>>();
+            this.SidePanels = new List<SidePanelVM>();
         }
 
         #endregion

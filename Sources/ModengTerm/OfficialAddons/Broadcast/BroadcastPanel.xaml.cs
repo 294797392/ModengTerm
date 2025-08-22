@@ -63,57 +63,57 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         private void OnTabChangedEvent(ClientEventArgs e, object userData)
         {
-            ClientEventTabChanged tabChanged = e as ClientEventTabChanged;
-            List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
-            shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
+            //ClientEventTabChanged tabChanged = e as ClientEventTabChanged;
+            //List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
+            //shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
 
-            List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST);
+            //List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST);
 
-            if (broadcastTabs == null)
-            {
-                broadcastTabs = new List<ShellTabVM>();
+            //if (broadcastTabs == null)
+            //{
+            //    broadcastTabs = new List<ShellTabVM>();
 
-                foreach (IClientShellTab shellTab in shellTabs)
-                {
-                    ShellTabVM vm = new ShellTabVM()
-                    {
-                        ID = shellTab.ID,
-                        Name = shellTab.Name,
-                        Tab = shellTab
-                    };
-                    broadcastTabs.Add(vm);
-                }
+            //    foreach (IClientShellTab shellTab in shellTabs)
+            //    {
+            //        ShellTabVM vm = new ShellTabVM()
+            //        {
+            //            ID = shellTab.ID,
+            //            Name = shellTab.Name,
+            //            Tab = shellTab
+            //        };
+            //        broadcastTabs.Add(vm);
+            //    }
 
-                tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST, broadcastTabs);
-            }
-            else
-            {
-                // 删除被关闭的标签
-                for (int i = 0; i < broadcastTabs.Count; i++)
-                {
-                    if (!shellTabs.Contains(broadcastTabs[i].Tab)) 
-                    {
-                        broadcastTabs.RemoveAt(i);
-                        i--;
-                    }
-                }
+            //    tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST, broadcastTabs);
+            //}
+            //else
+            //{
+            //    // 删除被关闭的标签
+            //    for (int i = 0; i < broadcastTabs.Count; i++)
+            //    {
+            //        if (!shellTabs.Contains(broadcastTabs[i].Tab)) 
+            //        {
+            //            broadcastTabs.RemoveAt(i);
+            //            i--;
+            //        }
+            //    }
 
-                // 创建新打开的标签
-                foreach (IClientShellTab shellTab in shellTabs)
-                {
-                    if (broadcastTabs.FirstOrDefault(v => v.Tab == shellTab) == null)
-                    {
-                        broadcastTabs.Add(new ShellTabVM()
-                        {
-                            ID = shellTab.ID,
-                            Name = shellTab.Name,
-                            Tab = shellTab
-                        });
-                    }
-                }
-            }
+            //    // 创建新打开的标签
+            //    foreach (IClientShellTab shellTab in shellTabs)
+            //    {
+            //        if (broadcastTabs.FirstOrDefault(v => v.Tab == shellTab) == null)
+            //        {
+            //            broadcastTabs.Add(new ShellTabVM()
+            //            {
+            //                ID = shellTab.ID,
+            //                Name = shellTab.Name,
+            //                Tab = shellTab
+            //            });
+            //        }
+            //    }
+            //}
 
-            DataGridBroadcastList.ItemsSource = broadcastTabs;
+            //DataGridBroadcastList.ItemsSource = broadcastTabs;
         }
 
         #endregion

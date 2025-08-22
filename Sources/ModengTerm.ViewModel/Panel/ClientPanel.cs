@@ -22,7 +22,7 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 公开属性
 
-        public PanelDefinition Definition { get; set; }
+        public PanelMetadata Metadata { get; set; }
 
         public PanelContent Content
         {
@@ -65,11 +65,6 @@ namespace ModengTerm.ViewModel.Panel
                 }
             }
         }
-        
-        /// <summary>
-        /// Panel所属的插件
-        /// </summary>
-        public AddonModule OwnerAddon { get; set; }
 
         #endregion
 
@@ -81,9 +76,8 @@ namespace ModengTerm.ViewModel.Panel
 
             try
             {
-                content = ConfigFactory<PanelContent>.CreateInstance(this.Definition.ClassName);
+                content = ConfigFactory<PanelContent>.CreateInstance(this.Metadata.ClassName);
                 content.OwnerPanel = this;
-                content.OwnerAddon = this.OwnerAddon;
             }
             catch (Exception ex)
             {

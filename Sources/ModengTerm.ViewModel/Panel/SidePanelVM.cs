@@ -10,7 +10,7 @@ namespace ModengTerm.ViewModel.Panel
     /// <summary>
     /// 提供扩展侧边栏面板的接口
     /// </summary>
-    public class SidePanel : ClientPanel, ISidePanel
+    public class SidePanelVM : ClientPanel, ISidePanel
     {
         #region 实例变量
 
