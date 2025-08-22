@@ -8,7 +8,7 @@ using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Windows;
@@ -538,7 +538,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ButtonCloseOverlayPanel_Click(object sender, RoutedEventArgs e)
         {
             FrameworkElement frameworkElement = sender as FrameworkElement;
-            OverlayPanel overlayPanel = frameworkElement.DataContext as OverlayPanel;
+            OverlayPanelVM overlayPanel = frameworkElement.DataContext as OverlayPanelVM;
             overlayPanel.Close();
         }
 

@@ -1,16 +1,16 @@
 ﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.Definitions;
 using System.Windows;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel.Panel
+namespace ModengTerm.ViewModel.Panels
 {
     /// <summary>
     /// 提供扩展侧边栏面板的接口
     /// </summary>
-    public class SidePanelVM : ClientPanel, ISidePanel
+    public class SidePanelVM : ClientPanelVM, ISidePanel
     {
         #region 实例变量
 

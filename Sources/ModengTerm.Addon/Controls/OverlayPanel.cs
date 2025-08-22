@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace ModengTerm.Addon.Panel
+namespace ModengTerm.Addon.Controls
 {
-    public abstract class OverlayPanelContent : PanelContent
+    public abstract class OverlayPanel : Panel
     {
         /// <summary>
         /// OverlayPanel所属的Tab页面

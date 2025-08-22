@@ -1,13 +1,12 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using WPFToolkit.MVVM;
+using Panel = ModengTerm.Addon.Controls.Panel;
 
-namespace ModengTerm.ViewModel.Panel
+namespace ModengTerm.ViewModel.Panels
 {
-    public abstract class ClientPanel : ViewModelBase, IClientPanel
+    public abstract class ClientPanelVM : ViewModelBase, IClientPanel
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientPanel");
 
@@ -15,7 +14,7 @@ namespace ModengTerm.ViewModel.Panel
 
         private bool isOpened;
         private string iconURI;
-        private PanelContent content;
+        private Addon.Controls.Panel content;
         private bool initialized;
 
         #endregion
@@ -24,7 +23,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelMetadata Metadata { get; set; }
 
-        public PanelContent Content
+        public Panel Content
         {
             get { return this.content; }
             private set
@@ -72,11 +71,11 @@ namespace ModengTerm.ViewModel.Panel
 
         private void InitializeContent()
         {
-            PanelContent content = null;
+            Addon.Controls.Panel content = null;
 
             try
             {
-                content = ConfigFactory<PanelContent>.CreateInstance(this.Metadata.ClassName);
+                content = ConfigFactory<Addon.Controls.Panel>.CreateInstance(this.Metadata.ClassName);
                 content.OwnerPanel = this;
             }
             catch (Exception ex)
@@ -110,7 +109,7 @@ namespace ModengTerm.ViewModel.Panel
             this.content.OnInitialize();
         }
 
-        public void Release() 
+        public void Release()
         {
             if (!this.initialized)
             {

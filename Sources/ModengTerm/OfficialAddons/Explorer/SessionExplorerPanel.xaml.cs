@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
 using System.Windows.Controls;
@@ -10,7 +10,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : SidePanelContent
+    public partial class SessionExplorerPanel : SidePanel
     {
         #region 类变量
 
@@ -63,7 +63,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #endregion
 
-        #region SidePanelContent
+        #region SidePanel
 
         public override void OnInitialize()
         {

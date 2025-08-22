@@ -1,17 +1,18 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Base.Addon;
 using System.Windows;
 using System.Windows.Threading;
+using Panel = ModengTerm.Addon.Controls.Panel;
 
-namespace ModengTerm.ViewModel.Panel
+namespace ModengTerm.ViewModel.Panels
 {
     /// <summary>
     /// 提供扩展悬浮面板的接口
     /// </summary>
-    public class OverlayPanel : ClientPanel, IOverlayPanel
+    public class OverlayPanelVM : ClientPanelVM, IOverlayPanel
     {
         #region 类变量
 
@@ -50,7 +51,7 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 构造方法
 
-        public OverlayPanel() 
+        public OverlayPanelVM() 
         {
             this.factory = ClientFactory.GetFactory();
         }
@@ -61,7 +62,7 @@ namespace ModengTerm.ViewModel.Panel
 
         protected override void OnInitialize()
         {
-            OverlayPanelContent overlayPanelContent = base.Content as OverlayPanelContent;
+            OverlayPanel overlayPanelContent = base.Content as OverlayPanel;
             overlayPanelContent.OwnerTab = this.OwnerTab;
         }
 
@@ -71,7 +72,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public override void Open()
         {
-            PanelContent content = this.Content;
+            Panel content = this.Content;
 
             this.IsOpened = true;
 

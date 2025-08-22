@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
+using Renci.SshNet;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
@@ -17,7 +21,7 @@ namespace ModengTerm
 
             if (doubleModKeys)
             {
-                if(!modKeys.HasFlag(ModifierKeys.Control))
+                if (!modKeys.HasFlag(ModifierKeys.Control))
                 {
                     // 如果快捷键里没有Control，那么就是不合法的快捷键
                     return string.Empty;
@@ -93,6 +97,70 @@ namespace ModengTerm
             }
 
             return e.Key;
+        }
+
+        /// <summary>
+        /// 根据指定的SessionType返回需要加载的侧边栏面板列表
+        /// </summary>
+        /// <param name="metadatas"></param>
+        /// <param name="sessionType"></param>
+        /// <returns></returns>
+        public static List<SidePanelMetadata> GetCreateSidePanelMetadatas(List<SidePanelMetadata> metadatas, SessionTypeEnum sessionType)
+        {
+            List<SidePanelMetadata> result = new List<SidePanelMetadata>();
+
+            foreach (SidePanelMetadata metadata in metadatas)
+            {
+                // 是否需要创建SidePanel
+                bool create = false;
+
+                #region 判断是否需要创建SidePanel
+
+                switch (sessionType)
+                {
+                    case SessionTypeEnum.SSH:
+                        {
+                            create = metadata.Scopes.Contains(SidePanelScopes.SSH);
+                            break;
+                        }
+
+                    case SessionTypeEnum.SFTP:
+                        {
+                            create = metadata.Scopes.Contains(SidePanelScopes.SFTP);
+                            break;
+                        }
+
+                    case SessionTypeEnum.Tcp:
+                        {
+                            create = metadata.Scopes.Contains(SidePanelScopes.Tcp);
+                            break;
+                        }
+
+                    case SessionTypeEnum.SerialPort:
+                        {
+                            create = metadata.Scopes.Contains(SidePanelScopes.SerialPort);
+                            break;
+                        }
+
+                    case SessionTypeEnum.Localhost:
+                        {
+                            create = metadata.Scopes.Contains(SidePanelScopes.Localhost);
+                            break;
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                #endregion
+
+                if (create) 
+                {
+                    result.Add(metadata);
+                }
+            }
+
+            return result;
         }
     }
 }

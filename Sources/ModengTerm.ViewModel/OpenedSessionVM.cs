@@ -2,9 +2,10 @@
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using System.Windows;
 using WPFToolkit.MVVM;
 
@@ -129,6 +130,16 @@ namespace ModengTerm.ViewModel
             OnClose();
         }
 
+        public void CreateSidePanels(List<SidePanelMetadata> metadatas)
+        {
+            foreach (SidePanelMetadata metadata in metadatas)
+            {
+                SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
+                spvm.Initialize();
+                this.SidePanels.Add(spvm);
+            }
+        }
+
         #endregion
 
         #region IClientTab
@@ -161,12 +172,12 @@ namespace ModengTerm.ViewModel
             }
 
             object value;
-            if (!map.TryGetValue(key, out value)) 
+            if (!map.TryGetValue(key, out value))
             {
                 return default(TValue);
             }
 
-            if (value == null) 
+            if (value == null)
             {
                 return default(TValue);
             }

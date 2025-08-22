@@ -1,10 +1,9 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using Renci.SshNet;
 using System;
 using System.Runtime.Serialization;

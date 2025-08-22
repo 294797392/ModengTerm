@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addon.Panel;
+﻿using ModengTerm.Addon.Controls;
 using ModengTerm.Base;
 using System.ComponentModel;
 using System.Windows;
@@ -10,7 +10,7 @@ namespace ModengTerm.OfficialAddons.Snippet
     /// <summary>
     /// QuickCommandUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SnippetPanel : SidePanelContent
+    public partial class SnippetPanel : SidePanel
     {
         #region 实例变量
 

@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
 using ModengTerm.Addon.Service;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace ModengTerm.OfficialAddons.Broadcast
     /// <summary>
     /// BroadcastInputPanel.xaml 的交互逻辑
     /// </summary>
-    public partial class BroadcastPanel : SidePanelContent
+    public partial class BroadcastPanel : SidePanel
     {
         #region 实例变量
 
@@ -33,7 +33,7 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         #endregion
 
-        #region SidePanelContent
+        #region SidePanel
 
         public override void OnInitialize()
         {

@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base.Definitions;
-using ModengTerm.ViewModel.Panel;
 using System.Collections.Generic;
 using System.Windows;
 

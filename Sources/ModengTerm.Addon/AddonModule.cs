@@ -35,7 +35,6 @@ namespace ModengTerm.Addon
 
         private Dictionary<string, Command> registerCommands;
 
-        private List<ISidePanel> activeSidePanels;
         private List<IOverlayPanel> overlayPanels;
 
         protected ClientFactory factory;
@@ -56,14 +55,6 @@ namespace ModengTerm.Addon
         /// </summary>
         public Dictionary<string, Command> RegisteredCommand { get { return this.registerCommands; } }
 
-        /// <summary>
-        /// 获取当前已经激活了的侧边栏面板
-        /// </summary>
-        public List<ISidePanel> ActiveSidePanels
-        {
-            get { return this.activeSidePanels; }
-        }
-
         #endregion
 
         #region 公开接口
@@ -77,7 +68,6 @@ namespace ModengTerm.Addon
             this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, Command>();
             this.overlayPanels = new List<IOverlayPanel>();
-            this.activeSidePanels = new List<ISidePanel>();
             this.metadata = context.Definition;
 
             this.client = this.factory.GetClient();
@@ -118,11 +108,6 @@ namespace ModengTerm.Addon
             };
 
             this.registerCommands[command] = cmd;
-        }
-
-        protected ISidePanel GetSidePanel(string id)
-        {
-            return this.activeSidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         protected string GetObjectId()

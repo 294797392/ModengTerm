@@ -4,7 +4,7 @@ using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Terminal;
 using WPFToolkit.MVVM;
 
@@ -166,6 +166,28 @@ namespace ModengTerm.ViewModel
         public void AddSidePanel(SidePanelVM spvm)
         {
             this.PanelContainers[spvm.Dock].Panels.Add(spvm);
+        }
+
+        public void AddSidePanels(IEnumerable<SidePanelVM> spvms) 
+        {
+            foreach (SidePanelVM spvm in spvms)
+            {
+                this.AddSidePanel(spvm);
+            }
+        }
+
+        public void RemoveSidePanel(SidePanelVM spvm) 
+        {
+            PanelContainer container = this.PanelContainers[spvm.Dock];
+            container.Panels.Remove(spvm);
+        }
+
+        public void RemoveSidePanels(IEnumerable<SidePanelVM> spvms)
+        {
+            foreach (SidePanelVM spvm in spvms)
+            {
+                this.RemoveSidePanel(spvm);
+            }
         }
 
         /// <summary>

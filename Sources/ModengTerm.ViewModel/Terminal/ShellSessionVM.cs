@@ -13,7 +13,7 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -226,7 +226,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public SessionTransport Transport { get { return sessionTransport; } }
 
-        public BindableCollection<OverlayPanel> OverlayPanels { get; private set; }
+        public BindableCollection<OverlayPanelVM> OverlayPanels { get; private set; }
 
         #endregion
 
@@ -235,7 +235,7 @@ namespace ModengTerm.ViewModel.Terminal
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
-            this.OverlayPanels = new BindableCollection<OverlayPanel>();
+            this.OverlayPanels = new BindableCollection<OverlayPanelVM>();
             this.tabEventSendUserInput = new TabEventShellSendUserInput() { Sender = this };
             this.tabEventShellRendered = new TabEventShellRendered() { Sender = this };
             this.tabEventStatusChanged = new TabEventStatusChanged() { Sender = this };
@@ -352,7 +352,7 @@ namespace ModengTerm.ViewModel.Terminal
 
             #region 释放OverlayPanel
 
-            foreach (OverlayPanel overlayPanel in this.OverlayPanels)
+            foreach (OverlayPanelVM overlayPanel in this.OverlayPanels)
             {
                 overlayPanel.Release();
             }

@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace ModengTerm.Addon.Panel
+namespace ModengTerm.Addon.Controls
 {
     /// <summary>
     /// 表示扩展的Panel里的内容
     /// </summary>
-    public abstract class PanelContent : UserControl
+    public abstract class Panel : UserControl
     {
         protected ClientFactory factory;
         protected IClientEventRegistry eventRegistry;
@@ -23,19 +23,19 @@ namespace ModengTerm.Addon.Panel
         /// </summary>
         public IClientPanel OwnerPanel { get; set; }
 
-        public PanelContent() 
+        public Panel() 
         {
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
         }
 
         /// <summary>
-        /// 当面板第一次被激活的时候触发
+        /// 当创建面板实例的时候触发
         /// </summary>
         public abstract void OnInitialize();
 
         /// <summary>
-        /// 当不需要面板的时候触发
+        /// 当释放面板的时候触发
         /// </summary>
         public abstract void OnRelease();
 

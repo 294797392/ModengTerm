@@ -5,7 +5,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Document;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Session;
 using WPFToolkit.MVVM;
 

@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <Compile Remove="ContextMenuData.cs" />
-    <Compile Remove="Panel\HostOverlayPanel.cs" />
+    <Compile Remove="Panels\HostOverlayPanel.cs" />
     <Compile Remove="Terminal\InputSessionVM.cs" />
     <Compile Remove="Terminal\PlaybackSessionVM.cs" />
     <Compile Remove="ThemeVM.cs" />

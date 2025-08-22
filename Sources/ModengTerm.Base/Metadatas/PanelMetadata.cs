@@ -67,7 +67,27 @@ namespace ModengTerm.Base.Definitions
         /// 侧边栏属于会话
         /// 每个会话都有一个单独的侧边栏实例
         /// </summary>
-        Session,
+        Localhost,
+
+        /// <summary>
+        /// 是一个SSH远程主机
+        /// </summary>
+        SSH,
+
+        /// <summary>
+        /// 是一个串口设备
+        /// </summary>
+        SerialPort,
+
+        /// <summary>
+        /// SFTP会话
+        /// </summary>
+        SFTP,
+
+        /// <summary>
+        /// Tcp会话
+        /// </summary>
+        Tcp
     }
 
     public class SidePanelMetadata : PanelMetadata
@@ -75,14 +95,8 @@ namespace ModengTerm.Base.Definitions
         /// <summary>
         /// 侧边栏窗口所属者
         /// </summary>
-        [JsonProperty("scope")]
-        public SidePanelScopes Scope { get; set; }
-
-        /// <summary>
-        /// 如果侧边栏所属者是Client，那么这个字段表示在打开哪些Session的时候显示侧边栏
-        /// </summary>
-        [JsonProperty("sessionTypes")]
-        public List<SessionTypeEnum> SessionTypes { get; private set; }
+        [JsonProperty("scopes")]
+        public List<SidePanelScopes> Scopes { get; set; }
 
         /// <summary>
         /// 侧边栏窗口的位置
@@ -92,7 +106,7 @@ namespace ModengTerm.Base.Definitions
 
         public SidePanelMetadata()
         {
-            this.SessionTypes = new List<SessionTypeEnum>();
+            this.Scopes = new List<SidePanelScopes>();
         }
     }
 

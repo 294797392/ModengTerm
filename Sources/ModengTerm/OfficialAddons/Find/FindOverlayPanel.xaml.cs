@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Panel;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
@@ -17,7 +17,7 @@ namespace ModengTerm.OfficialAddons.Find
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindOverlayPanel : OverlayPanelContent
+    public partial class FindOverlayPanel : OverlayPanel
     {
         #region 类变量
 

@@ -2,7 +2,7 @@
 using ModengTerm.Base.Addon;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel.Panel
+namespace ModengTerm.ViewModel.Panels
 {
     public class PanelContainer : ViewModelBase
     {

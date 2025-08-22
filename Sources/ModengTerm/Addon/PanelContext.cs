@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base.Definitions;
-using ModengTerm.ViewModel.Panel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

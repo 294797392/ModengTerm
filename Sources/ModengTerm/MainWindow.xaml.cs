@@ -15,7 +15,7 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Panel;
+using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
@@ -478,7 +478,7 @@ namespace ModengTerm
         {
             AddonMetadata metadata = addon.Metadata;
 
-            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scope == SidePanelScopes.Client).ToList();
+            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scopes.Contains(SidePanelScopes.Client)).ToList();
 
             foreach (SidePanelMetadata panelMetadata in panelMetadatas)
             {
@@ -486,19 +486,35 @@ namespace ModengTerm
             }
         }
 
+        /// <summary>
+        /// 初始化会话侧边栏窗口
+        /// </summary>
+        /// <param name="sessionVM"></param>
+        private void CreateSessionSidePanel(OpenedSessionVM sessionVM)
+        {
+            foreach (AddonModule addon in this.addons)
+            {
+                AddonMetadata metadata = addon.Metadata;
+
+                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetCreateSidePanelMetadatas(metadata.SidePanels, sessionVM.Type);
+
+                sessionVM.CreateSidePanels(sidePanelMetadatas);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
 
-        private OverlayPanel EnsureOverlayPanel(OverlayPanelContext opc)
+        private OverlayPanelVM EnsureOverlayPanel(OverlayPanelContext opc)
         {
             OverlayPanelMetadata definition = opc.Definition as OverlayPanelMetadata;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
+            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
 
             if (overlayPanel == null)
             {
-                overlayPanel = new OverlayPanel();
+                overlayPanel = new OverlayPanelVM();
                 overlayPanel.Metadata = definition;
                 overlayPanel.ID = definition.ID;
                 overlayPanel.Name = definition.Name;
@@ -515,7 +531,7 @@ namespace ModengTerm
         private void OnOpenOverlayPanelEvent(object userData)
         {
             OverlayPanelContext opc = userData as OverlayPanelContext;
-            OverlayPanel overlayPanel = this.EnsureOverlayPanel(opc);
+            OverlayPanelVM overlayPanel = this.EnsureOverlayPanel(opc);
             overlayPanel.Open();
         }
 
@@ -524,7 +540,7 @@ namespace ModengTerm
             OverlayPanelContext opc = userData as OverlayPanelContext;
             PanelMetadata definition = opc.Definition;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanel overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
+            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
 
             if (overlayPanel == null)
             {
@@ -537,9 +553,10 @@ namespace ModengTerm
         private void OnSwitchOverlayPanelEvent(CommandArgs e)
         {
             OverlayPanelContext opc = e.UserData as OverlayPanelContext;
-            OverlayPanel overlayPanel = this.EnsureOverlayPanel(opc);
+            OverlayPanelVM overlayPanel = this.EnsureOverlayPanel(opc);
             overlayPanel.SwitchStatus();
         }
+
 
 
         private void OnOpenSidePanelEvent(object userData)
@@ -613,21 +630,35 @@ namespace ModengTerm
                 ContentControlSession.Content = openedSessionVM.Content;
             }
 
-            #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
-
             OpenedSessionVM removedSession = null, addedSession = null;
 
             if (e.RemovedItems.Count > 0)
             {
                 removedSession = e.RemovedItems[0] as OpenedSessionVM;
+
+                if (removedSession != null) // 有可能是空的，因为有一个打开会话的项
+                {
+                    #region 隐藏之前显示的侧边栏
+
+                    this.mainWindowVM.RemoveSidePanels(removedSession.SidePanels);
+
+                    #endregion
+                }
             }
 
             if (e.AddedItems.Count > 0)
             {
                 addedSession = e.AddedItems[0] as OpenedSessionVM;
-            }
 
-            #endregion
+                if (addedSession != null) // 有可能是空的，因为有一个打开会话的项
+                {
+                    #region 显示当前显示的会话里的侧边栏
+
+                    this.mainWindowVM.AddSidePanels(addedSession.SidePanels);
+
+                    #endregion
+                }
+            }
 
             if (selectedSession is OpenedSessionVM)
             {
@@ -881,7 +912,9 @@ namespace ModengTerm
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 
-            // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
+            // 先创建会话侧边栏面板，再把会话加入到界面上，最后触发选中的会话改变事件
+            this.CreateSessionSidePanel(openedSessionVM);
+
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
             this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
             this.mainWindowVM.SelectedSession = openedSessionVM;
