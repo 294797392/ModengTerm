@@ -100,7 +100,7 @@ namespace ModengTerm.ViewModel.Panels
                 return;
             }
 
-            this.panel.OnRelease();
+            this.panel.Release();
 
             this.OnRelease();
 
@@ -114,7 +114,7 @@ namespace ModengTerm.ViewModel.Panels
         /// </summary>
         public void Loaded()
         {
-            this.panel.OnLoaded();
+            this.panel.Load();
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ModengTerm.ViewModel.Panels
         /// </summary>
         public void Unloaded()
         {
-            this.panel.OnUnload();
+            this.panel.Unload();
         }
 
         public void SwitchStatus()

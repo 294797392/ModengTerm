@@ -75,20 +75,20 @@ namespace ModengTerm.OfficialAddons.Snippet
 
         #region SidePanelContent
 
-        public override void OnInitialize()
+        public override void Initialize()
         {
 
         }
 
-        public override void OnRelease()
+        public override void Release()
         {
         }
 
-        public override void OnLoaded()
+        public override void Load()
         {
         }
 
-        public override void OnUnload()
+        public override void Unload()
         {
         }
 

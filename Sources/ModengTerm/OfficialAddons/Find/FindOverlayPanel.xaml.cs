@@ -28,9 +28,6 @@ namespace ModengTerm.OfficialAddons.Find
 
         #region 实例变量
 
-        private ClientFactory factory;
-        private IClientEventRegistry eventRegistory;
-
         private IDrawingContext drawingContext;
         /// <summary>
         /// 用来高亮显示匹配结果的矩形
@@ -57,8 +54,6 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void InitializePanel()
         {
-            this.factory = ClientFactory.GetFactory();
-            this.eventRegistory = this.factory.GetEventRegistry();
             this.textBoxBorderBrush = TextBoxKeyword.BorderBrush;
             TextBoxKeyword.BorderBrush = Brushes.Red;
         }
@@ -116,34 +111,35 @@ namespace ModengTerm.OfficialAddons.Find
 
         #endregion
 
-        #region OverlayPanelHost
+        #region OverlayPanel
 
-        public override void OnInitialize()
+        public override void Initialize()
         {
-            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
             string backColorRgbKey = this.Tab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
             IClientShellTab shellTab = this.Tab as IClientShellTab;
             this.drawingContext = shellTab.DrawingContext;
+
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
         }
 
-        public override void OnRelease()
+        public override void Release()
         {
-            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
             this.drawingContext.DeleteGraphicsObject(this.highlightObject);
         }
 
-        public override void OnLoaded()
+        public override void Load()
         {
             TextBoxKeyword.Focus();
 
             this.PerformFind();
         }
 
-        public override void OnUnload()
+        public override void Unload()
         {
             this.highlightObject.Clear();
         }
@@ -154,11 +150,10 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void OnShellRendered(TabEventArgs e, object userData)
         {
-            throw new System.NotImplementedException();
-            //if (this.OwnerPanel.IsOpened)
-            //{
-            //    this.PerformFind();
-            //}
+            if (this.Container.IsOpened)
+            {
+                this.PerformFind();
+            }
         }
 
         #endregion

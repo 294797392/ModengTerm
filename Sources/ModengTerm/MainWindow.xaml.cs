@@ -699,6 +699,10 @@ namespace ModengTerm
             FrameworkElement frameworkElement = sender as FrameworkElement;
             OpenedSessionVM openedSessionVM = frameworkElement.DataContext as OpenedSessionVM;
 
+            // CloseSession之前先手动移除已经显示到界面上的侧边栏
+            // 因为CloseSession的时候会清空SidePanels, 如果放在CloseSession之后执行, 界面上已经显示的侧边栏就删不掉了
+            this.mainWindowVM.RemoveSidePanels(openedSessionVM.SidePanels);
+
             this.CloseSession(openedSessionVM);
 
             this.mainWindowVM.SelectedSession = this.mainWindowVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
@@ -720,10 +724,6 @@ namespace ModengTerm
 
                 //this.ShowSessionListWindow();
             }
-
-            // 关闭后触发的ListBoxOpenedSession_SelectionChanged事件里，RemovedItems为空
-            // 需要手动移除被关闭的会话对应的侧边栏面板
-            this.mainWindowVM.RemoveSidePanels(openedSessionVM.SidePanels);
 
             // 触发关闭事件
             ClientEventTabClosed tabClosed = new ClientEventTabClosed()
@@ -926,9 +926,6 @@ namespace ModengTerm
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 
-            this.CreateTabedSidePanel(openedSessionVM);
-            this.CreateTabedOverlayPanel(openedSessionVM);
-
             // 把打开的会话加到ListBoxOpenedSession里，此时会触发ListBoxOpenedSession_SelectionChanged事件
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
             this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
@@ -954,6 +951,12 @@ namespace ModengTerm
                 OpenedTab = openedSessionVM,
             };
             this.PublishEvent(tabOpened);
+
+            // 会话打开之后再创建需要显示的面板
+            // 面板里可能会用到会话里的数据
+            this.CreateTabedSidePanel(openedSessionVM);
+            this.CreateTabedOverlayPanel(openedSessionVM);
+            this.mainWindowVM.AddSidePanels(openedSessionVM.SidePanels);
         }
 
         /// <summary>

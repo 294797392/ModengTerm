@@ -1,10 +1,6 @@
-﻿using ModengTerm.Addon.Controls;
-using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Graphics;
-using System.Windows.Media;
 
 namespace ModengTerm.Addon.Interactive
 {

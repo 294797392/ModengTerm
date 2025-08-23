@@ -51,7 +51,7 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         #region SidePanel
 
-        public override void OnInitialize()
+        public override void Initialize()
         {
             this.broadcastTabs = new BindableCollection<ShellTabVM>();
             List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
@@ -72,19 +72,19 @@ namespace ModengTerm.OfficialAddons.Broadcast
             this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_USER_INPUT, this.OnTabShellUserInput, this.Tab);
         }
 
-        public override void OnRelease()
+        public override void Release()
         {
             this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnClientTabOpened);
             this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_TAB_CLOSED, this.OnClientTabClosed);
             this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_USER_INPUT, this.OnTabShellUserInput, this.Tab);
         }
 
-        public override void OnLoaded()
+        public override void Load()
         {
             logger.InfoFormat("OnLoaded");
         }
 
-        public override void OnUnload()
+        public override void Unload()
         {
             logger.InfoFormat("OnUnload");
         }

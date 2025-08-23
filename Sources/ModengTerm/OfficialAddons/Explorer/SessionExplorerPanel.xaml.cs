@@ -65,7 +65,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #region SidePanel
 
-        public override void OnInitialize()
+        public override void Initialize()
         {
             this.resourceManagerTreeVM = VMUtils.CreateSessionTreeVM(false, true);
             this.resourceManagerTreeVM.Roots[0].Name = "会话列表";
@@ -76,17 +76,17 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             logger.InfoFormat(string.Format("{0}, OnInitialize", this.Name));
         }
 
-        public override void OnRelease()
+        public override void Release()
         {
             logger.InfoFormat(string.Format("{0}, OnRelease", this.Name));
         }
 
-        public override void OnLoaded()
+        public override void Load()
         {
             logger.InfoFormat(string.Format("{0}, OnLoaded", this.Name));
         }
 
-        public override void OnUnload()
+        public override void Unload()
         {
             logger.InfoFormat(string.Format("{0}, OnUnload", this.Name));
         }

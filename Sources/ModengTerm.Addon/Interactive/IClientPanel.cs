@@ -8,14 +8,10 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 向插件公开Panel的接口
+    /// 向插件公开控制Panel的接口
     /// </summary>
     public interface IClientPanel
     {
-        object ID { get; }
-
-        string Name { get; }
-
         /// <summary>
         /// 获取该面板是否是打开状态
         /// </summary>

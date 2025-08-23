@@ -1,18 +1,14 @@
 ﻿using DotNEToolkit;
-using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
-using ModengTerm.ViewModel.Terminal;
 using System.Windows;
 using WPFToolkit.MVVM;
-using Panel = ModengTerm.Addon.Controls.Panel;
 
 namespace ModengTerm.ViewModel
 {
@@ -92,7 +88,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 该会话所拥有的侧边栏
         /// </summary>
-        public List<SidePanelVM> SidePanels { get { return this.SidePanels; } }
+        public List<SidePanelVM> SidePanels { get { return this.sidePanels; } }
 
         public BindableCollection<OverlayPanelVM> OverlayPanels { get { return this.overlayPanels; } }
 
@@ -128,6 +124,27 @@ namespace ModengTerm.ViewModel
             this.OnRelease();
 
             // release
+
+            #region 释放OverlayPanel
+
+            foreach (OverlayPanelVM opvm in this.overlayPanels)
+            {
+                opvm.Release();
+            }
+
+            this.OverlayPanels.Clear();
+
+            #endregion
+
+            #region 释放SidePanel
+
+            foreach (SidePanelVM spvm in this.sidePanels)
+            {
+                spvm.Release();
+            }
+
+            #endregion
+
             this.dataMap.Clear();
         }
 
@@ -161,7 +178,8 @@ namespace ModengTerm.ViewModel
                     {
                         tabSidePanel.Tab = this;
                     }
-                    sidePanel.OnInitialize();
+                    sidePanel.Container = spvm;
+                    sidePanel.Initialize();
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +211,8 @@ namespace ModengTerm.ViewModel
                 {
                     overlayPanel = ConfigFactory<OverlayPanel>.CreateInstance(opvm.Metadata.ClassName);
                     overlayPanel.Tab = this;
-                    overlayPanel.OnInitialize();
+                    overlayPanel.Container = opvm;
+                    overlayPanel.Initialize();
                 }
                 catch (Exception ex)
                 {

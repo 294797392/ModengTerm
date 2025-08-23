@@ -347,17 +347,6 @@ namespace ModengTerm.ViewModel.Terminal
             // 释放剪贴板
             clipboard.Release();
 
-            #region 释放OverlayPanel
-
-            foreach (OverlayPanelVM overlayPanel in this.OverlayPanels)
-            {
-                overlayPanel.Release();
-            }
-
-            this.OverlayPanels.Clear();
-
-            #endregion
-
             isRunning = false;
         }
 

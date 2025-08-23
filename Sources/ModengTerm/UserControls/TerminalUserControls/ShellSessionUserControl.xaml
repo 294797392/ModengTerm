@@ -203,7 +203,7 @@
                                          SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseOverlayPanel_Click"
                                          Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
 
-                        <ContentControl Grid.Row="1" Content="{Binding Path=Content}" Margin="3"/>
+                        <ContentControl Grid.Row="1" Content="{Binding Path=Panel}" Margin="3"/>
 
                         <Border Grid.Row="2" Background="{DynamicResource ResourceKey=RES60006E}"/>
 
