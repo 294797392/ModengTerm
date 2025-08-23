@@ -67,9 +67,9 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
             DataGridBroadcastList.ItemsSource = this.broadcastTabs;
 
-            this.eventRegistry.SubscribeEvent("onClientTabOpened:ssh|local|serial|tcp", this.OnClientTabOpened, null);
-            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed, null);
-            this.eventRegistry.SubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab, null);
+            this.eventRegistry.SubscribeEvent("onClientTabOpened:ssh|local|serial|tcp", this.OnClientTabOpened);
+            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed);
+            this.eventRegistry.SubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab);
         }
 
         public override void OnRelease()
