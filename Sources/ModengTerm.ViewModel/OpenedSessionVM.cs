@@ -164,7 +164,6 @@ namespace ModengTerm.ViewModel
             foreach (SidePanelMetadata metadata in metadatas)
             {
                 SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
-                spvm.Session = this;
 
                 #region 创建Panel实例
 

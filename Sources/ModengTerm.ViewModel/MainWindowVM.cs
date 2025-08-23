@@ -1,4 +1,6 @@
-﻿using ModengTerm.Addon.Interactive;
+﻿using DotNEToolkit;
+using ModengTerm.Addon.Controls;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
@@ -168,7 +170,7 @@ namespace ModengTerm.ViewModel
             this.PanelContainers[spvm.Dock].Panels.Add(spvm);
         }
 
-        public void AddSidePanels(IEnumerable<SidePanelVM> spvms) 
+        public void AddSidePanels(IEnumerable<SidePanelVM> spvms)
         {
             foreach (SidePanelVM spvm in spvms)
             {
@@ -176,7 +178,7 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public void RemoveSidePanel(SidePanelVM spvm) 
+        public void RemoveSidePanel(SidePanelVM spvm)
         {
             PanelContainer container = this.PanelContainers[spvm.Dock];
             container.Panels.Remove(spvm);
@@ -197,7 +199,29 @@ namespace ModengTerm.ViewModel
         public void CreateSidePanel(SidePanelMetadata metadata)
         {
             SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
+
+            #region 创建Panel实例
+
+            SidePanel sidePanel = null;
+
+            try
+            {
+                sidePanel = ConfigFactory<SidePanel>.CreateInstance(spvm.Metadata.ClassName);
+                sidePanel.Container = spvm;
+                sidePanel.Initialize();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("加载SidePanel异常", ex);
+                return;
+            }
+
+            spvm.Panel = sidePanel;
+
+            #endregion
+
             spvm.Initialize();
+
             this.AddSidePanel(spvm);
         }
 

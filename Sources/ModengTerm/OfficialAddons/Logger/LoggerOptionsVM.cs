@@ -103,6 +103,12 @@ namespace ModengTerm.OfficialAddons.Logger
             }
         }
 
+        /// <summary>
+        /// 要记录哪个Tab的日志
+        /// </summary>
+        public IClientShellTab ShellTab { get; set; }
+
+
         #endregion
 
         #region 构造方法

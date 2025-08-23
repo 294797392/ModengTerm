@@ -176,7 +176,7 @@
 
         </ListBox>
 
-        <Grid Grid.Column="1" x:Name="GridContent" Width="300" Visibility="{Binding Path=Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, FallbackValue=Collapsed}">
+        <Grid Grid.Column="1" x:Name="GridContent" MinWidth="300" Visibility="{Binding Path=Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, FallbackValue=Collapsed}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>

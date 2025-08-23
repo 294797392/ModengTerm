@@ -20,11 +20,6 @@ namespace ModengTerm.ViewModel.Panels
 
         public SidePanelDocks Dock { get; set; }
 
-        /// <summary>
-        /// 如果侧边栏面板的Scope属于会话，那么该属性存储属于哪个会话
-        /// </summary>
-        public OpenedSessionVM Session { get; set; }
-
         #endregion
 
         #region ClientPanel

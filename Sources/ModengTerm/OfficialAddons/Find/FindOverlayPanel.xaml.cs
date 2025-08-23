@@ -121,7 +121,6 @@ namespace ModengTerm.OfficialAddons.Find
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
             IClientShellTab shellTab = this.Tab as IClientShellTab;
             this.drawingContext = shellTab.DrawingContext;
-
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
         }
 

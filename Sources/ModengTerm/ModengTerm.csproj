@@ -49,6 +49,7 @@
     <Compile Remove="OfficialAddons\Logger\LoggerFilter.cs" />
     <Compile Remove="OfficialAddons\Logger\LoggerFilterFactory.cs" />
     <Compile Remove="OfficialAddons\Logger\LoggerManager.cs" />
+    <Compile Remove="OfficialAddons\Logger\LoggerOptionsVM.cs" />
     <Compile Remove="OfficialAddons\Logger\NoneFilter.cs" />
     <Compile Remove="OfficialAddons\Logger\RegexpFilter.cs" />
     <Compile Remove="OfficialAddons\Snippet\CommandManagerWindow.xaml.cs" />
