@@ -150,6 +150,17 @@ namespace ModengTerm.ViewModel
             return sidePanel;
         }
 
+        public static OverlayPanelVM CreateOverlayPanelVM(OverlayPanelMetadata metadata)
+        {
+            OverlayPanelVM overlayPanel = new OverlayPanelVM();
+            overlayPanel.Metadata = metadata;
+            overlayPanel.ID = metadata.ID;
+            overlayPanel.Name = metadata.Name;
+            overlayPanel.IconURI = metadata.Icon;
+            overlayPanel.Dock = metadata.Dock;
+            return overlayPanel;
+        }
+
 
 
         private static void LoadSessionGroupNode(SessionGroupVM parentGroup, List<SessionGroup> groups)

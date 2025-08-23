@@ -105,11 +105,11 @@ namespace ModengTerm
         /// <param name="metadatas"></param>
         /// <param name="sessionType"></param>
         /// <returns></returns>
-        public static List<SidePanelMetadata> GetCreateSidePanelMetadatas(List<SidePanelMetadata> metadatas, SessionTypeEnum sessionType)
+        public static List<TPanelMetadata> GetTabedPanelMetadatas<TPanelMetadata>(List<TPanelMetadata> metadatas, SessionTypeEnum sessionType) where TPanelMetadata : PanelMetadata
         {
-            List<SidePanelMetadata> result = new List<SidePanelMetadata>();
+            List<TPanelMetadata> result = new List<TPanelMetadata>();
 
-            foreach (SidePanelMetadata metadata in metadatas)
+            foreach (TPanelMetadata metadata in metadatas)
             {
                 // 是否需要创建SidePanel
                 bool create = false;
@@ -120,31 +120,31 @@ namespace ModengTerm
                 {
                     case SessionTypeEnum.SSH:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SshTab);
+                            create = metadata.Scopes.Contains(PanelScope.SshTab);
                             break;
                         }
 
                     case SessionTypeEnum.SFTP:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SftpTab);
+                            create = metadata.Scopes.Contains(PanelScope.SftpTab);
                             break;
                         }
 
                     case SessionTypeEnum.Tcp:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.TcpTab);
+                            create = metadata.Scopes.Contains(PanelScope.TcpTab);
                             break;
                         }
 
                     case SessionTypeEnum.SerialPort:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SerialPortTab);
+                            create = metadata.Scopes.Contains(PanelScope.SerialPortTab);
                             break;
                         }
 
                     case SessionTypeEnum.Localhost:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.ConsoleTab);
+                            create = metadata.Scopes.Contains(PanelScope.ConsoleTab);
                             break;
                         }
 

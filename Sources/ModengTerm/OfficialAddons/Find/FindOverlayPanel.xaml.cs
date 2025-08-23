@@ -6,6 +6,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Graphics;
+using ModengTerm.OfficialAddons.Broadcast;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -64,13 +65,15 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void PerformFind()
         {
+            IClientShellTab shellTab = this.Tab as IClientShellTab;
+
             FindOptions options = new FindOptions()
             {
                 CaseSensitive = CheckBoxCaseSensitive.IsChecked.Value,
                 Regexp = CheckBoxRegexp.IsChecked.Value,
                 Keyword = TextBoxKeyword.Text
             };
-            List<VTextRange> textRanges = this.OwnerTab.FindMatches(options);
+            List<VTextRange> textRanges = shellTab.FindMatches(options);
             if (textRanges == null || textRanges.Count == 0)
             {
                 this.highlightObject.Clear();
@@ -117,17 +120,18 @@ namespace ModengTerm.OfficialAddons.Find
 
         public override void OnInitialize()
         {
-            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
+            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
-            string backColorRgbKey = this.OwnerTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            string backColorRgbKey = this.Tab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
-            this.drawingContext = this.OwnerTab.DrawingContext;
+            IClientShellTab shellTab = this.Tab as IClientShellTab;
+            this.drawingContext = shellTab.DrawingContext;
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
         }
 
         public override void OnRelease()
         {
-            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
+            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
             this.drawingContext.DeleteGraphicsObject(this.highlightObject);
         }

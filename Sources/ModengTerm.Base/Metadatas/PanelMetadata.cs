@@ -4,6 +4,47 @@ using Newtonsoft.Json;
 
 namespace ModengTerm.Base.Definitions
 {
+    /// <summary>
+    /// 定义侧边栏面板所属范围
+    /// </summary>
+    public enum PanelScope
+    {
+        /// <summary>
+        /// 侧边栏面板属于客户端，整个app运行期间只有一个实例
+        /// </summary>
+        Client,
+
+        /// <summary>
+        /// 侧边栏面板属于控制台会话
+        /// 每个控制台会话都有一个单独的侧边栏面板实例
+        /// </summary>
+        ConsoleTab,
+
+        /// <summary>
+        /// 侧边栏面板属于Ssh会话
+        /// 每个Ssh会话都有一个单独的侧边栏面板实例
+        /// </summary>
+        SshTab,
+
+        /// <summary>
+        /// 侧边栏面板属于串口会话
+        /// 每个串口会话都有一个单独的侧边栏面板实例
+        /// </summary>
+        SerialPortTab,
+
+        /// <summary>
+        /// 侧边栏面板属于Sftp会话
+        /// 每个Sftp会话都有一个单独的侧边栏面板实例
+        /// </summary>
+        SftpTab,
+
+        /// <summary>
+        /// 侧边栏面板属于Tcp会话
+        /// 每个Tcp会话都有一个单独的侧边栏面板实例
+        /// </summary>
+        TcpTab
+    }
+
     public abstract class PanelMetadata
     {
         //
@@ -48,63 +89,23 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("commands")]
         public List<string> Commands { get; private set; }
 
+        /// <summary>
+        /// 面板所属者
+        /// </summary>
+        [JsonProperty("scopes")]
+        public List<PanelScope> Scopes { get; private set; }
+
         public PanelMetadata()
         {
             this.OpenHotkeys = new List<string>();
             this.CloseHotkeys = new List<string>();
             this.Commands = new List<string>();
+            this.Scopes = new List<PanelScope>();
         }
-    }
-
-    /// <summary>
-    /// 定义侧边栏面板所属范围
-    /// </summary>
-    public enum SidePanelScopes
-    {
-        /// <summary>
-        /// 侧边栏面板属于客户端，整个app运行期间只有一个实例
-        /// </summary>
-        Client,
-
-        /// <summary>
-        /// 侧边栏面板属于控制台会话
-        /// 每个控制台会话都有一个单独的侧边栏面板实例
-        /// </summary>
-        ConsoleTab,
-
-        /// <summary>
-        /// 侧边栏面板属于Ssh会话
-        /// 每个Ssh会话都有一个单独的侧边栏面板实例
-        /// </summary>
-        SshTab,
-
-        /// <summary>
-        /// 侧边栏面板属于串口会话
-        /// 每个串口会话都有一个单独的侧边栏面板实例
-        /// </summary>
-        SerialPortTab,
-
-        /// <summary>
-        /// 侧边栏面板属于Sftp会话
-        /// 每个Sftp会话都有一个单独的侧边栏面板实例
-        /// </summary>
-        SftpTab,
-
-        /// <summary>
-        /// 侧边栏面板属于Tcp会话
-        /// 每个Tcp会话都有一个单独的侧边栏面板实例
-        /// </summary>
-        TcpTab
     }
 
     public class SidePanelMetadata : PanelMetadata
     {
-        /// <summary>
-        /// 侧边栏窗口所属者
-        /// </summary>
-        [JsonProperty("scopes")]
-        public List<SidePanelScopes> Scopes { get; set; }
-
         /// <summary>
         /// 侧边栏窗口的位置
         /// </summary>
@@ -113,7 +114,6 @@ namespace ModengTerm.Base.Definitions
 
         public SidePanelMetadata()
         {
-            this.Scopes = new List<SidePanelScopes>();
         }
     }
 

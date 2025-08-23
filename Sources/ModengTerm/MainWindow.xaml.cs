@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using log4net.Appender;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
@@ -170,12 +171,12 @@ namespace ModengTerm
             {
                 foreach (string hkey in metadata.OpenHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnOpenSidePanelEvent, metadata);
+                    this.eventRegistry.RegisterHotkey(hkey, this.OnOpenSidePanelEvent, metadata);
                 }
 
                 foreach (string hkey in metadata.CloseHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.Client, this.OnCloseSidePanelEvent, metadata);
+                    this.eventRegistry.RegisterHotkey(hkey, this.OnCloseSidePanelEvent, metadata);
                 }
 
                 foreach (string command in metadata.Commands)
@@ -188,21 +189,19 @@ namespace ModengTerm
 
             foreach (OverlayPanelMetadata metadata in overlayPanelMetadatas)
             {
-                OverlayPanelContext opc = new OverlayPanelContext(addon, metadata);
-
                 foreach (string hkey in metadata.OpenHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnOpenOverlayPanelEvent, opc);
+                    this.eventRegistry.RegisterHotkey(hkey, this.OnOpenOverlayPanelEvent, metadata);
                 }
 
                 foreach (string hkey in metadata.CloseHotkeys)
                 {
-                    this.eventRegistry.RegisterHotkey(addon, hkey, HotkeyScopes.ClientShellTab, this.OnCloseOverlayPanelEvent, opc);
+                    this.eventRegistry.RegisterHotkey(hkey, this.OnCloseOverlayPanelEvent, metadata);
                 }
 
                 foreach (string command in metadata.Commands)
                 {
-                    addon.RegisterCommand(command, this.OnSwitchOverlayPanelEvent, opc);
+                    addon.RegisterCommand(command, this.OnSwitchOverlayPanelEvent, metadata);
                 }
             }
         }
@@ -479,7 +478,7 @@ namespace ModengTerm
         {
             AddonMetadata metadata = addon.Metadata;
 
-            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scopes.Contains(SidePanelScopes.Client)).ToList();
+            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scopes.Contains(PanelScope.Client)).ToList();
 
             foreach (SidePanelMetadata panelMetadata in panelMetadatas)
             {
@@ -497,9 +496,21 @@ namespace ModengTerm
             {
                 AddonMetadata metadata = addon.Metadata;
 
-                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetCreateSidePanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
+                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetTabedPanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
 
                 openedSessionVM.CreateSidePanels(sidePanelMetadatas);
+            }
+        }
+
+        private void CreateTabedOverlayPanel(OpenedSessionVM openedSessionVM) 
+        {
+            foreach (AddonModule addon in this.addons)
+            {
+                AddonMetadata metadata = addon.Metadata;
+
+                List<OverlayPanelMetadata> overlayPanelMetadatas = VTClientUtils.GetTabedPanelMetadatas(metadata.OverlayPanels, openedSessionVM.Type);
+
+                openedSessionVM.CreateOverlayPanels(overlayPanelMetadatas);
             }
         }
 
@@ -507,55 +518,37 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private OverlayPanelVM EnsureOverlayPanel(OverlayPanelContext opc)
-        {
-            OverlayPanelMetadata definition = opc.Definition as OverlayPanelMetadata;
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
-
-            if (overlayPanel == null)
-            {
-                overlayPanel = new OverlayPanelVM();
-                overlayPanel.Metadata = definition;
-                overlayPanel.ID = definition.ID;
-                overlayPanel.Name = definition.Name;
-                overlayPanel.IconURI = definition.Icon;
-                overlayPanel.OwnerTab = shellSession;
-                overlayPanel.Dock = definition.Dock;
-                overlayPanel.Initialize();
-                shellSession.OverlayPanels.Add(overlayPanel);
-            }
-
-            return overlayPanel;
-        }
-
         private void OnOpenOverlayPanelEvent(object userData)
         {
-            OverlayPanelContext opc = userData as OverlayPanelContext;
-            OverlayPanelVM overlayPanel = this.EnsureOverlayPanel(opc);
-            overlayPanel.Open();
+            OverlayPanelMetadata metadata = userData as OverlayPanelMetadata;
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            if (overlayPanel != null) 
+            {
+                overlayPanel.Open();
+            }
         }
 
         private void OnCloseOverlayPanelEvent(object userData)
         {
-            OverlayPanelContext opc = userData as OverlayPanelContext;
-            PanelMetadata definition = opc.Definition;
+            OverlayPanelMetadata metadata = userData as OverlayPanelMetadata;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == definition);
-
-            if (overlayPanel == null)
+            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            if (overlayPanel != null)
             {
-                return;
+                overlayPanel.Close();
             }
-
-            overlayPanel.Close();
         }
 
         private void OnSwitchOverlayPanelEvent(CommandArgs e)
         {
-            OverlayPanelContext opc = e.UserData as OverlayPanelContext;
-            OverlayPanelVM overlayPanel = this.EnsureOverlayPanel(opc);
-            overlayPanel.SwitchStatus();
+            OverlayPanelMetadata metadata = e.UserData as OverlayPanelMetadata;
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            if (overlayPanel != null)
+            {
+                overlayPanel.SwitchStatus();
+            }
         }
 
 
@@ -564,21 +557,30 @@ namespace ModengTerm
         {
             SidePanelMetadata metadata = userData as SidePanelMetadata;
             SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
-            spvm.Open();
+            if (spvm != null)
+            {
+                spvm.Open();
+            }
         }
 
         private void OnCloseSidePanelEvent(object userData)
         {
             SidePanelMetadata metadata = userData as SidePanelMetadata;
             SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
-            spvm.Close();
+            if (spvm != null)
+            {
+                spvm.Close();
+            }
         }
 
         private void OnSwitchSidePanelEvent(CommandArgs e)
         {
             SidePanelMetadata metadata = e.UserData as SidePanelMetadata;
             SidePanelVM spvm = this.mainWindowVM.GetSidePanel(metadata);
-            spvm.SwitchStatus();
+            if (spvm != null)
+            {
+                spvm.SwitchStatus();
+            }
         }
 
 
@@ -925,6 +927,7 @@ namespace ModengTerm
             openedSessionVM.Initialize();
 
             this.CreateTabedSidePanel(openedSessionVM);
+            this.CreateTabedOverlayPanel(openedSessionVM);
 
             // 把打开的会话加到ListBoxOpenedSession里，此时会触发ListBoxOpenedSession_SelectionChanged事件
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);

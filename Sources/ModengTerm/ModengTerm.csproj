@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Addon\PanelContext.cs" />
     <Compile Remove="Addon\WindowImpl.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="OfficialAddons\Broadcast\BroadcastInputManagerWindow.xaml.cs" />

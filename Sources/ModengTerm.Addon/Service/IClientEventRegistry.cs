@@ -70,7 +70,6 @@ namespace ModengTerm.Addon.Service
         /// <summary>
         /// 注册快捷键事件
         /// </summary>
-        /// <param name="addon">要注册快捷键的插件</param>
         /// <param name="hotkey">
         /// 要注册的快捷键
         /// 格式：
@@ -85,16 +84,13 @@ namespace ModengTerm.Addon.Service
         /// 9. Ctrl+Alt+A
         /// </param>
         /// <param name="delegate">快捷键回调</param>
-        void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate);
-
-        void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate, object userData);
+        void RegisterHotkey(string hotkey, ClientHotkeyDelegate @delegate, object userData = null);
 
         /// <summary>
         /// 取消注册快捷键
         /// </summary>
-        /// <param name="addon">要取消注册快捷键的插件</param>
         /// <param name="hotkey">要取消注册的快捷键</param>
-        void UnregisterHotkey(AddonModule addon, string hotkey);
+        void UnregisterHotkey(string hotkey, ClientHotkeyDelegate @delegate);
 
         /// <summary>
         /// 

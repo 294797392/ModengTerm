@@ -30,7 +30,7 @@ namespace ModengTerm.ViewModel.Panels
         /// <summary>
         /// 悬浮面板所属的Tab页面
         /// </summary>
-        public IClientShellTab OwnerTab { get; set; }
+        public IClientTab Tab { get; set; }
 
         public OverlayPanelDocks Dock
         {
@@ -60,8 +60,6 @@ namespace ModengTerm.ViewModel.Panels
 
         protected override void OnInitialize()
         {
-            OverlayPanel overlayPanelContent = base.Panel as OverlayPanel;
-            overlayPanelContent.OwnerTab = this.OwnerTab;
         }
 
         protected override void OnRelease()

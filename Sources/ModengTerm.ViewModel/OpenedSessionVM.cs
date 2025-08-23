@@ -9,6 +9,7 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
+using ModengTerm.ViewModel.Terminal;
 using System.Windows;
 using WPFToolkit.MVVM;
 using Panel = ModengTerm.Addon.Controls.Panel;
@@ -37,6 +38,8 @@ namespace ModengTerm.ViewModel
         private DependencyObject content;
 
         private Dictionary<AddonModule, Dictionary<string, object>> dataMap;
+        private List<SidePanelVM> sidePanels;
+        private BindableCollection<OverlayPanelVM> overlayPanels;
 
         #endregion
 
@@ -89,7 +92,9 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 该会话所拥有的侧边栏
         /// </summary>
-        public List<SidePanelVM> SidePanels { get; private set; }
+        public List<SidePanelVM> SidePanels { get { return this.SidePanels; } }
+
+        public BindableCollection<OverlayPanelVM> OverlayPanels { get { return this.overlayPanels; } }
 
         #endregion
 
@@ -99,7 +104,8 @@ namespace ModengTerm.ViewModel
         {
             this.Session = session;
             this.dataMap = new Dictionary<AddonModule, Dictionary<string, object>>();
-            this.SidePanels = new List<SidePanelVM>();
+            this.sidePanels = new List<SidePanelVM>();
+            this.overlayPanels = new BindableCollection<OverlayPanelVM>();
         }
 
         #endregion
@@ -150,11 +156,16 @@ namespace ModengTerm.ViewModel
                 try
                 {
                     sidePanel = ConfigFactory<SidePanel>.CreateInstance(spvm.Metadata.ClassName);
+                    TabedSidePanel tabSidePanel = sidePanel as TabedSidePanel;
+                    if (tabSidePanel != null)
+                    {
+                        tabSidePanel.Tab = this;
+                    }
                     sidePanel.OnInitialize();
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("加载Panel异常", ex);
+                    logger.Error("加载SidePanel异常", ex);
                     return;
                 }
 
@@ -162,15 +173,42 @@ namespace ModengTerm.ViewModel
 
                 #endregion
 
-                TabedSidePanel tabSidePanel = sidePanel as TabedSidePanel;
-                if (tabSidePanel != null)
-                {
-                    tabSidePanel.Tab = this;
-                }
-
                 spvm.Initialize();
 
-                this.SidePanels.Add(spvm);
+                this.sidePanels.Add(spvm);
+            }
+        }
+
+        public void CreateOverlayPanels(List<OverlayPanelMetadata> metadatas)
+        {
+            foreach (OverlayPanelMetadata metadata in metadatas)
+            {
+                OverlayPanelVM opvm = VMUtils.CreateOverlayPanelVM(metadata);
+
+                #region 创建Panel实例
+
+                OverlayPanel overlayPanel = null;
+
+                try
+                {
+                    overlayPanel = ConfigFactory<OverlayPanel>.CreateInstance(opvm.Metadata.ClassName);
+                    overlayPanel.Tab = this;
+                    overlayPanel.OnInitialize();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("加载OverlayPanel异常", ex);
+                    return;
+                }
+
+                opvm.Panel = overlayPanel;
+
+                #endregion
+
+                opvm.Tab = this;
+                opvm.Initialize();
+
+                this.overlayPanels.Add(opvm);
             }
         }
 

@@ -13,6 +13,6 @@ namespace ModengTerm.Addon.Controls
         /// <summary>
         /// OverlayPanel所属的Tab页面
         /// </summary>
-        public IClientShellTab OwnerTab { get; set; }
+        public IClientTab Tab { get; set; }
     }
 }

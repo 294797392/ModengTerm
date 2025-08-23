@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
+    <Compile Remove="HotkeyScopes.cs" />
     <Compile Remove="Metadatas\OptionDefinition.cs" />
     <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />
     <Compile Remove="ICloneable.cs" />

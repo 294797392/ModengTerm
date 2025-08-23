@@ -1,10 +1,10 @@
-﻿<maddpan:OverlayPanel x:Class="ModengTerm.OfficialAddons.Find.FindOverlayPanel"
+﻿<mac:OverlayPanel x:Class="ModengTerm.OfficialAddons.Find.FindOverlayPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
-        xmlns:maddpan="clr-namespace:ModengTerm.Addon.Controls;assembly=ModengTerm.Addon"
+        xmlns:mac="clr-namespace:ModengTerm.Addon.Controls;assembly=ModengTerm.Addon"
         mc:Ignorable="d"
         Height="Auto" Width="300">
 
@@ -85,4 +85,4 @@
 
 
     </Grid>
-</maddpan:OverlayPanel>
+</mac:OverlayPanel>

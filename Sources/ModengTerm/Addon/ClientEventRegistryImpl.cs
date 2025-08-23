@@ -102,11 +102,7 @@ namespace ModengTerm.Addon
 
         private class HotkeyEvent
         {
-            public AddonModule Addon { get; set; }
-
             public ClientHotkeyDelegate Delegate { get; set; }
-
-            public HotkeyScopes Scope { get; set; }
 
             public object UserData { get; set; }
         }
@@ -151,7 +147,7 @@ namespace ModengTerm.Addon
 
 
 
-        public void SubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null) 
+        public void SubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null)
         {
             this.SubscribeTabEvent(ev, string.Empty, @delegate, tab, userData);
         }
@@ -217,12 +213,8 @@ namespace ModengTerm.Addon
 
 
 
-        public void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate)
-        {
-            this.RegisterHotkey(addon, hotkey, scope, @delegate, null);
-        }
 
-        public void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate, object userData)
+        public void RegisterHotkey(string hotkey, ClientHotkeyDelegate @delegate, object userData = null)
         {
             List<HotkeyEvent> events;
             if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
@@ -233,14 +225,12 @@ namespace ModengTerm.Addon
 
             events.Add(new HotkeyEvent()
             {
-                Addon = addon,
                 Delegate = @delegate,
-                Scope = scope,
                 UserData = userData
             });
         }
 
-        public void UnregisterHotkey(AddonModule addon, string hotkey)
+        public void UnregisterHotkey(string hotkey, ClientHotkeyDelegate @delegate)
         {
             List<HotkeyEvent> events;
             if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
@@ -248,13 +238,14 @@ namespace ModengTerm.Addon
                 return;
             }
 
-            HotkeyEvent ev = events.FirstOrDefault(v => v.Addon == addon);
+            HotkeyEvent ev = events.FirstOrDefault(v => v.Delegate == @delegate);
             if (ev == null)
             {
                 return;
             }
 
             // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
+            // TODO：修改成链表方式
             List<HotkeyEvent> newevents = events.ToList();
             newevents.Remove(ev);
             this.hotKeyRegistry[hotkey] = newevents;
@@ -273,48 +264,15 @@ namespace ModengTerm.Addon
                 return false;
             }
 
-            ClientFactory factory = ClientFactory.GetFactory();
-            IClient client = factory.GetClient();
-            IClientTab clientTab = client.GetActiveTab<IClientTab>();
-
             foreach (HotkeyEvent ev in events)
             {
-                bool canExecute = false;
-
-                switch (ev.Scope)
+                try
                 {
-                    case HotkeyScopes.Client:
-                        {
-                            canExecute = true;
-                            break;
-                        }
-
-                    case HotkeyScopes.ClientShellTab:
-                        {
-                            canExecute = clientTab is IClientShellTab;
-                            break;
-                        }
-
-                    case HotkeyScopes.ClientSftpTab:
-                        {
-                            canExecute = clientTab is IClientSftpTab;
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
+                    ev.Delegate(ev.UserData);
                 }
-
-                if (canExecute)
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        ev.Delegate(ev.UserData);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("快捷键执行异常", ex);
-                    }
+                    logger.Error("快捷键执行异常", ex);
                 }
             }
 

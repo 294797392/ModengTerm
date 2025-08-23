@@ -226,8 +226,6 @@ namespace ModengTerm.ViewModel.Terminal
 
         public SessionTransport Transport { get { return sessionTransport; } }
 
-        public BindableCollection<OverlayPanelVM> OverlayPanels { get; private set; }
-
         #endregion
 
         #region 构造方法
@@ -235,7 +233,6 @@ namespace ModengTerm.ViewModel.Terminal
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
-            this.OverlayPanels = new BindableCollection<OverlayPanelVM>();
             this.tabEventSendUserInput = new TabEventShellUserInput() { Sender = this };
             this.tabEventShellRendered = new TabEventShellRendered() { Sender = this };
             this.tabEventStatusChanged = new TabEventStatusChanged() { Sender = this };
