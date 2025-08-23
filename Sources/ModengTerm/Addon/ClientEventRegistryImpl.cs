@@ -9,7 +9,7 @@ namespace ModengTerm.Addon
 {
     public class ClientEventRegistryImpl : IClientEventRegistry
     {
-        private class Registry<TDelegate> where TDelegate : Delegate
+        private class Registry<TEventType, TDelegate> where TDelegate : Delegate
         {
             private class EventData
             {
@@ -23,20 +23,17 @@ namespace ModengTerm.Addon
             }
 
             // 为了防止在publish的时候subscribe或者unsubscribe，使用链表存储事件信息
-            private Dictionary<string, LinkedList<EventData>> eventRegistry;
+            private Dictionary<TEventType, LinkedList<EventData>> eventRegistry;
 
             public Registry()
             {
-                this.eventRegistry = new Dictionary<string, LinkedList<EventData>>();
+                this.eventRegistry = new Dictionary<TEventType, LinkedList<EventData>>();
             }
 
-            public void Subscribe(string evid, TDelegate @delegate, object userData)
+            public void Subscribe(TEventType ev, string evcond, TDelegate @delegate, object userData)
             {
                 // 此时ev里可能有条件字符串
                 // 解析出真正的事件名字
-                string ev, cond;
-                this.ParseEvid(evid, out ev, out cond);
-
                 LinkedList<EventData> evds;
                 if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
@@ -46,17 +43,14 @@ namespace ModengTerm.Addon
 
                 EventData evd = new EventData();
                 evd.Delegate = @delegate;
-                evd.Condition = cond;
+                evd.Condition = evcond;
                 evd.UserData = userData;
 
                 evds.AddLast(evd);
             }
 
-            public void Unsubscribe(string evid, TDelegate @delegate)
+            public void Unsubscribe(TEventType ev, TDelegate @delegate)
             {
-                string ev, cond;
-                this.ParseEvid(evid, out ev, out cond);
-
                 LinkedList<EventData> evds;
                 if (!this.eventRegistry.TryGetValue(ev, out evds))
                 {
@@ -77,10 +71,10 @@ namespace ModengTerm.Addon
                 }
             }
 
-            public void Publish(EventArgsBase ev)
+            public void Publish(TEventType ev, EventArgsBase args)
             {
                 LinkedList<EventData> evds;
-                if (this.eventRegistry.TryGetValue(ev.Name, out evds))
+                if (this.eventRegistry.TryGetValue(ev, out evds))
                 {
                     LinkedListNode<EventData> current = evds.First;
 
@@ -90,7 +84,7 @@ namespace ModengTerm.Addon
 
                         if (!string.IsNullOrEmpty(evd.Condition))
                         {
-                            if (!ev.MatchCondition(evd.Condition))
+                            if (!args.MatchCondition(evd.Condition))
                             {
                                 current = current.Next;
 
@@ -98,18 +92,11 @@ namespace ModengTerm.Addon
                             }
                         }
 
-                        evd.Delegate.DynamicInvoke(ev, evd.UserData);
+                        evd.Delegate.DynamicInvoke(args, evd.UserData);
 
                         current = current.Next;
                     }
                 }
-            }
-
-            private void ParseEvid(string evid, out string ev, out string cond)
-            {
-                string[] items = evid.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                ev = items[0];
-                cond = items.Length > 1 ? items[1] : string.Empty;
             }
         }
 
@@ -126,63 +113,69 @@ namespace ModengTerm.Addon
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientEventRegistoryImpl");
 
-        private Registry<ClientEventDelegate> clientRegistry;
-        private Registry<TabEventDelegate> tabRegistry;
-        private Dictionary<IClientTab, Registry<TabEventDelegate>> tabEventRegistry;
+        private Registry<ClientEvent, ClientEventDelegate> clientRegistry;
+        private Registry<TabEvent, TabEventDelegate> tabRegistry;
+        private Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>> tabEventRegistry;
         private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
 
         public ClientEventRegistryImpl()
         {
-            this.clientRegistry = new Registry<ClientEventDelegate>();
-            this.tabRegistry = new Registry<TabEventDelegate>();
-            this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEventDelegate>>();
+            this.clientRegistry = new Registry<ClientEvent, ClientEventDelegate>();
+            this.tabRegistry = new Registry<TabEvent, TabEventDelegate>();
+            this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
         }
 
 
-
-        public void SubscribeEvent(string ev, ClientEventDelegate @delegate)
+        public void SubscribeEvent(ClientEvent ev, ClientEventDelegate @delegate, object userData = null)
         {
-            this.clientRegistry.Subscribe(ev, @delegate, null);
+            this.clientRegistry.Subscribe(ev, string.Empty, @delegate, userData);
         }
 
-        public void SubscribeEvent(string evid, ClientEventDelegate @delegate, object userData)
+        public void SubscribeEvent(ClientEvent ev, string evcond, ClientEventDelegate @delegate, object userData = null)
         {
-            this.clientRegistry.Subscribe(evid, @delegate, userData);
+            this.clientRegistry.Subscribe(ev, evcond, @delegate, userData);
         }
 
-        public void UnsubscribeEvent(string ev, ClientEventDelegate @delegate)
+        public void UnsubscribeEvent(ClientEvent ev, ClientEventDelegate @delegate)
         {
             this.clientRegistry.Unsubscribe(ev, @delegate);
         }
 
         public void PublishEvent(ClientEventArgs e)
         {
-            this.clientRegistry.Publish(e);
+            this.clientRegistry.Publish(e.Type, e);
         }
 
 
 
-        public void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null)
+
+
+        public void SubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null) 
+        {
+            this.SubscribeTabEvent(ev, string.Empty, @delegate, tab, userData);
+        }
+
+        public void SubscribeTabEvent(TabEvent ev, string evcond, TabEventDelegate @delegate, IClientTab tab = null, object userData = null)
         {
             if (tab == null)
             {
-                this.tabRegistry.Subscribe(ev, @delegate, userData);
+                this.tabRegistry.Subscribe(ev, evcond, @delegate, userData);
             }
             else
             {
-                Registry<TabEventDelegate> registry;
+                Registry<TabEvent, TabEventDelegate> registry;
                 if (!this.tabEventRegistry.TryGetValue(tab, out registry))
                 {
-                    registry = new Registry<TabEventDelegate>();
+                    registry = new Registry<TabEvent, TabEventDelegate>();
                     this.tabEventRegistry[tab] = registry;
                 }
 
-                registry.Subscribe(ev, @delegate, userData);
+                registry.Subscribe(ev, evcond, @delegate, userData);
             }
         }
 
-        public void UnsubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null)
+        public void UnsubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null)
         {
             if (tab == null)
             {
@@ -190,7 +183,7 @@ namespace ModengTerm.Addon
             }
             else
             {
-                Registry<TabEventDelegate> registry;
+                Registry<TabEvent, TabEventDelegate> registry;
                 if (!this.tabEventRegistry.TryGetValue(tab, out registry))
                 {
                     return;
@@ -210,16 +203,16 @@ namespace ModengTerm.Addon
             IClientTab tab = e.Sender;
 
             // 先发布全局Tab事件
-            this.tabRegistry.Publish(e);
+            this.tabRegistry.Publish(e.Type, e);
 
             // 再发布针对于单个订阅的Tab事件
-            Registry<TabEventDelegate> registry;
+            Registry<TabEvent, TabEventDelegate> registry;
             if (!this.tabEventRegistry.TryGetValue(tab, out registry))
             {
                 return;
             }
 
-            registry.Publish(e);
+            registry.Publish(e.Type, e);
         }
 
 

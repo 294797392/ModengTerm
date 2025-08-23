@@ -60,8 +60,6 @@ namespace ModengTerm.Addon
 
     public class TabEventShellRendered : TabEventArgs
     {
-        public override string Name => "onTabShellRendered";
-
         public override TabEvent Type => TabEvent.SHELL_RENDERED;
 
         /// <summary>
@@ -93,8 +91,6 @@ namespace ModengTerm.Addon
 
     public class TabEventShellUserInput : TabEventArgs
     {
-        public override string Name => "onTabShellUserInput";
-
         public override TabEvent Type => TabEvent.SHELL_USER_INPUT;
 
         /// <summary>

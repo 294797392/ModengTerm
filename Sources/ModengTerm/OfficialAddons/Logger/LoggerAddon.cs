@@ -105,8 +105,8 @@ namespace ModengTerm.OfficialAddons.Logger
 
             tab.SetData(this, KEY_LOGGER, null);
 
-            this.eventRegistry.UnsubscribeTabEvent("onTabClosed", this.OnTabClosed, tab);
-            this.eventRegistry.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
+            //this.eventRegistry.UnsubscribeTabEvent("onTabClosed", this.OnTabClosed, tab);
+            //this.eventRegistry.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
         }
 
         #endregion
@@ -140,8 +140,8 @@ namespace ModengTerm.OfficialAddons.Logger
             LoggerContext logger = this.Start(window.Options);
             activeTab.SetData(this, KEY_LOGGER, logger);
 
-            this.eventRegistry.SubscribeTabEvent("onTabClosed", this.OnTabClosed, activeTab);
-            this.eventRegistry.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, activeTab);
+            //this.eventRegistry.SubscribeTabEvent("onTabClosed", this.OnTabClosed, activeTab);
+            //this.eventRegistry.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, activeTab);
         }
 
         private void ExecuteStopLoggerCommand(CommandArgs e)

@@ -13,21 +13,21 @@ namespace ModengTerm.Addon.Service
     {
         #region ClientEvent
 
+        void SubscribeEvent(ClientEvent ev, ClientEventDelegate @delegate, object userData = null);
+
         /// <summary>
         /// 订阅客户端的事件
         /// </summary>
         /// <param name="evid"></param>
         /// <param name="delegate"></param>
-        void SubscribeEvent(string evid, ClientEventDelegate @delegate);
-
-        void SubscribeEvent(string evid, ClientEventDelegate @delegate, object userData);
+        void SubscribeEvent(ClientEvent evid, string evcond, ClientEventDelegate @delegate, object userData = null);
 
         /// <summary>
         /// 取消订阅客户端事件
         /// </summary>
         /// <param name="evid"></param>
         /// <param name="delegate"></param>
-        void UnsubscribeEvent(string evid, ClientEventDelegate @delegate);
+        void UnsubscribeEvent(ClientEvent evid, ClientEventDelegate @delegate);
 
         /// <summary>
         /// 发布一个事件
@@ -39,15 +39,17 @@ namespace ModengTerm.Addon.Service
 
         #region TabEvent
 
+        void SubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null);
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="evType">要订阅的事件</param>
+        /// <param name="ev">要订阅的事件</param>
         /// <param name="delegate"></param>
         /// <param name="tab">要订阅的标签页，如果为空，则订阅所有标签页的事件</param>
-        void SubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null, object userData = null);
+        void SubscribeTabEvent(TabEvent ev, string evcond, TabEventDelegate @delegate, IClientTab tab = null, object userData = null);
 
-        void UnsubscribeTabEvent(string ev, TabEventDelegate @delegate, IClientTab tab = null);
+        void UnsubscribeTabEvent(TabEvent ev, TabEventDelegate @delegate, IClientTab tab = null);
 
         /// <summary>
         /// 取消指定tab的所有订阅的事件

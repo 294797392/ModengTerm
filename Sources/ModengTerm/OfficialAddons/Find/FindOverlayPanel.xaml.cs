@@ -117,7 +117,7 @@ namespace ModengTerm.OfficialAddons.Find
 
         public override void OnInitialize()
         {
-            this.eventRegistory.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, this.OwnerTab);
+            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
 
             string backColorRgbKey = this.OwnerTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
@@ -127,7 +127,7 @@ namespace ModengTerm.OfficialAddons.Find
 
         public override void OnRelease()
         {
-            this.eventRegistory.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, this.OwnerTab);
+            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
 
             this.drawingContext.DeleteGraphicsObject(this.highlightObject);
         }

@@ -718,6 +718,17 @@ namespace ModengTerm
 
                 //this.ShowSessionListWindow();
             }
+
+            // 关闭后触发的ListBoxOpenedSession_SelectionChanged事件里，RemovedItems为空
+            // 需要手动移除被关闭的会话对应的侧边栏面板
+            this.mainWindowVM.RemoveSidePanels(openedSessionVM.SidePanels);
+
+            // 触发关闭事件
+            ClientEventTabClosed tabClosed = new ClientEventTabClosed()
+            {
+                ClosedTab = openedSessionVM
+            };
+            this.PublishEvent(tabClosed);
         }
 
 

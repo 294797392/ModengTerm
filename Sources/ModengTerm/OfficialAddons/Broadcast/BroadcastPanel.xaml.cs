@@ -67,16 +67,16 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
             DataGridBroadcastList.ItemsSource = this.broadcastTabs;
 
-            this.eventRegistry.SubscribeEvent("onClientTabOpened:ssh|local|serial|tcp", this.OnClientTabOpened);
-            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed);
-            this.eventRegistry.SubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab);
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, "ssh|local|serial|tcp", this.OnClientTabOpened);
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_TAB_CLOSED, "ssh|local|serial|tcp", this.OnClientTabClosed);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_USER_INPUT, this.OnTabShellUserInput, this.Tab);
         }
 
         public override void OnRelease()
         {
-            this.eventRegistry.UnsubscribeEvent("onClientTabOpened", this.OnClientTabOpened);
-            this.eventRegistry.UnsubscribeEvent("onClientTabClosed", this.OnClientTabClosed);
-            this.eventRegistry.UnsubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab);
+            this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnClientTabOpened);
+            this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_TAB_CLOSED, this.OnClientTabClosed);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_USER_INPUT, this.OnTabShellUserInput, this.Tab);
         }
 
         public override void OnLoaded()

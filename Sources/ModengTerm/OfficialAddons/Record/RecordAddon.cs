@@ -38,7 +38,7 @@ namespace ModengTerm.OfficialAddons.Record
 
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed);
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_TAB_CLOSED, "ssh|local|serial|tcp", this.OnClientTabClosed);
             this.RegisterCommand("RecordAddon.StartRecord", ExecuteStartRecordCommand);
             this.RegisterCommand("RecordAddon.StopRecord", ExecuteStopRecordCommand);
             this.RegisterCommand("RecordAddon.OpenRecord", ExecuteOpenRecordCommand);
@@ -46,7 +46,7 @@ namespace ModengTerm.OfficialAddons.Record
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.UnsubscribeEvent("onClientTabClosed", this.OnClientTabClosed);
+            this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_TAB_CLOSED, this.OnClientTabClosed);
         }
 
         #endregion
@@ -87,7 +87,7 @@ namespace ModengTerm.OfficialAddons.Record
 
             tab.SetData(this, KEY_CONTEXT, context);
 
-            this.eventRegistry.SubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, tab);
 
             return context;
         }
@@ -106,7 +106,7 @@ namespace ModengTerm.OfficialAddons.Record
 
             tab.SetData(this, KEY_CONTEXT, null);
 
-            this.eventRegistry.UnsubscribeTabEvent("onTabShellRendered", this.OnShellRendered, tab);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, tab);
         }
 
         #endregion

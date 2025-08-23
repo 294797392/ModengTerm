@@ -41,8 +41,6 @@ namespace ModengTerm.Addon
 
     public abstract class EventArgsBase
     {
-        public virtual string Name { get { return string.Empty; } }
-
         public virtual bool MatchCondition(string cond)
         {
             return true;
@@ -56,8 +54,6 @@ namespace ModengTerm.Addon
 
     public class ClientEventClientInitialized : ClientEventArgs
     {
-        public override string Name => "onClientInitialized";
-
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
@@ -66,8 +62,6 @@ namespace ModengTerm.Addon
     /// </summary>
     public class ClientEventTabChanged : ClientEventArgs
     {
-        public override string Name => "onClientTabChanged";
-
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_CHANGED;
 
         /// <summary>
@@ -91,8 +85,6 @@ namespace ModengTerm.Addon
     /// </summary>
     public class ClientEventTabOpened : ClientEventArgs
     {
-        public override string Name => "onClientTabOpened";
-
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_OPENED;
 
         /// <summary>
@@ -108,8 +100,6 @@ namespace ModengTerm.Addon
 
     public class ClientEventTabClosed : ClientEventArgs
     {
-        public override string Name => "onClientTabClosed";
-
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_CLOSED;
 
         public IClientTab ClosedTab { get; set; }
