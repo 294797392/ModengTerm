@@ -107,7 +107,7 @@ namespace ModengTerm.UserControls
                 return;
             }
 
-            DependencyObject dependencyObject = selectedItem.Content;
+            DependencyObject dependencyObject = selectedItem.Panel;
             if (dependencyObject == null)
             {
                 logger.ErrorFormat("加载页面失败, 页面为空, {0}", selectedItem.Name);

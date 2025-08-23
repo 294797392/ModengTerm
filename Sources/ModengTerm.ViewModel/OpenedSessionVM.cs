@@ -1,4 +1,7 @@
-﻿using ModengTerm.Addon;
+﻿using DotNEToolkit;
+using log4net.Repository.Hierarchy;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
@@ -8,6 +11,7 @@ using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using System.Windows;
 using WPFToolkit.MVVM;
+using Panel = ModengTerm.Addon.Controls.Panel;
 
 namespace ModengTerm.ViewModel
 {
@@ -16,6 +20,8 @@ namespace ModengTerm.ViewModel
     /// </summary>
     public abstract class OpenedSessionVM : SessionItemVM, IClientTab
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenedSessionVM");
+
         #region 公开事件
 
         /// <summary>
@@ -135,7 +141,35 @@ namespace ModengTerm.ViewModel
             foreach (SidePanelMetadata metadata in metadatas)
             {
                 SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
+                spvm.Session = this;
+
+                #region 创建Panel实例
+
+                SidePanel sidePanel = null;
+
+                try
+                {
+                    sidePanel = ConfigFactory<SidePanel>.CreateInstance(spvm.Metadata.ClassName);
+                    sidePanel.OnInitialize();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("加载Panel异常", ex);
+                    return;
+                }
+
+                spvm.Panel = sidePanel;
+
+                #endregion
+
+                TabedSidePanel tabSidePanel = sidePanel as TabedSidePanel;
+                if (tabSidePanel != null)
+                {
+                    tabSidePanel.Tab = this;
+                }
+
                 spvm.Initialize();
+
                 this.SidePanels.Add(spvm);
             }
         }

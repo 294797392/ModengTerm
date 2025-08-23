@@ -16,18 +16,18 @@ namespace ModengTerm.Addon.Service
         /// <summary>
         /// 订阅客户端的事件
         /// </summary>
-        /// <param name="ev"></param>
+        /// <param name="evid"></param>
         /// <param name="delegate"></param>
-        void SubscribeEvent(string ev, ClientEventDelegate @delegate);
+        void SubscribeEvent(string evid, ClientEventDelegate @delegate);
 
         void SubscribeEvent(string evid, ClientEventDelegate @delegate, object userData);
 
         /// <summary>
         /// 取消订阅客户端事件
         /// </summary>
-        /// <param name="ev"></param>
+        /// <param name="evid"></param>
         /// <param name="delegate"></param>
-        void UnsubscribeEvent(string ev, ClientEventDelegate @delegate);
+        void UnsubscribeEvent(string evid, ClientEventDelegate @delegate);
 
         /// <summary>
         /// 发布一个事件

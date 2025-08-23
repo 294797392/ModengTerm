@@ -1,9 +1,7 @@
-﻿using DotNEToolkit;
-using ModengTerm.Addon;
+﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Base.Addon;
-using System.Windows;
 using System.Windows.Threading;
 using Panel = ModengTerm.Addon.Controls.Panel;
 
@@ -62,7 +60,7 @@ namespace ModengTerm.ViewModel.Panels
 
         protected override void OnInitialize()
         {
-            OverlayPanel overlayPanelContent = base.Content as OverlayPanel;
+            OverlayPanel overlayPanelContent = base.Panel as OverlayPanel;
             overlayPanelContent.OwnerTab = this.OwnerTab;
         }
 
@@ -72,13 +70,13 @@ namespace ModengTerm.ViewModel.Panels
 
         public override void Open()
         {
-            Panel content = this.Content;
+            Panel content = this.Panel;
 
             this.IsOpened = true;
 
             // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG96L
             // 确保控件Loaded完毕，此时设置才可以设置焦点
-            this.Content.Dispatcher.BeginInvoke(base.Loaded, DispatcherPriority.Loaded);
+            this.Panel.Dispatcher.BeginInvoke(base.Loaded, DispatcherPriority.Loaded);
         }
 
         public override void Close()

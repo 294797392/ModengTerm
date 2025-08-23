@@ -8,30 +8,36 @@ namespace ModengTerm.ViewModel.Panels
 {
     public abstract class ClientPanelVM : ViewModelBase, IClientPanel
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientPanel");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientPanelVM");
 
         #region 实例变量
 
         private bool isOpened;
         private string iconURI;
-        private Addon.Controls.Panel content;
+        private Addon.Controls.Panel panel;
         private bool initialized;
 
         #endregion
 
         #region 公开属性
 
+        /// <summary>
+        /// 面板元数据信息
+        /// </summary>
         public PanelMetadata Metadata { get; set; }
 
-        public Panel Content
+        /// <summary>
+        /// 插件面板实例
+        /// </summary>
+        public Panel Panel
         {
-            get { return this.content; }
-            private set
+            get { return this.panel; }
+            set
             {
-                if (this.content != value)
+                if (this.panel != value)
                 {
-                    this.content = value;
-                    this.NotifyPropertyChanged("Content");
+                    this.panel = value;
+                    this.NotifyPropertyChanged("Panel");
                 }
             }
         }
@@ -52,6 +58,9 @@ namespace ModengTerm.ViewModel.Panels
             }
         }
 
+        /// <summary>
+        /// 面板对应的图标路径
+        /// </summary>
         public string IconURI
         {
             get { return this.iconURI; }
@@ -69,44 +78,19 @@ namespace ModengTerm.ViewModel.Panels
 
         #region 实例方法
 
-        private void InitializeContent()
-        {
-            Addon.Controls.Panel content = null;
-
-            try
-            {
-                content = ConfigFactory<Addon.Controls.Panel>.CreateInstance(this.Metadata.ClassName);
-                content.OwnerPanel = this;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("加载PanelContent异常", ex);
-            }
-
-            this.Content = content;
-        }
-
         #endregion
 
         #region 公开接口
 
         /// <summary>
-        /// 在第一次Active之后，OnLoad之前触发
+        /// 在第一次创建面板的时候触发
         /// </summary>
         public void Initialize()
         {
             this.initialized = true;
 
-            this.InitializeContent();
-
-            // init
-
+            // 初始化ClientPanelVM
             this.OnInitialize();
-
-            // 最后调用content.OnInitialize
-            // OverlayPanel OnInitialize的时候需要OverlayPanelContent的OwnerTab赋值
-            // OverlayPanelContent.OnInitialize里可能会用到OwnerTab
-            this.content.OnInitialize();
         }
 
         public void Release()
@@ -116,7 +100,7 @@ namespace ModengTerm.ViewModel.Panels
                 return;
             }
 
-            this.content.OnRelease();
+            this.panel.OnRelease();
 
             this.OnRelease();
 
@@ -130,7 +114,7 @@ namespace ModengTerm.ViewModel.Panels
         /// </summary>
         public void Loaded()
         {
-            this.content.OnLoaded();
+            this.panel.OnLoaded();
         }
 
         /// <summary>
@@ -138,7 +122,7 @@ namespace ModengTerm.ViewModel.Panels
         /// </summary>
         public void Unloaded()
         {
-            this.content.OnUnload();
+            this.panel.OnUnload();
         }
 
         public void SwitchStatus()

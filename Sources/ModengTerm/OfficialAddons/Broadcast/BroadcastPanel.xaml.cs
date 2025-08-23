@@ -2,21 +2,25 @@
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
+using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Windows.Media.Effects;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.OfficialAddons.Broadcast
 {
     /// <summary>
     /// BroadcastInputPanel.xaml 的交互逻辑
     /// </summary>
-    public partial class BroadcastPanel : SidePanel
+    public partial class BroadcastPanel : TabedSidePanel
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("BroadcastPanel");
+
         #region 实例变量
 
-        private ClientFactory factory;
-        private IClientEventRegistry eventRegistory;
-        private IClient client;
+        private BindableCollection<ShellTabVM> broadcastTabs;
 
         #endregion
 
@@ -31,89 +35,121 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         #region 实例方法
 
+        private ShellTabVM CreateShellTabVM(IClientShellTab shellTab) 
+        {
+            ShellTabVM stvm = new ShellTabVM()
+            {
+                ID = shellTab.ID,
+                Name = shellTab.Name,
+                Tab = shellTab
+            };
+
+            return stvm;
+        }
+
         #endregion
 
         #region SidePanel
 
         public override void OnInitialize()
         {
-            this.factory = ClientFactory.GetFactory();
-            this.eventRegistory = this.factory.GetEventRegistry();
-            this.client = this.factory.GetClient();
+            this.broadcastTabs = new BindableCollection<ShellTabVM>();
+            List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
+            foreach (IClientShellTab shellTab in shellTabs)
+            {
+                if (shellTab == this.Tab)
+                {
+                    continue;
+                }
 
-            this.eventRegistory.SubscribeEvent("onClientTabChanged:ssh|local|serial|tcp", this.OnTabChangedEvent);
+                this.broadcastTabs.Add(this.CreateShellTabVM(shellTab));
+            }
+
+            DataGridBroadcastList.ItemsSource = this.broadcastTabs;
+
+            this.eventRegistry.SubscribeEvent("onClientTabOpened:ssh|local|serial|tcp", this.OnClientTabOpened, null);
+            this.eventRegistry.SubscribeEvent("onClientTabClosed:ssh|local|serial|tcp", this.OnClientTabClosed, null);
+            this.eventRegistry.SubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab, null);
         }
 
         public override void OnRelease()
         {
-            this.eventRegistory.UnsubscribeEvent("onClientTabChanged", this.OnTabChangedEvent);
+            this.eventRegistry.UnsubscribeEvent("onClientTabOpened", this.OnClientTabOpened);
+            this.eventRegistry.UnsubscribeEvent("onClientTabClosed", this.OnClientTabClosed);
+            this.eventRegistry.UnsubscribeTabEvent("onTabShellUserInput", this.OnTabShellUserInput, this.Tab);
         }
 
         public override void OnLoaded()
         {
+            logger.InfoFormat("OnLoaded");
         }
 
         public override void OnUnload()
         {
+            logger.InfoFormat("OnUnload");
         }
 
         #endregion
 
         #region 事件处理器
 
-        private void OnTabChangedEvent(ClientEventArgs e, object userData)
+        private void OnClientTabOpened(ClientEventArgs e, object userData) 
         {
-            //ClientEventTabChanged tabChanged = e as ClientEventTabChanged;
-            //List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
-            //shellTabs.Remove(tabChanged.NewTab as IClientShellTab);
+            ClientEventTabOpened tabOpened = e as ClientEventTabOpened;
 
-            //List<ShellTabVM> broadcastTabs = tabChanged.NewTab.GetData<List<ShellTabVM>>(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST);
+            if (tabOpened.OpenedTab == this.Tab) 
+            {
+                return;
+            }
 
-            //if (broadcastTabs == null)
-            //{
-            //    broadcastTabs = new List<ShellTabVM>();
+            this.broadcastTabs.Add(this.CreateShellTabVM(tabOpened.OpenedTab as IClientShellTab));
+        }
 
-            //    foreach (IClientShellTab shellTab in shellTabs)
-            //    {
-            //        ShellTabVM vm = new ShellTabVM()
-            //        {
-            //            ID = shellTab.ID,
-            //            Name = shellTab.Name,
-            //            Tab = shellTab
-            //        };
-            //        broadcastTabs.Add(vm);
-            //    }
+        private void OnClientTabClosed(ClientEventArgs e, object userData) 
+        {
+            ClientEventTabClosed tabClosed = e as ClientEventTabClosed;
 
-            //    tabChanged.NewTab.SetData(this.OwnerAddon, BroadcastAddon.KEY_BROADCAST_LIST, broadcastTabs);
-            //}
-            //else
-            //{
-            //    // 删除被关闭的标签
-            //    for (int i = 0; i < broadcastTabs.Count; i++)
-            //    {
-            //        if (!shellTabs.Contains(broadcastTabs[i].Tab)) 
-            //        {
-            //            broadcastTabs.RemoveAt(i);
-            //            i--;
-            //        }
-            //    }
+            if (tabClosed.ClosedTab == this.Tab)
+            {
+                return;
+            }
 
-            //    // 创建新打开的标签
-            //    foreach (IClientShellTab shellTab in shellTabs)
-            //    {
-            //        if (broadcastTabs.FirstOrDefault(v => v.Tab == shellTab) == null)
-            //        {
-            //            broadcastTabs.Add(new ShellTabVM()
-            //            {
-            //                ID = shellTab.ID,
-            //                Name = shellTab.Name,
-            //                Tab = shellTab
-            //            });
-            //        }
-            //    }
-            //}
+            ShellTabVM stvm = this.broadcastTabs.FirstOrDefault(v => v.ID == tabClosed.ClosedTab.ID);
+            if (stvm == null) 
+            {
+                return;
+            }
 
-            //DataGridBroadcastList.ItemsSource = broadcastTabs;
+            this.broadcastTabs.Remove(stvm);
+        }
+
+        private void OnTabShellUserInput(TabEventArgs e, object userData)
+        {
+            TabEventShellUserInput shellSendUserInput = e as TabEventShellUserInput;
+
+            IEnumerable<ShellTabVM> broadcastTabs = this.broadcastTabs;
+
+            if (broadcastTabs == null)
+            {
+                return;
+            }
+
+            foreach (ShellTabVM shellTabVM in broadcastTabs)
+            {
+                if (!shellTabVM.IsChecked)
+                {
+                    continue;
+                }
+
+                IClientShellTab shellTab = shellTabVM.Tab;
+
+                if (shellTab.Status != SessionStatusEnum.Connected)
+                {
+                    continue;
+                }
+
+                shellTab.Send(shellSendUserInput.Buffer);
+            }
         }
 
         #endregion

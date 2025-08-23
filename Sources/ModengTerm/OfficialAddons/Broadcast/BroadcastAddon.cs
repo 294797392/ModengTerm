@@ -18,12 +18,10 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         protected override void OnActive(ActiveContext context)
         {
-            this.eventRegistry.SubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistry.UnsubscribeTabEvent("OnTabShellSendUserInput", this.OnShellSendUserInput);
         }
 
         #endregion
@@ -34,34 +32,6 @@ namespace ModengTerm.OfficialAddons.Broadcast
 
         #region 事件处理器
 
-        private void OnShellSendUserInput(TabEventArgs e, object userData)
-        {
-            TabEventShellSendUserInput sendData = e as TabEventShellSendUserInput;
-
-            List<ShellTabVM> broadcastTabs = e.Sender.GetData<List<ShellTabVM>>(this, KEY_BROADCAST_LIST);
-
-            if (broadcastTabs == null)
-            {
-                return;
-            }
-
-            foreach (ShellTabVM shellTabVM in broadcastTabs)
-            {
-                if (!shellTabVM.IsChecked)
-                {
-                    continue;
-                }
-
-                IClientShellTab shellTab = shellTabVM.Tab;
-
-                if (shellTab.Status != SessionStatusEnum.Connected)
-                {
-                    continue;
-                }
-
-                shellTab.Send(sendData.Buffer);
-            }
-        }
 
         #endregion
     }

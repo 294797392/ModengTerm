@@ -31,10 +31,10 @@ namespace ModengTerm.Addon
         SHELL_RENDERED = 301,
 
         /// <summary>
-        /// OnTabShellSendUserInput
+        /// onTabShellUserInput
         /// 每当发送用户输入的数据的时候触发
         /// </summary>
-        SHELL_SEND_USER_INPUT,
+        SHELL_USER_INPUT,
     }
 
     public abstract class TabEventArgs : EventArgsBase
@@ -91,11 +91,11 @@ namespace ModengTerm.Addon
         }
     }
 
-    public class TabEventShellSendUserInput : TabEventArgs
+    public class TabEventShellUserInput : TabEventArgs
     {
-        public override string Name => "OnTabShellSendUserInput";
+        public override string Name => "onTabShellUserInput";
 
-        public override TabEvent Type => TabEvent.SHELL_SEND_USER_INPUT;
+        public override TabEvent Type => TabEvent.SHELL_USER_INPUT;
 
         /// <summary>
         /// 发送的数据缓冲区

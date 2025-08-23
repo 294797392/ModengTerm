@@ -74,7 +74,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         private List<ScriptItem> scriptItems;
 
-        private TabEventShellSendUserInput tabEventSendUserInput;
+        private TabEventShellUserInput tabEventSendUserInput;
         private TabEventShellRendered tabEventShellRendered;
         private TabEventStatusChanged tabEventStatusChanged;
 
@@ -236,7 +236,7 @@ namespace ModengTerm.ViewModel.Terminal
             base(session)
         {
             this.OverlayPanels = new BindableCollection<OverlayPanelVM>();
-            this.tabEventSendUserInput = new TabEventShellSendUserInput() { Sender = this };
+            this.tabEventSendUserInput = new TabEventShellUserInput() { Sender = this };
             this.tabEventShellRendered = new TabEventShellRendered() { Sender = this };
             this.tabEventStatusChanged = new TabEventStatusChanged() { Sender = this };
         }

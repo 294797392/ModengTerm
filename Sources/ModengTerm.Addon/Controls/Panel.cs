@@ -1,10 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace ModengTerm.Addon.Controls
@@ -16,17 +11,13 @@ namespace ModengTerm.Addon.Controls
     {
         protected ClientFactory factory;
         protected IClientEventRegistry eventRegistry;
-
-        /// <summary>
-        /// 所属的Panel
-        /// 在创建PanelContent实例的时候赋值
-        /// </summary>
-        public IClientPanel OwnerPanel { get; set; }
+        protected IClient client;
 
         public Panel() 
         {
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
+            this.client = this.factory.GetClient();
         }
 
         /// <summary>

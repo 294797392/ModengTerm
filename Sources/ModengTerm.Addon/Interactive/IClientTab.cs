@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addon.Controls;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
@@ -88,8 +89,6 @@ namespace ModengTerm.Addon.Interactive
         void CopySelection();
 
         void ClearScreen();
-
-        IOverlayPanel GetOverlayPanel(string id);
 
         /// <summary>
         /// 对当前视图进行关键字搜索

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 向插件公开应用程序的功能
+    /// 封装插件可以调用的客户端接口
     /// </summary>
     public interface IClient
     {

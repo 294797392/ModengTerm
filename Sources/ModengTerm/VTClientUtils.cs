@@ -120,31 +120,31 @@ namespace ModengTerm
                 {
                     case SessionTypeEnum.SSH:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SSH);
+                            create = metadata.Scopes.Contains(SidePanelScopes.SshTab);
                             break;
                         }
 
                     case SessionTypeEnum.SFTP:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SFTP);
+                            create = metadata.Scopes.Contains(SidePanelScopes.SftpTab);
                             break;
                         }
 
                     case SessionTypeEnum.Tcp:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.Tcp);
+                            create = metadata.Scopes.Contains(SidePanelScopes.TcpTab);
                             break;
                         }
 
                     case SessionTypeEnum.SerialPort:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.SerialPort);
+                            create = metadata.Scopes.Contains(SidePanelScopes.SerialPortTab);
                             break;
                         }
 
                     case SessionTypeEnum.Localhost:
                         {
-                            create = metadata.Scopes.Contains(SidePanelScopes.Localhost);
+                            create = metadata.Scopes.Contains(SidePanelScopes.ConsoleTab);
                             break;
                         }
 

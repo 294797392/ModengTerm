@@ -2,6 +2,7 @@
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base;
@@ -489,16 +490,16 @@ namespace ModengTerm
         /// <summary>
         /// 初始化会话侧边栏窗口
         /// </summary>
-        /// <param name="sessionVM"></param>
-        private void CreateSessionSidePanel(OpenedSessionVM sessionVM)
+        /// <param name="openedSessionVM"></param>
+        private void CreateTabedSidePanel(OpenedSessionVM openedSessionVM)
         {
             foreach (AddonModule addon in this.addons)
             {
                 AddonMetadata metadata = addon.Metadata;
 
-                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetCreateSidePanelMetadatas(metadata.SidePanels, sessionVM.Type);
+                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetCreateSidePanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
 
-                sessionVM.CreateSidePanels(sidePanelMetadatas);
+                openedSessionVM.CreateSidePanels(sidePanelMetadatas);
             }
         }
 
@@ -912,9 +913,9 @@ namespace ModengTerm
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 
-            // 先创建会话侧边栏面板，再把会话加入到界面上，最后触发选中的会话改变事件
-            this.CreateSessionSidePanel(openedSessionVM);
+            this.CreateTabedSidePanel(openedSessionVM);
 
+            // 把打开的会话加到ListBoxOpenedSession里，此时会触发ListBoxOpenedSession_SelectionChanged事件
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
             this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
             this.mainWindowVM.SelectedSession = openedSessionVM;

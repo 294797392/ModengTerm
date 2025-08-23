@@ -150,10 +150,11 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void OnShellRendered(TabEventArgs e, object userData)
         {
-            if (this.OwnerPanel.IsOpened)
-            {
-                this.PerformFind();
-            }
+            throw new System.NotImplementedException();
+            //if (this.OwnerPanel.IsOpened)
+            //{
+            //    this.PerformFind();
+            //}
         }
 
         #endregion
