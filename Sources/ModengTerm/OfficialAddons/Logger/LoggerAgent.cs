@@ -48,6 +48,11 @@ namespace ModengTerm.OfficialAddons.Logger
         {
             ClientFactory clientFactory = ClientFactory.GetFactory();
             this.eventRegistry = clientFactory.GetEventRegistry();
+            this.loggerEvent = new ManualResetEvent(false);
+            this.loggerList = new List<LoggerVM>();
+            this.loggerListCopy = new List<LoggerVM>();
+            this.listChanged = false;
+            this.listLock = new object();
         }
 
         #region 公开接口
@@ -56,12 +61,6 @@ namespace ModengTerm.OfficialAddons.Logger
         {
             if (!this.initOnce)
             {
-                this.loggerEvent = new ManualResetEvent(false);
-                this.loggerList = new List<LoggerVM>();
-                this.loggerListCopy = new List<LoggerVM>();
-                this.listChanged = false;
-                this.listLock = new object();
-
                 this.writeThread = new Thread(this.WriteThreadProc);
                 this.writeThread.IsBackground = true;
                 this.writeThread.Start();

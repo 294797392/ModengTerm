@@ -20,7 +20,7 @@ namespace ModengTerm.Addon
 
         private static ClientFactory instance;
 
-        public abstract StorageService GetStorageService();
+        public abstract IClientStorage GetStorageService();
 
         public abstract IClient GetClient();
 

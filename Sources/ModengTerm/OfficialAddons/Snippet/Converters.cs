@@ -7,24 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace ModengTerm.OfficialAddons.QuickInput
+namespace ModengTerm.OfficialAddons.Snippet
 {
-    public class ShellCommandTypeConverter : IValueConverter
+    public class SnippetType2TextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is CommandTypeEnum))
-            {
-                return string.Empty;
-            }
+            SnippetTypes snippetType = (SnippetTypes)value;
 
-            CommandTypeEnum commandType = (CommandTypeEnum)value;
-
-            switch (commandType)
+            switch (snippetType)
             {
-                case CommandTypeEnum.PureText: return "纯文本";
-                case CommandTypeEnum.HexData: return "十六进制数据";
-                default: throw new NotImplementedException();
+                case SnippetTypes.Text: return "纯文本";
+                case SnippetTypes.Hex: return "十六进制数据";
+                default:
+                    throw new NotImplementedException();
             }
         }
 

@@ -54,7 +54,6 @@
     <Compile Remove="OfficialAddons\Logger\RegexpFilter.cs" />
     <Compile Remove="OfficialAddons\Snippet\CommandManagerWindow.xaml.cs" />
     <Compile Remove="OfficialAddons\Snippet\CommandVM.cs" />
-    <Compile Remove="OfficialAddons\Snippet\Converters.cs" />
     <Compile Remove="OfficialAddons\Snippet\QuickInputVM.cs" />
     <Compile Remove="OfficialAddons\Record\PlaybackUserControl.xaml.cs" />
     <Compile Remove="OfficialAddons\Explorer\SessionExplorerPanelVM.cs" />
@@ -91,8 +90,8 @@
 
   <ItemGroup>
     <Page Remove="OfficialAddons\Broadcast\BroadcastInputManagerWindow.xaml" />
-    <Page Remove="OfficialAddons\Snippet\CommandManagerWindow.xaml" />
     <Page Remove="OfficialAddons\Record\PlaybackUserControl.xaml" />
+    <Page Remove="OfficialAddons\Snippet\CommandManagerWindow.xaml" />
     <Page Remove="Themes\Themes.Default.xaml" />
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
     <Page Remove="Themes\Themes.XShell.xaml" />

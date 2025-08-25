@@ -28,6 +28,8 @@
 
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
+    <Compile Remove="DataModels\ShellCommand.cs" />
+    <Compile Remove="Enumerations\Terminal\CommandTypeEnum.cs" />
     <Compile Remove="HotkeyScopes.cs" />
     <Compile Remove="Metadatas\OptionDefinition.cs" />
     <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />

@@ -59,7 +59,7 @@ namespace ModengTerm.OfficialAddons.Record
             {
                 Name = Path.GetFileNameWithoutExtension(options.FilePath),
                 Id = this.GetObjectId(),
-                SessionId = tab.ID.ToString(),
+                TabId = tab.ID.ToString(),
                 FullPath = options.FilePath
             };
 

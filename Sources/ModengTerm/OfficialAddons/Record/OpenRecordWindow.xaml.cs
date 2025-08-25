@@ -41,7 +41,7 @@ namespace ModengTerm.OfficialAddons.Record
         private bool isPlaying;
         private BindableCollection<Playback> playbacks;
         private IClientTab tab;
-        private StorageService storage;
+        private IClientStorage storage;
 
         private object playLock = new object();
         private Playback playback;
@@ -428,7 +428,7 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
-            int code = this.storage.DeleteObject(playback.Id);
+            int code = this.storage.DeleteObject<Playback>(playback);
             if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Info("删除失败, {0}", code);

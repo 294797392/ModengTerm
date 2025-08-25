@@ -40,7 +40,7 @@ namespace ModengTerm.Addon
 
         protected ClientFactory factory;
         protected IClient client;
-        protected StorageService storageService;
+        protected IClientStorage storageService;
         protected IClientEventRegistry eventRegistry;
 
         #endregion

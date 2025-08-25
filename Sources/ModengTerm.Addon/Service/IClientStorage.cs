@@ -1,12 +1,4 @@
-﻿using DotNEToolkit.DataModels;
-using ModengTerm.Base;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Automation.Provider;
+﻿using ModengTerm.Base;
 
 namespace ModengTerm.Addon.Service
 {
@@ -20,13 +12,13 @@ namespace ModengTerm.Addon.Service
         /// <summary>
         /// 如果该对象不和任何一个Session关联，写空
         /// </summary>
-        public string SessionId { get; set; }
+        public string TabId { get; set; }
     }
 
     /// <summary>
     /// 对插件提供持久化数据存储服务
     /// </summary>
-    public abstract class StorageService
+    public abstract class IClientStorage
     {
         public abstract int AddObject<T>(T obj) where T : StorageObject;
 
@@ -55,23 +47,9 @@ namespace ModengTerm.Addon.Service
         /// <returns></returns>
         public abstract List<T> GetObjects<T>(string sessionId) where T : StorageObject;
 
-        /// <summary>
-        /// 删除指定对象
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public abstract int DeleteObject(string objectId);
+        #region 删除接口
 
-        public int DeleteObjects(List<string> objectIds)
-        {
-            foreach (string objectId in objectIds)
-            {
-                DeleteObject(objectId);
-            }
-
-            return ResponseCode.SUCCESS;
-        }
+        public abstract int DeleteObject<T>(string objectId) where T : StorageObject;
 
         /// <summary>
         /// 删除指定会话里指定类型的对象
@@ -79,6 +57,29 @@ namespace ModengTerm.Addon.Service
         /// <param name="sessionId"></param>
         /// <returns></returns>
         public abstract int DeleteObjects<T>(string sessionId) where T : StorageObject;
+
+        /// <summary>
+        /// 删除指定对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int DeleteObject<T>(T obj) where T : StorageObject
+        {
+            return this.DeleteObject<T>(obj.Id);
+        }
+
+        public int DeleteObjects<T>(List<T> objs) where T : StorageObject
+        {
+            foreach (T obj in objs)
+            {
+                this.DeleteObject<T>(obj);
+            }
+
+            return ResponseCode.SUCCESS;
+        }
+
+        #endregion
 
         public abstract int UpdateObject<T>(T obj) where T : StorageObject;
     }

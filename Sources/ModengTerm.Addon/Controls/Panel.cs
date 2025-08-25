@@ -11,6 +11,7 @@ namespace ModengTerm.Addon.Controls
     {
         protected ClientFactory factory;
         protected IClientEventRegistry eventRegistry;
+        protected IClientStorage storage;
         protected IClient client;
 
         /// <summary>
@@ -22,6 +23,7 @@ namespace ModengTerm.Addon.Controls
         {
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
+            this.storage = this.factory.GetStorageService();
             this.client = this.factory.GetClient();
         }
 

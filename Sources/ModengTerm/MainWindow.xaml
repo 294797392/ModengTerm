@@ -32,7 +32,6 @@
     </WindowChrome.WindowChrome>
 
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static mcmd:MCommands.SendCommand}" Executed="SendCommand_Executed"/>
         <CommandBinding Command="{x:Static mcmd:MCommands.OpenSessionCommand}" Executed="OpenSessionCommand_Executed"/>
         <CommandBinding Command="{x:Static mcmd:MCommands.ExecuteAddonCommand}" Executed="ExecuteAddonCommand_Executed"/>
     </Window.CommandBindings>
@@ -78,10 +77,10 @@
 
             <DataTemplate x:Key="DataTemplateOpenSession">
                 <mcsext:MdButton Content="+" FontWeight="Bold" FontSize="16" Margin="3"
-                                        Background="{DynamicResource ResourceKey=RES50019E}"
-                                        MouseOverBrush="{DynamicResource ResourceKey=RES50020E}" 
-                                        MouseDownBrush="{DynamicResource ResourceKey=RES50021E}"
-                                        Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
+                                 Background="{DynamicResource ResourceKey=RES50019E}"
+                                 MouseOverBrush="{DynamicResource ResourceKey=RES50020E}" 
+                                 MouseDownBrush="{DynamicResource ResourceKey=RES50021E}"
+                                 Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
             </DataTemplate>
 
             <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">

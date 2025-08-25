@@ -21,7 +21,7 @@ namespace ModengTerm.Addon
     /// <summary>
     /// 使用Sqlite实现本地存储服务
     /// </summary>
-    public class SqliteStorageService : StorageService
+    public class SqliteStorageService : IClientStorage
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("SqliteStorageService");
         private const string DbFileResourceName = "ModengTerm.database.db";
@@ -41,7 +41,7 @@ namespace ModengTerm.Addon
         /// 确保db文件存在
         /// </summary>
         /// <param name="filePath"></param>
-        private void EnsureDbFile(string filePath) 
+        private void EnsureDbFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -61,11 +61,11 @@ namespace ModengTerm.Addon
 
             dbParameters[0].DbType = System.Data.DbType.String;
             dbParameters[0].ParameterName = "id";
-            dbParameters[0].Value = Guid.NewGuid().ToString();
+            dbParameters[0].Value = obj.Id;
 
             dbParameters[1].DbType = System.Data.DbType.String;
             dbParameters[1].ParameterName = "sid";
-            dbParameters[1].Value = obj.SessionId;
+            dbParameters[1].Value = obj.TabId;
 
             dbParameters[2].DbType = System.Data.DbType.String;
             dbParameters[2].ParameterName = "type";
@@ -93,7 +93,9 @@ namespace ModengTerm.Addon
             }
         }
 
-        public override int DeleteObject(string objectId)
+        #region 删除接口
+
+        public override int DeleteObject<T>(string objectId)
         {
             DbParameter[] dbParameters = dbManager.CreateDbParameters(1);
 
@@ -148,6 +150,8 @@ namespace ModengTerm.Addon
                 return ResponseCode.FAILED;
             }
         }
+
+        #endregion
 
         public override List<T> GetObjects<T>()
         {

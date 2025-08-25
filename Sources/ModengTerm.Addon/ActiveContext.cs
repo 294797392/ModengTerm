@@ -22,7 +22,7 @@ namespace ModengTerm.Addon
         /// <summary>
         /// 存储服务
         /// </summary>
-        public StorageService StorageService { get; set; }
+        public IClientStorage StorageService { get; set; }
 
         public AddonMetadata Definition { get; set; }
     }

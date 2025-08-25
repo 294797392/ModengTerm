@@ -10,7 +10,7 @@ namespace ModengTerm.Addon
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientFactoryImpl");
 
-        private StorageService storageSvcImpl = new SqliteStorageService();
+        private IClientStorage storageSvcImpl = new SqliteStorageService();
         private IClientEventRegistry eventRegistory = new ClientEventRegistryImpl();
 
         public ClientFactoryImpl()
@@ -18,7 +18,7 @@ namespace ModengTerm.Addon
 
         }
 
-        public override StorageService GetStorageService()
+        public override IClientStorage GetStorageService()
         {
             return storageSvcImpl;
         }

@@ -247,10 +247,12 @@
     <SolidColorBrush x:Key="RES60009E" Color="White"/><!-- OverlayPanel关闭按钮悬浮背景 -->
     <SolidColorBrush x:Key="RES60010E" Color="White"/><!-- OverlayPanel关闭按钮按下背景 -->
 
-    <!-- QuickCommandUserControl 65001 - 66000 -->
+    <!-- SnippetPanel 65001 - 66000 -->
     <SolidColorBrush x:Key="RES65001E" Color="#8591A2"/><!-- 默认边框 -->
     <SolidColorBrush x:Key="RES65002E" Color="#203D77"/><!-- 悬浮边框 -->
-
+    <SolidColorBrush x:Key="RES65003E" Color="Black" Opacity="0.3"/><!-- 删除按钮SVG默认颜色 -->
+    <SolidColorBrush x:Key="RES65004E" Color="Black" Opacity="0.6"/><!-- 删除按钮SVG悬浮颜色 -->
+    <SolidColorBrush x:Key="RES65005E" Color="Black"/><!-- 删除按钮SVG按下颜色 -->
 
     <!-- 四种连接状态图标 -->
     <BitmapImage x:Key="5520" UriSource="pack://application:,,,/ModengTerm;component/Images/ok.png"/>
@@ -263,4 +265,6 @@
     <SolidColorBrush x:Key="RES66002E" Color="#ECF4FF"/><!-- 按钮悬浮背景 -->
     <SolidColorBrush x:Key="RES66003E" Color="#ECF4FF" Opacity="0.7"/><!-- 按钮按下背景 -->
 
+    
+    
 </ResourceDictionary>

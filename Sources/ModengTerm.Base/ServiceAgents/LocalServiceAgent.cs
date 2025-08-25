@@ -144,63 +144,63 @@ namespace ModengTerm.Base.ServiceAgents
 
         #region ShellCommand管理
 
-        public override List<ShellCommand> GetShellCommands(string sessionId)
-        {
-            try
-            {
-                return JSONDatabase.SelectAll<ShellCommand>(v => v.SessionId == sessionId);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("GetShellCommands异常", ex);
-                return new List<ShellCommand>();
-            }
-        }
+        //public override List<ShellCommand> GetShellCommands(string sessionId)
+        //{
+        //    try
+        //    {
+        //        return JSONDatabase.SelectAll<ShellCommand>(v => v.SessionId == sessionId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("GetShellCommands异常", ex);
+        //        return new List<ShellCommand>();
+        //    }
+        //}
 
-        public override int AddShellCommand(ShellCommand shcmd)
-        {
-            try
-            {
-                JSONDatabase.Insert<ShellCommand>(shcmd);
+        //public override int AddShellCommand(ShellCommand shcmd)
+        //{
+        //    try
+        //    {
+        //        JSONDatabase.Insert<ShellCommand>(shcmd);
 
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AddShellCommand异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
+        //        return ResponseCode.SUCCESS;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("AddShellCommand异常", ex);
+        //        return ResponseCode.FAILED;
+        //    }
+        //}
 
-        public override int DeleteShellCommand(string id)
-        {
-            try
-            {
-                JSONDatabase.Delete<ShellCommand>(v => v.ID == id);
+        //public override int DeleteShellCommand(string id)
+        //{
+        //    try
+        //    {
+        //        JSONDatabase.Delete<ShellCommand>(v => v.ID == id);
 
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex) 
-            {
-                logger.Error("DeleteShellCommand异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
+        //        return ResponseCode.SUCCESS;
+        //    }
+        //    catch (Exception ex) 
+        //    {
+        //        logger.Error("DeleteShellCommand异常", ex);
+        //        return ResponseCode.FAILED;
+        //    }
+        //}
 
-        public override int UpdateShellCommand(ShellCommand shcmd)
-        {
-            try
-            {
-                JSONDatabase.Update<ShellCommand>(v => v.ID == shcmd.ID, shcmd);
+        //public override int UpdateShellCommand(ShellCommand shcmd)
+        //{
+        //    try
+        //    {
+        //        JSONDatabase.Update<ShellCommand>(v => v.ID == shcmd.ID, shcmd);
 
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("UpdateShellCommand异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
+        //        return ResponseCode.SUCCESS;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("UpdateShellCommand异常", ex);
+        //        return ResponseCode.FAILED;
+        //    }
+        //}
 
         #endregion
 
