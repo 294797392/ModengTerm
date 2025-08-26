@@ -109,18 +109,18 @@
                     "name": "Tcp",
                     "className": "ModengTerm.UserControls.OptionsUserControl.RawTcp.RawTcpOptionsUserControl, ModengTerm"
                 },
-                {
-                    "id": "6B71F68F-E5C0-4E9C-8E5D-CB1DD80E1DD6",
-                    "name": "登录脚本",
-                    "className": "ModengTerm.UserControls.OptionsUserControls.LoginScriptOptionsUserControl, ModengTerm",
-                    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.LoginScriptOptionVM, ModengTerm"
-                },
-                {
-                    "id": "B1B81B97-5656-4F38-B8FE-FE869790F7B3",
-                    "name": "系统监控",
-                    "className": "ModengTerm.UserControls.OptionsUserControls.SystemWatchOptionsUserControl, ModengTerm",
-                    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.SystemWatchOptionVM, ModengTerm"
-                }
+                //{
+                //    "id": "6B71F68F-E5C0-4E9C-8E5D-CB1DD80E1DD6",
+                //    "name": "登录脚本",
+                //    "className": "ModengTerm.UserControls.OptionsUserControls.LoginScriptOptionsUserControl, ModengTerm",
+                //    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.LoginScriptOptionVM, ModengTerm"
+                //},
+                //{
+                //    "id": "B1B81B97-5656-4F38-B8FE-FE869790F7B3",
+                //    "name": "系统监控",
+                //    "className": "ModengTerm.UserControls.OptionsUserControls.SystemWatchOptionsUserControl, ModengTerm",
+                //    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.SystemWatchOptionVM, ModengTerm"
+                //}
             ]
         },
 
@@ -133,7 +133,7 @@
                     "id": "0FA6848B-5FC8-4B4A-B387-544EEF845498",
                     "name": "外观",
                     "className": "ModengTerm.UserControls.OptionsUserControls.Terminal.ThemeOptionsUserControl, ModengTerm",
-                    "vmClassName": "ModengTerm.ViewModels.CreateSession.TerminalOptions.ThemeOptionsVM, ModengTerm"
+                    "vmClassName": "ModengTerm.ViewModel.CreateSession.TerminalOptions.ThemeOptionsVM, ModengTerm.ViewModel"
                 },
                 {
                     "id": "5ABD09D0-3F88-45DC-A2DA-1E528914DF00",
@@ -144,7 +144,7 @@
                     "id": "39C7B12B-479D-40DF-803F-FDDEC7B4CF61",
                     "name": "高级",
                     "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm",
-                    "vmClassName": "ModengTerm.ViewModels.CreateSession.TerminalOptions.AdvancedOptionsVM, ModengTerm"
+                    "vmClassName": "ModengTerm.ViewModel.CreateSession.TerminalOptions.AdvancedOptionsVM, ModengTerm.ViewModel"
                 }
             ]
         }

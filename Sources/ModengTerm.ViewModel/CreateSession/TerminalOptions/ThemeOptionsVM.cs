@@ -182,22 +182,23 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
 
             this.manifest = manifest;
 
-            FontFamilyList = new BindableCollection<FontFamilyDefinition>();
-            FontFamilyList.AddRange(manifest.FontFamilyList);
+            this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
+            InstalledFontCollection installedFont = new InstalledFontCollection();
+            this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
 
-            FontSizeList = new BindableCollection<FontSizeDefinition>();
-            FontSizeList.AddRange(manifest.FontSizeList);
+            this.FontSizeList = new BindableCollection<FontSizeDefinition>();
+            this.FontSizeList.AddRange(manifest.FontSizeList);
 
-            CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
-            CursorSpeeds.AddRange(VTBaseUtils.GetEnumValues<VTCursorSpeeds>());
+            this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
+            this.CursorSpeeds.AddRange(VTBaseUtils.GetEnumValues<VTCursorSpeeds>());
 
-            CursorStyles = new BindableCollection<VTCursorStyles>();
-            CursorStyles.AddRange(VTBaseUtils.GetEnumValues<VTCursorStyles>());
+            this.CursorStyles = new BindableCollection<VTCursorStyles>();
+            this.CursorStyles.AddRange(VTBaseUtils.GetEnumValues<VTCursorStyles>());
 
-            ThemeList = new BindableCollection<ThemePackage>();
-            ThemeList.AddRange(manifest.DefaultThemes);
-            ThemeList.SelectionChanged += ThemeList_SelectionChanged;
-            ThemeList.SelectedItem = ThemeList.FirstOrDefault();
+            this.ThemeList = new BindableCollection<ThemePackage>();
+            this.ThemeList.AddRange(manifest.DefaultThemes);
+            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
+            this.ThemeList.SelectedItem = ThemeList.FirstOrDefault();
         }
 
         public override void OnLoaded()
@@ -272,21 +273,6 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
 
         private void SwitchTheme(ThemePackage theme)
         {
-            // 加载系统已安装的所有字体
-            FontFamilyList.Clear();
-            InstalledFontCollection installedFont = new InstalledFontCollection();
-            foreach (FontFamilyDefinition ffd in this.manifest.FontFamilyList)
-            {
-                if (installedFont.Families.FirstOrDefault(v => v.Name == ffd.Value) != null)
-                {
-                    FontFamilyList.Add(ffd);
-                }
-            }
-            // 如果所有的预定义字体都不存在于当前系统里安装的字体，那么把当前系统里的所有字体加进去
-            if (FontFamilyList.Count == 0)
-            {
-                FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
-            }
             FontFamilyList.SelectedItem = FontFamilyList.FirstOrDefault();
             FontSizeList.SelectedItem = FontSizeList.FirstOrDefault(v => v.Value == theme.FontSize);
 
