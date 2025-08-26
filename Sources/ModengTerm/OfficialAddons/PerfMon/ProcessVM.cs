@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.Watch;
 using System;
 using System.ComponentModel;
 using WPFToolkit.MVVM;

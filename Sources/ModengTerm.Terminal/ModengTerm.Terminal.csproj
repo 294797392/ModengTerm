@@ -22,6 +22,7 @@
     <Compile Remove="EventArgs\**" />
     <Compile Remove="Modules\**" />
     <Compile Remove="Rendering\**" />
+    <Compile Remove="SystemWatch\**" />
     <Compile Remove="TestCase\**" />
     <Compile Remove="Wallpapers\**" />
     <Compile Remove="Watchers\**" />
@@ -30,6 +31,7 @@
     <EmbeddedResource Remove="EventArgs\**" />
     <EmbeddedResource Remove="Modules\**" />
     <EmbeddedResource Remove="Rendering\**" />
+    <EmbeddedResource Remove="SystemWatch\**" />
     <EmbeddedResource Remove="TestCase\**" />
     <EmbeddedResource Remove="Wallpapers\**" />
     <EmbeddedResource Remove="Watchers\**" />
@@ -38,6 +40,7 @@
     <None Remove="EventArgs\**" />
     <None Remove="Modules\**" />
     <None Remove="Rendering\**" />
+    <None Remove="SystemWatch\**" />
     <None Remove="TestCase\**" />
     <None Remove="Wallpapers\**" />
     <None Remove="Watchers\**" />
@@ -46,6 +49,7 @@
     <Page Remove="EventArgs\**" />
     <Page Remove="Modules\**" />
     <Page Remove="Rendering\**" />
+    <Page Remove="SystemWatch\**" />
     <Page Remove="TestCase\**" />
     <Page Remove="Wallpapers\**" />
     <Page Remove="Watchers\**" />
@@ -77,7 +81,6 @@
     <Compile Remove="VTModifierKeys.cs" />
     <Compile Remove="VTScreen.cs" />
     <Compile Remove="VTUtils.cs" />
-    <Compile Remove="SystemWatch\IDiskInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Enumerations;
-using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

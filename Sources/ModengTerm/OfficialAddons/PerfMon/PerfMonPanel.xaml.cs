@@ -6,7 +6,6 @@ using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.OfficialAddons.Broadcast;
-using ModengTerm.Terminal.Watch;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;

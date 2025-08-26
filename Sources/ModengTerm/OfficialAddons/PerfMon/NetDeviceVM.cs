@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Enumerations;
-using ModengTerm.Terminal.Watch;
 using System.Diagnostics;
 using WPFToolkit.MVVM;
 
