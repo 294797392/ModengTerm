@@ -1,4 +1,6 @@
-﻿using DotNEToolkit.Utility;
+﻿using DotNEToolkit;
+using DotNEToolkit.Utility;
+using log4net.Util;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
@@ -51,6 +53,12 @@ namespace ModengTerm.OfficialAddons.PerfMon
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("PerfMonPanel");
 
+        private static readonly List<int> CPU_USER_TIME_INDEX = new List<int>() { 1, 2 };
+        private static readonly List<int> CPU_KERNEL_TIME_INDEX = new List<int>() { 3, 5, 6, 7, 8 };
+        private static readonly List<int> CPU_IDLE_TIME_INDEX = new List<int>() { 4 };
+        private static readonly string FetchNetworkInterfaces = "interfaces=$(ifconfig | grep -o '^[a-zA-Z0-9]\\+:' | tr -d ':');for interface in $interfaces; do ip_address=$(ifconfig \"$interface\" | grep -o 'inet [0-9.]\\+' | awk '{print $2}');receive_bytes=$(ifconfig \"$interface\" | grep 'RX packets' | awk '{print $5}');transmit_bytes=$(ifconfig \"$interface\" | grep 'TX packets' | awk '{print $5}');echo $interface,$ip_address,$receive_bytes,$transmit_bytes;done;";
+        private static readonly string FetchProcess = "for pid in $(ls -d /proc/[0-9]* 2>/dev/null); do pid=${pid##*/};name=$(grep '^Name:' \"/proc/$pid/status\" | awk '{print $2}');rss=$(grep '^VmRSS:' \"/proc/$pid/status\" | awk '{print $2}');stat=($(awk '{print $14, $15}' \"/proc/$pid/stat\"));utime=${stat[0]};ktime=${stat[1]};echo $pid,$name,$rss,$utime,$ktime;done;";
+
         #endregion
 
         #region 实例变量
@@ -67,6 +75,11 @@ namespace ModengTerm.OfficialAddons.PerfMon
         // windows使用
         private int memstatSize;
         private PerformanceCounter cpuUsagePerf;
+
+        // ssh使用
+        private ulong prevKernelProcessorTime;
+        private ulong prevUserProcessorTime;
+        private ulong prevIdleProcessorTime;
 
         #endregion
 
@@ -100,8 +113,339 @@ namespace ModengTerm.OfficialAddons.PerfMon
 
         private void UpdateSshPerfMon() 
         {
-            //IClientSshTab sshTab = this.Tab as IClientSshTab;
+            IClientShellTab shellTab = this.Tab as IClientShellTab;
+            ISshEngine sshEngine = shellTab.GetSshEngine();
+
+            this.UpdateSshMem(sshEngine);
+            this.UpdateSshCpu(sshEngine);
+            this.UpdateSshDisks(sshEngine);
+            this.UpdateSshNetDevices(sshEngine);
+            this.UpdateSshProcess(sshEngine);
         }
+
+        private void UpdateSshMem(ISshEngine sshEngine) 
+        {
+            string meminfo = sshEngine.ExecuteScript("cat /proc/meminfo");
+            string[] items = meminfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            ulong totalMem;
+            if (!this.parse_meminfo_item(items, "MemTotal", out totalMem))
+            {
+                logger.ErrorFormat("解析MemTotal失败");
+                return;
+            }
+
+            ulong availableMem;
+            if (!this.parse_meminfo_item(items, "MemAvailable", out availableMem))
+            {
+                logger.ErrorFormat("解析MemAvailable失败");
+                return;
+            }
+
+            ulong usageMem = totalMem - availableMem;
+
+            double total, usage;
+            UnitType totalUnit, usageUnit;
+            this.AutoFitSize(totalMem, UnitType.KB, out total, out totalUnit);
+            this.AutoFitSize(usageMem, UnitType.KB, out usage, out usageUnit);
+            this.cpuMem.DisplayMemoryUsage = string.Format("{0}{1}/{2}{3}", usage, usageUnit, total, totalUnit);
+            this.cpuMem.MemoryPercent = Math.Round((double)usageMem / totalMem * 100, 2);
+        }
+
+        private void UpdateSshCpu(ISshEngine sshEngine) 
+        {
+            ulong userProcessorTime, kernelProcesstorTime, idleProcesstorTime;
+
+            string cpuinfo = sshEngine.ExecuteScript("cat /proc/stat");
+            string[] cpuitems = cpuinfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            string cpu = cpuitems.FirstOrDefault(v => v.Contains("cpu "));
+            if (!this.handle_cpu(cpu, out userProcessorTime, out kernelProcesstorTime, out idleProcesstorTime)) 
+            {
+                return;
+            }
+
+            ulong totalProcessorTime = 0;
+
+            // 确保至少读取了一次CPU占用信息
+            if (this.prevKernelProcessorTime > 0)
+            {
+                ulong idleTime = idleProcesstorTime - this.prevIdleProcessorTime;
+                ulong kernelTime = kernelProcesstorTime - this.prevKernelProcessorTime;
+                ulong userTime = userProcessorTime - this.prevUserProcessorTime;
+                ulong totalTime = idleTime + kernelTime + userTime;
+                totalProcessorTime = kernelTime + userTime;
+                this.cpuMem.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
+                if (this.cpuMem.CpuPercent > 100)
+                {
+                    logger.FatalFormat("3. {0}, totalProcessorTime = {1}, totalTime = {2}, kernelTime = {3}, userTime = {4}, idleTime = {4}, prevIdleProcessorTime = {5}", this.cpuMem.CpuPercent, totalProcessorTime, totalTime, kernelTime, userTime, idleTime, this.prevIdleProcessorTime);
+                }
+            }
+
+            this.prevIdleProcessorTime = idleProcesstorTime;
+            this.prevKernelProcessorTime = kernelProcesstorTime;
+            this.prevUserProcessorTime = userProcessorTime;
+        }
+
+        private void UpdateSshDisks(ISshEngine sshEngine)
+        {
+            string df = sshEngine.ExecuteScript("df");
+
+            if (string.IsNullOrEmpty(df))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = df.Split('\n', StringSplitOptions.RemoveEmptyEntries).Skip(1);
+            if (lines == null)
+            {
+                return;
+            }
+
+            foreach (string source in lines)
+            {
+                string[] strs = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (strs.Length < 5)
+                {
+                    logger.ErrorFormat("unix disk format error, {0}", source);
+                    continue;
+                }
+
+                string name = strs[strs.Length - 1];
+
+                DiskVM disk = this.disks.FirstOrDefault(v => v.Name == name);
+                if (disk == null) 
+                {
+                    disk = new DiskVM();
+                    disk.Name = name;
+
+                    Dispatcher.Invoke(() => 
+                    {
+                        this.disks.Add(disk);
+                    });
+                }
+
+                double totalSize = 0, availableFreeSpace = 0;
+                UnitType totalSizeUnit = UnitType.bytes, availableFreeSpaceUnit = UnitType.bytes;
+
+                ulong available;
+                if (ulong.TryParse(strs[3], out available))
+                {
+                    this.AutoFitSize(available, UnitType.KB, out availableFreeSpace, out availableFreeSpaceUnit);
+                }
+                else
+                {
+                    logger.ErrorFormat("unix disk available error, {0}", source);
+                    continue;
+                }
+
+                ulong size;
+                if (ulong.TryParse(strs[1], out size))
+                {
+                    this.AutoFitSize(size, UnitType.KB, out totalSize, out totalSizeUnit);
+                }
+                else
+                {
+                    logger.ErrorFormat("unix disk size error, {0}", source);
+                    continue;
+                }
+
+                disk.FreeRatio = string.Format("{0}{1}/{2}{3}", availableFreeSpace, availableFreeSpaceUnit, totalSize, totalSizeUnit);
+            }
+
+            if (this.disks.Count > lines.Count())
+            {
+                IEnumerable<string> names = lines.Select(source => 
+                {
+                    string[] strs = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (strs.Length < 5)
+                    {
+                        return string.Empty;
+                    }
+
+                    return strs[strs.Length - 1];
+                });
+
+                this.CleanupDisks(names);
+            }
+        }
+
+        private void UpdateSshNetDevices(ISshEngine sshEngine)
+        {
+            string netdev = sshEngine.ExecuteScript(FetchNetworkInterfaces);
+
+            if (string.IsNullOrEmpty(netdev))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = netdev.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines == null)
+            {
+                return;
+            }
+
+            foreach (string source in lines)
+            {
+                string[] items = source.Split(',');
+
+                NetDeviceVM netDevice = this.netDevices.FirstOrDefault(v => v.Name == items[0]);
+                if (netDevice == null) 
+                {
+                    netDevice = new NetDeviceVM();
+                    netDevice.IfaceId = items[0];
+                    netDevice.Name = items[0];
+
+                    Dispatcher.Invoke(() => 
+                    {
+                        this.netDevices.Add(netDevice);
+                    });
+                }
+
+                netDevice.IPAddress = items[1];
+
+                ulong bytesReceived, bytesSent;
+                if (ulong.TryParse(items[2], out bytesReceived))
+                {
+                    netDevice.BytesReceived = bytesReceived;
+                }
+
+                if (ulong.TryParse(items[3], out bytesSent))
+                {
+                    netDevice.BytesSent = bytesSent;
+                }
+            }
+
+            if (this.netDevices.Count > lines.Count())
+            {
+                this.CleanupNetDevices(lines.Select(v => v.Split(',')[0]));
+            }
+        }
+
+        private void UpdateSshProcess(ISshEngine sshEngine)
+        {
+            string process = sshEngine.ExecuteScript(FetchProcess);
+
+            if (string.IsNullOrEmpty(process))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = process.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines == null)
+            {
+                return;
+            }
+
+            if (this.processes.Count == 0)
+            {
+                List<ProcessVM> procVMs = new List<ProcessVM>();
+
+                foreach (string source in lines)
+                {
+                    string[] items = source.Split(',');
+
+                    int pid;
+                    if (!int.TryParse(items[0], out pid))
+                    {
+                        logger.ErrorFormat("parse unix proc pid failed");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(items[1]))
+                    {
+                        // 进程名字为空
+                        continue;
+                    }
+
+                    ProcessVM procVM = new ProcessVM();
+                    procVM.PID = pid;
+                    procVM.Name = items[1];
+
+                    ulong rss;
+                    if (ulong.TryParse(items[2], out rss))
+                    {
+                        double memory;
+                        UnitType memoryUnit;
+                        this.AutoFitSize(rss, UnitType.KB, out memory, out memoryUnit);
+                        procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
+                    }
+
+                    //long utime = 0, ktime = 0;
+                    //long.TryParse(items[3], out utime);
+                    //long.TryParse(items[4], out ktime);
+
+                    //target.TotalProcessorTime = utime + ktime;
+
+                    procVMs.Add(procVM);
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    this.processes.AddRange(procVMs);
+                });
+            }
+            else
+            {
+                List<int> pids = new List<int>();
+
+                foreach (string source in lines)
+                {
+                    string[] items = source.Split(',');
+
+                    int pid;
+                    if (!int.TryParse(items[0], out pid))
+                    {
+                        logger.ErrorFormat("parse unix proc pid failed");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(items[1])) 
+                    {
+                        // 进程名字为空
+                        continue;
+                    }
+
+                    pids.Add(pid);
+
+                    ProcessVM procVM = this.processes.FirstOrDefault(v => v.PID == pid);
+                    if (procVM == null)
+                    {
+                        procVM = new ProcessVM();
+                        procVM.PID = pid;
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            this.processes.Add(procVM);
+                        });
+                    }
+
+                    procVM.Name = items[1];
+
+                    ulong rss;
+                    if (ulong.TryParse(items[2], out rss))
+                    {
+                        double memory;
+                        UnitType memoryUnit;
+                        this.AutoFitSize(rss, UnitType.KB, out memory, out memoryUnit);
+                        procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
+                    }
+
+                    //long utime = 0, ktime = 0;
+                    //long.TryParse(items[3], out utime);
+                    //long.TryParse(items[4], out ktime);
+
+                    //target.TotalProcessorTime = utime + ktime;
+                }
+
+                if (this.processes.Count > pids.Count)
+                {
+                    this.CleanupProcesses(pids);
+                }
+            }
+        }
+
+
+
 
         /// <summary>
         /// 
@@ -117,10 +461,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 DiskVM disk = this.disks.FirstOrDefault(v => v.Name == drive.Name);
                 if (disk == null)
                 {
-                    disk = new DiskVM()
-                    {
-                        Name = drive.Name,
-                    };
+                    disk = new DiskVM();
+                    disk.Name = drive.Name;
 
                     Dispatcher.Invoke(() =>
                     {
@@ -150,7 +492,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
 
             if (this.processes.Count == 0)
             {
-                List<ProcessVM> processVMs = new List<ProcessVM>();
+                List<ProcessVM> procVMs = new List<ProcessVM>();
 
                 foreach (Process win32Proc in processes)
                 {
@@ -163,12 +505,12 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     this.AutoFitSize(win32Proc.WorkingSet64, UnitType.bytes, out memory, out memoryUnit);
                     procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
 
-                    processVMs.Add(procVM);
+                    procVMs.Add(procVM);
                 }
 
                 Dispatcher.Invoke(() =>
                 {
-                    this.processes.AddRange(processVMs);
+                    this.processes.AddRange(procVMs);
                 });
             }
             else
@@ -180,13 +522,14 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     {
                         procVM = new ProcessVM();
                         procVM.PID = win32Proc.Id;
-                        procVM.Name = win32Proc.ProcessName;
 
                         Dispatcher.Invoke(() =>
                         {
                             this.processes.Add(procVM);
                         });
                     }
+
+                    procVM.Name = win32Proc.ProcessName;
 
                     double memory;
                     UnitType memoryUnit;
@@ -236,9 +579,6 @@ namespace ModengTerm.OfficialAddons.PerfMon
                         this.netDevices.Add(netDev);
                     });
                 }
-
-                netDev.PrevBytesSent = netDev.BytesSent;
-                netDev.PrevBytesReceived = netDev.BytesReceived;
 
                 IPv4InterfaceStatistics statistics = interfaze.GetIPv4Statistics();
                 netDev.BytesSent = (ulong)statistics.BytesSent;
@@ -390,6 +730,10 @@ namespace ModengTerm.OfficialAddons.PerfMon
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newestPids">进程Id列表</param>
         private void CleanupProcesses(IEnumerable<int> newestPids)
         {
             for (int i = 0; i < this.processes.Count; i++)
@@ -407,6 +751,10 @@ namespace ModengTerm.OfficialAddons.PerfMon
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="newestNetDeviceIds">最新的网络接口Id</param>
         private void CleanupNetDevices(IEnumerable<string> newestNetDeviceIds)
         {
             for (int i = 0; i < this.netDevices.Count; i++)
@@ -457,6 +805,11 @@ namespace ModengTerm.OfficialAddons.PerfMon
 
         private void PerfMonThreadProc(TimerHandle timer, object userData)
         {
+            if (this.Tab.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
             switch (this.Tab.Type)
             {
                 case SessionTypeEnum.SSH:
@@ -566,6 +919,128 @@ namespace ModengTerm.OfficialAddons.PerfMon
         }
         [DllImport("kernel32")]
         public static extern void GetSystemInfo(ref SYSTEM_INFO sysinfo);
+
+        #endregion
+
+        #region 解析Ssh返回数据
+
+        private bool parse_meminfo_item(string[] items, string key, out ulong value)
+        {
+            value = 0;
+
+            string text = items.FirstOrDefault(v => v.StartsWith(key));
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            string[] strs = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (strs == null || strs.Length != 3)
+            {
+                logger.ErrorFormat("mem error = {0}", text);
+                return false;
+            }
+
+            if (!ulong.TryParse(strs[1], out value))
+            {
+                logger.ErrorFormat("mem error2 = {0}", text);
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool calc_cpu_time(string[] strs, List<int> indexs, out ulong cpu_time)
+        {
+            cpu_time = 0;
+
+            foreach (int index in indexs)
+            {
+                ulong v;
+                if (!ulong.TryParse(strs[index], out v))
+                {
+                    return false;
+                }
+
+                cpu_time += v;
+            }
+
+            return true;
+        }
+
+        private bool handle_cpu(string cpu, out ulong userProcessorTime, out ulong kernelProcessorTime, out ulong idleProcessorTime)
+        {
+            userProcessorTime = 0;
+            kernelProcessorTime = 0;
+            idleProcessorTime = 0;
+
+            //        
+            // cpu  1661515 33740 1757851 27139465 233 0 387078 0 0 0
+
+            if (string.IsNullOrEmpty(cpu))
+            {
+                logger.ErrorFormat("cpu empty");
+                return false;
+            }
+
+            string[] strs = cpu.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (strs.Length < 9)
+            {
+                logger.ErrorFormat("cpu error = {0}", cpu);
+                return false;
+            }
+
+            // 用户时间
+            ulong user_time;
+            if (!this.calc_cpu_time(strs, CPU_USER_TIME_INDEX, out user_time))
+            {
+                logger.ErrorFormat("cpu user time error = {0}", cpu);
+            }
+            else
+            {
+                userProcessorTime = user_time;
+            }
+
+            // 内核时间
+            ulong kernel_time;
+            if (!this.calc_cpu_time(strs, CPU_KERNEL_TIME_INDEX, out kernel_time))
+            {
+                logger.ErrorFormat("cpu kernel time error = {0}", cpu);
+            }
+            else
+            {
+                kernelProcessorTime = kernel_time;
+            }
+
+            // 空闲时间
+            ulong idle_time;
+            if (!this.calc_cpu_time(strs, CPU_IDLE_TIME_INDEX, out idle_time))
+            {
+                logger.ErrorFormat("cpu idle time error = {0}", cpu);
+            }
+            else
+            {
+                idleProcessorTime = idle_time;
+            }
+
+            return true;
+        }
+
+        private void handle_process(string process)
+        {
+            if (string.IsNullOrEmpty(process))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = process.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines == null)
+            {
+                return;
+            }
+
+            //this.Copy<string, VTProcess>(this.systemInfo.Processes, lines, this.processCopy);
+        }
 
         #endregion
     }

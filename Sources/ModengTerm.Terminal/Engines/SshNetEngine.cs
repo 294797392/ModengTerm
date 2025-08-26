@@ -1,7 +1,7 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using Renci.SshNet;
@@ -10,12 +10,12 @@ using System.IO;
 using System.Text;
 using XTerminal.Base.Enumerations;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// 使用Rench.SshNet库实现的ssh会话
     /// </summary>
-    public class SshNetSession : SessionDriver
+    public class SshNetEngine : AbstractEngin, ISshEngine
     {
         #region 类变量
 
@@ -29,6 +29,8 @@ namespace ModengTerm.Terminal.Session
         private ShellStream stream;
         private List<PortForwardState> portForwardStates;
 
+        private SshCommand sshCommand;
+
         #endregion
 
         #region 属性
@@ -39,7 +41,7 @@ namespace ModengTerm.Terminal.Session
 
         #region 构造方法
 
-        public SshNetSession(XTermSession options) :
+        public SshNetEngine(XTermSession options) :
             base(options)
         {
         }
@@ -80,7 +82,7 @@ namespace ModengTerm.Terminal.Session
                 case SSHAuthTypeEnum.PrivateKey:
                     {
                         PrivateKey privateKey = VTApp.Context.ServiceAgent.GetPrivateKey(privateKeyId);
-                        if (privateKey == null) 
+                        if (privateKey == null)
                         {
                             logger.ErrorFormat("登录失败, 密钥不存在");
                             return ResponseCode.PRIVATE_KEY_NOT_FOUND;
@@ -151,7 +153,9 @@ namespace ModengTerm.Terminal.Session
             }
 
             #endregion
-            
+
+            this.sshCommand = this.sshClient.CreateCommand(string.Empty);
+
             //Task.Factory.StartNew(() => 
             //{
             //    SshCommand sshCommand = this.sshClient.CreateCommand("tail -f ~/1");
@@ -173,17 +177,11 @@ namespace ModengTerm.Terminal.Session
             return ResponseCode.SUCCESS;
         }
 
-        private void SshClient_ServerIdentificationReceived(object? sender, SshIdentificationEventArgs e)
-        {
-        }
-
-        private void SshClient_HostKeyReceived(object? sender, HostKeyEventArgs e)
-        {
-            e.CanTrust = true;
-        }
-
         public override void Close()
         {
+            this.sshClient.HostKeyReceived -= SshClient_HostKeyReceived;
+            this.sshClient.ServerIdentificationReceived -= SshClient_ServerIdentificationReceived;
+
             this.stream.Dispose();
             this.sshClient.Disconnect();
 
@@ -191,7 +189,7 @@ namespace ModengTerm.Terminal.Session
 
             foreach (PortForwardState forwardState in this.portForwardStates)
             {
-                if (forwardState.Status == PortForwardStatusEnum.Opened) 
+                if (forwardState.Status == PortForwardStatusEnum.Opened)
                 {
                     ForwardedPort forwardedPort = forwardState.DriverObject as ForwardedPort;
                     forwardedPort.Stop();
@@ -268,6 +266,24 @@ namespace ModengTerm.Terminal.Session
         #endregion
 
         #region 事件处理器
+
+        private void SshClient_ServerIdentificationReceived(object? sender, SshIdentificationEventArgs e)
+        {
+        }
+
+        private void SshClient_HostKeyReceived(object? sender, HostKeyEventArgs e)
+        {
+            e.CanTrust = true;
+        }
+
+        #endregion
+
+        #region ISshEngine
+
+        public string ExecuteScript(string script)
+        {
+            return this.sshCommand.Execute(script);
+        }
 
         #endregion
     }

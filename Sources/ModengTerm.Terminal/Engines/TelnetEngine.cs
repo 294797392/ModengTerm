@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
-    public class TelnetSession : SessionDriver
+    public class TelnetEngine : AbstractEngin
     {
-        public TelnetSession(XTermSession session) : 
+        public TelnetEngine(XTermSession session) : 
             base(session)
         {
         }

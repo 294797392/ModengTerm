@@ -12,7 +12,7 @@ using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using System.Text;
 using System.Windows.Input;
 
@@ -32,7 +32,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 用来发送数据给主机（比如终端的窗口大小改变了）
         /// </summary>
-        public SessionTransport SessionTransport { get; set; }
+        public EngineTransport SessionTransport { get; set; }
 
         /// <summary>
         /// 终端的宽度
@@ -118,7 +118,7 @@ namespace ModengTerm.Terminal
 
         private string name;
 
-        private SessionTransport sessionTransport;
+        private EngineTransport sessionTransport;
 
         /// <summary>
         /// 主缓冲区文档模型

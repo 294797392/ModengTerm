@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -54,7 +54,7 @@ namespace ModengTerm.Terminal.Watch
 
         #region 构造方法
 
-        public UnixAdbWatcher(XTermSession session, SessionDriver driver) :
+        public UnixAdbWatcher(XTermSession session, AbstractEngin driver) :
             base(session, driver)
         {
             this.cmd2FileName = new Dictionary<string, FileNames>();

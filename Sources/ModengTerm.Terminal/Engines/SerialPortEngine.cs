@@ -3,9 +3,9 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using System.IO.Ports;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
-    public class SerialPortSession : SessionDriver
+    public class SerialPortEngine : AbstractEngin
     {
         #region 类变量
 
@@ -21,7 +21,7 @@ namespace ModengTerm.Terminal.Session
 
         #region 构造方法
 
-        public SerialPortSession(XTermSession options) :
+        public SerialPortEngine(XTermSession options) :
             base(options)
         {
         }

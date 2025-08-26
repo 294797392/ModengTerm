@@ -1,9 +1,9 @@
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.ComponentModel;
-using static ModengTerm.Terminal.Session.ConPTY.Native.PseudoConsoleApi;
+using static ModengTerm.Terminal.Engines.ConPTY.Native.PseudoConsoleApi;
 
-namespace ModengTerm.Terminal.Session.ConPTY
+namespace ModengTerm.Terminal.Engines.ConPTY
 {
     /// <summary>
     /// Utility functions around the new Pseudo Console APIs.

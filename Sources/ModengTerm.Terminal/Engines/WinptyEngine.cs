@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// Native API wrapper for WinPty.
@@ -217,7 +217,7 @@ namespace ModengTerm.Terminal.Session
     /// <summary>
     /// 使用winpty库实现与Windows命令行通信
     /// </summary>
-    public class WinptySession : SessionDriver
+    public class WinptyEngine : AbstractEngin
     {
         #region 类变量
 
@@ -237,7 +237,7 @@ namespace ModengTerm.Terminal.Session
 
         #region 构造方法
 
-        public WinptySession(XTermSession options) :
+        public WinptyEngine(XTermSession options) :
             base(options)
         { }
 

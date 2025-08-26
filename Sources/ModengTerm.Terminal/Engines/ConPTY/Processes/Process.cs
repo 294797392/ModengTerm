@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using static ModengTerm.Terminal.Session.ConPTY.Native.ProcessApi;
+using static ModengTerm.Terminal.Engines.ConPTY.Native.ProcessApi;
 
-namespace ModengTerm.Terminal.Session.ConPTY.Processes
+namespace ModengTerm.Terminal.Engines.ConPTY.Processes
 {
     /// <summary>
     /// Represents an instance of a process.

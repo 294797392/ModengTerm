@@ -58,6 +58,8 @@
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="DataModels\VTCharacterSM.cs" />
     <Compile Remove="DataModels\Wallpaper.cs" />
+    <Compile Remove="Engines\libvt.cs" />
+    <Compile Remove="Engines\libvtsshSession.cs" />
     <Compile Remove="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="Parsing\VTActions.cs" />
@@ -65,8 +67,8 @@
     <Compile Remove="Parsing\VTDispatchHandler.cs" />
     <Compile Remove="Parsing\VTParserEventDlg.cs" />
     <Compile Remove="PrimaryScreen.cs" />
-    <Compile Remove="Session\AdbShellSession.cs" />
-    <Compile Remove="Session\PlaybackSession.cs" />
+    <Compile Remove="Engines\AdbShellSession.cs" />
+    <Compile Remove="Engines\PlaybackSession.cs" />
     <Compile Remove="Triggers\Trigger.cs" />
     <Compile Remove="Triggers\TriggerAction.cs" />
     <Compile Remove="VTBookmark.cs" />
@@ -119,10 +121,6 @@
     <None Update="ShellScripts\FetchNetworkInterfaces.sh">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Session\ConPTY\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>

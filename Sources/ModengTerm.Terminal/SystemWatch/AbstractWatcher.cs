@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +16,7 @@ namespace ModengTerm.Terminal.Watch
         /// </summary>
         /// <param name="session">要watch的Session</param>
         /// <param name="driver">要watch的Driver</param>
-        public AbstractWatcher(XTermSession session, SessionDriver driver)
+        public AbstractWatcher(XTermSession session, AbstractEngin driver)
         {
         }
 

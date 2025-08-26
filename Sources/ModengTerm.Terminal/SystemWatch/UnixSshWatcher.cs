@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using Renci.SshNet;
 
 namespace ModengTerm.Terminal.Watch
@@ -10,7 +10,7 @@ namespace ModengTerm.Terminal.Watch
 
         #region 实例变量
 
-        private SshNetSession sshNetDrv;
+        private SshNetEngine sshNetDrv;
         private SshClient sshClient;
         private SshCommand sshCommand;
 
@@ -18,10 +18,10 @@ namespace ModengTerm.Terminal.Watch
 
         #region 构造方法
 
-        public UnixSshWatcher(XTermSession session, SessionDriver driver) :
+        public UnixSshWatcher(XTermSession session, AbstractEngin driver) :
             base(session, driver)
         {
-            this.sshNetDrv = driver as SshNetSession;
+            this.sshNetDrv = driver as SshNetEngine;
             this.sshClient = sshNetDrv.SshClient;
             this.sshCommand = this.sshClient.CreateCommand(string.Empty);
         }

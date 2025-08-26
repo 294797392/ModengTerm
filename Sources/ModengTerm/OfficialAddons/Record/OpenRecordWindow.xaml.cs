@@ -9,7 +9,7 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using ModengTerm.UserControls.TerminalUserControls;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Terminal;
@@ -114,7 +114,7 @@ namespace ModengTerm.OfficialAddons.Record
                 MainDocument = DocumentMain,
                 Width = DocumentMain.ActualWidth,
                 Height = DocumentMain.ActualHeight,
-                SessionTransport = new SessionTransport()
+                SessionTransport = new EngineTransport()
             };
 
             VideoTerminal videoTerminal = new VideoTerminal();

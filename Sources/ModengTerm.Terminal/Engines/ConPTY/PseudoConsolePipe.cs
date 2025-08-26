@@ -2,9 +2,9 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using static ModengTerm.Terminal.Session.ConPTY.Native.PseudoConsoleApi;
+using static ModengTerm.Terminal.Engines.ConPTY.Native.PseudoConsoleApi;
 
-namespace ModengTerm.Terminal.Session.ConPTY
+namespace ModengTerm.Terminal.Engines.ConPTY
 {
     /// <summary>
     /// A pipe used to talk to the pseudoconsole, as described in:

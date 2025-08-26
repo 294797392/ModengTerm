@@ -1,11 +1,8 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal;
+using ModengTerm.Terminal.Engines;
 using ModengTerm.Terminal.Modem;
-using ModengTerm.Terminal.Session;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Terminal
@@ -46,7 +43,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public XTermSession Session { get; set; }
 
-        public SessionTransport Transport { get; set; }
+        public EngineTransport Transport { get; set; }
 
         public ModemTypeEnum Type { get; set; }
 
@@ -178,7 +175,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         #region 事件处理器
 
-        private void Transport_DataReceived(SessionTransport transport, byte[] buffer, int size)
+        private void Transport_DataReceived(EngineTransport transport, byte[] buffer, int size)
         {
             synchronizedStream.Write(buffer, size);
         }

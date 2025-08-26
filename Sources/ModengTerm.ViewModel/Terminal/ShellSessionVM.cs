@@ -9,12 +9,9 @@ using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Engines;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Modem;
-using ModengTerm.Terminal.Session;
-using ModengTerm.ViewModel.Panels;
-using Renci.SshNet;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -41,7 +38,7 @@ namespace ModengTerm.ViewModel.Terminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private SessionTransport sessionTransport;
+        private EngineTransport engineTransport;
 
         /// <summary>
         /// 终端引擎
@@ -225,8 +222,6 @@ namespace ModengTerm.ViewModel.Terminal
             }
         }
 
-        public SessionTransport Transport { get { return sessionTransport; } }
-
         #endregion
 
         #region 构造方法
@@ -285,7 +280,7 @@ namespace ModengTerm.ViewModel.Terminal
             VTOptions options = new VTOptions()
             {
                 Session = Session,
-                SessionTransport = new SessionTransport(),
+                SessionTransport = new EngineTransport(),
                 AlternateDocument = AlternateDocument,
                 MainDocument = MainDocument,
                 Width = Width,
@@ -311,13 +306,13 @@ namespace ModengTerm.ViewModel.Terminal
             #region 连接终端通道
 
             // 连接SSH服务器
-            SessionTransport transport = options.SessionTransport;
+            EngineTransport transport = options.SessionTransport;
             transport.StatusChanged += SessionTransport_StatusChanged;
             transport.DataReceived += SessionTransport_DataReceived;
             transport.Initialize(Session);
             transport.OpenAsync();
 
-            sessionTransport = transport;
+            engineTransport = transport;
 
             #endregion
 
@@ -337,10 +332,10 @@ namespace ModengTerm.ViewModel.Terminal
 
             AutoCompletionVM.Release();
 
-            sessionTransport.StatusChanged -= SessionTransport_StatusChanged;
-            sessionTransport.DataReceived -= SessionTransport_DataReceived;
-            sessionTransport.Close();
-            sessionTransport.Release();
+            engineTransport.StatusChanged -= SessionTransport_StatusChanged;
+            engineTransport.DataReceived -= SessionTransport_DataReceived;
+            engineTransport.Close();
+            engineTransport.Release();
 
             videoTerminal.OnViewportChanged -= VideoTerminal_ViewportChanged;
             videoTerminal.Release();
@@ -452,7 +447,7 @@ namespace ModengTerm.ViewModel.Terminal
 
             // 这里不同步向其他会话发送，单独发送到本会话
             byte[] bytes = writeEncoding.GetBytes(send);
-            int code = sessionTransport.Write(bytes);
+            int code = engineTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("执行script失败, 发送数据失败, {0}", code);
@@ -527,7 +522,7 @@ namespace ModengTerm.ViewModel.Terminal
                 Type = modemType,
                 Session = Session,
                 FilePaths = filePaths,
-                Transport = sessionTransport
+                Transport = engineTransport
             };
             viewModel.ProgressChanged += ViewModel_ProgressChanged;
             viewModel.StartAsync();
@@ -652,7 +647,7 @@ namespace ModengTerm.ViewModel.Terminal
         /// <param name="kbdInput">用户输入信息</param>
         public void SendInput(VTKeyboardInput kbdInput)
         {
-            if (sessionTransport.Status != SessionStatusEnum.Connected)
+            if (engineTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
@@ -686,7 +681,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public int Control(int command, object parameter, out object result)
         {
-            return sessionTransport.Control(command, parameter, out result);
+            return engineTransport.Control(command, parameter, out result);
         }
 
         public int Control(int code)
@@ -721,7 +716,7 @@ namespace ModengTerm.ViewModel.Terminal
             ViewportColumn = newColumn;
         }
 
-        private void SessionTransport_DataReceived(SessionTransport transport, byte[] buffer, int size)
+        private void SessionTransport_DataReceived(EngineTransport transport, byte[] buffer, int size)
         {
             VTDebug.Context.WriteRawRead(buffer, size);
 
@@ -900,7 +895,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public void Send(byte[] bytes)
         {
-            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            if (this.engineTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
@@ -1008,7 +1003,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public ISshEngine GetSshEngine() 
         {
-            return this.sessionTransport.Driver as ISshEngine;
+            return this.engineTransport.Engine as ISshEngine;
         }
 
         #endregion

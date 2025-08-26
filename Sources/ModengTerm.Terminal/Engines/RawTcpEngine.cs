@@ -10,9 +10,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
-    public class RawTcpSession : SessionDriver
+    public class RawTcpEngine : AbstractEngin
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("RawTcpSession");
 
@@ -20,7 +20,7 @@ namespace ModengTerm.Terminal.Session
         private TcpClient client;
         private NetworkStream stream;
 
-        public RawTcpSession(XTermSession session) :
+        public RawTcpEngine(XTermSession session) :
             base(session)
         {
         }

@@ -2,12 +2,12 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// 封装SessionDriver
     /// </summary>
-    public class SessionTransport
+    public class EngineTransport
     {
         #region 类变量
 
@@ -25,14 +25,14 @@ namespace ModengTerm.Terminal.Session
         /// <summary>
         /// 当收到数据流的时候触发
         /// </summary>
-        public event Action<SessionTransport, byte[], int> DataReceived;
+        public event Action<EngineTransport, byte[], int> DataReceived;
 
         #endregion
 
         #region 实例变量
 
         private XTermSession session;
-        private SessionDriver driver;
+        private AbstractEngin driver;
 
         private Task backgroundTask;
         private bool isRunning;
@@ -53,7 +53,7 @@ namespace ModengTerm.Terminal.Session
         /// <summary>
         /// 获取传输层所使用的驱动对象
         /// </summary>
-        public SessionDriver Driver { get { return this.driver; } }
+        public AbstractEngin Engine { get { return this.driver; } }
 
         /// <summary>
         /// 获取当前Session的连接状态
@@ -76,7 +76,7 @@ namespace ModengTerm.Terminal.Session
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             this.readBuffer = new byte[bufferSize];
-            this.driver = SessionFactory.Create(session);
+            this.driver = EngineFactory.Create(session);
 
             return ResponseCode.SUCCESS;
         }

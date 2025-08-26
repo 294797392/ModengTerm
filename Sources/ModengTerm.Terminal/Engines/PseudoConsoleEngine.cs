@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.Session.ConPTY;
+using ModengTerm.Terminal.Engines.ConPTY;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,16 +9,16 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ConPTYTerminal = ModengTerm.Terminal.Session.ConPTY.Terminal;
+using ConPTYTerminal = ModengTerm.Terminal.Engines.ConPTY.Terminal;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// 使用PseudoConsoleAPI实现的Windows命令行会话，只支持在Windows10或者更高版本使用
     /// 参考：
     /// https://github.com/microsoft/terminal/tree/main/samples/ConPTY/GUIConsole/GUIConsole.ConPTY
     /// </summary>
-    public class PseudoConsoleSession : SessionDriver
+    public class PseudoConsoleEngine : AbstractEngin
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("PseudoConsoleSession");
 
@@ -26,7 +26,7 @@ namespace ModengTerm.Terminal.Session
         private Stream consoleInStream;
         private Stream consoleOutStream;
 
-        public PseudoConsoleSession(XTermSession session) :
+        public PseudoConsoleEngine(XTermSession session) :
             base(session)
         {
         }

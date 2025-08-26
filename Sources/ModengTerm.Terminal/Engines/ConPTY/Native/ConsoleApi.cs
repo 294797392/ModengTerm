@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace ModengTerm.Terminal.Session.ConPTY.Native
+namespace ModengTerm.Terminal.Engines.ConPTY.Native
 {
     /// <summary>
     /// PInvoke signatures for Win32's Console API.

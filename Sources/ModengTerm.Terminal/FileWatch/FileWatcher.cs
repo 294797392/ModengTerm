@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 
 namespace ModengTerm.Terminal.FileWatch
 {
@@ -27,7 +27,7 @@ namespace ModengTerm.Terminal.FileWatch
 
         public XTermSession Session { get; set; }
 
-        public SessionDriver SessionDriver { get; set; }
+        public AbstractEngin SessionDriver { get; set; }
 
         /// <summary>
         /// 判断是否有数据可读

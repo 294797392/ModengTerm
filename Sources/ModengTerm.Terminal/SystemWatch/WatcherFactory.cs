@@ -1,16 +1,16 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 
 namespace ModengTerm.Terminal.Watch
 {
     public abstract class WatcherFactory
     {
-        public static AbstractWatcher Create(SessionTransport sessionTransport)
+        public static AbstractWatcher Create(EngineTransport sessionTransport)
         {
             XTermSession session = sessionTransport.Session;
-            SessionDriver driver = sessionTransport.Driver;
+            AbstractEngin driver = sessionTransport.Engine;
 
             switch ((SessionTypeEnum)sessionTransport.Session.Type)
             {

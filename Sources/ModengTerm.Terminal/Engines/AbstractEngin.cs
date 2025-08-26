@@ -2,7 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 
-namespace ModengTerm.Terminal.Session
+namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// 管理与远程主机的连接
@@ -10,7 +10,7 @@ namespace ModengTerm.Terminal.Session
     /// 由SessionTransport封装为非阻塞接口
     /// 上层调用SessionTransport接口来和SessionDriver打交道
     /// </summary>
-    public abstract class SessionDriver
+    public abstract class AbstractEngin
     {
         #region 常量
 
@@ -42,7 +42,7 @@ namespace ModengTerm.Terminal.Session
 
         #region 构造方法
 
-        public SessionDriver(XTermSession session)
+        public AbstractEngin(XTermSession session)
         {
             this.session = session;
         }

@@ -92,6 +92,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
             {
                 if (this.bytesSent != value)
                 {
+                    this.prevBytesSent = this.bytesSent;
+
                     this.bytesSent = value;
                     this.NotifyPropertyChanged("BytesSent");
                 }
@@ -105,6 +107,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
             {
                 if (this.bytesReceived != value)
                 {
+                    this.prevBytesReceived = this.bytesReceived;
+
                     this.bytesReceived = value;
                     this.NotifyPropertyChanged("BytesReceived");
                 }
@@ -118,13 +122,6 @@ namespace ModengTerm.OfficialAddons.PerfMon
         public ulong PrevBytesSent
         {
             get { return this.prevBytesSent; }
-            set
-            {
-                if (this.prevBytesSent != value)
-                {
-                    this.prevBytesSent = value;
-                }
-            }
         }
 
         /// <summary>
@@ -134,13 +131,6 @@ namespace ModengTerm.OfficialAddons.PerfMon
         public ulong PrevBytesReceived
         {
             get { return this.prevBytesReceived; }
-            set
-            {
-                if (this.prevBytesReceived != value)
-                {
-                    this.prevBytesReceived = value;
-                }
-            }
         }
 
         #endregion

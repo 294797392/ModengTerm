@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using Renci.SshNet;
 
 namespace ModengTerm.Terminal.FileWatch
@@ -8,7 +8,7 @@ namespace ModengTerm.Terminal.FileWatch
     {
         #region 实例变量
 
-        private SshNetSession sshNetDrv;
+        private SshNetEngine sshNetDrv;
         private SshClient sshClient;
         private SshCommand sshCommand;
 
@@ -20,7 +20,7 @@ namespace ModengTerm.Terminal.FileWatch
 
         protected override int OnInitialize()
         {
-            this.sshNetDrv = this.SessionDriver as SshNetSession;
+            this.sshNetDrv = this.SessionDriver as SshNetEngine;
             this.sshClient = this.sshNetDrv.SshClient;
             this.sshCommand = this.sshClient.CreateCommand(string.Format("tail -f {0}", this.FilePath));
             this.sshCommand.ExecuteAsync();

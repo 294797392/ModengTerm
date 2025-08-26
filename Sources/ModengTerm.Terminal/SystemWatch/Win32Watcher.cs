@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Engines;
 using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
@@ -28,7 +28,7 @@ namespace ModengTerm.Terminal.Watch
 
         #region 构造方法
 
-        public Win32Watcher(XTermSession session, SessionDriver driver) :
+        public Win32Watcher(XTermSession session, AbstractEngin driver) :
             base(session, driver)
         {
         }
