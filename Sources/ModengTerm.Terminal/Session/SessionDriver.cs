@@ -1,8 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using System.Reflection.Emit;
-using System.Windows.Documents.DocumentStructures;
 
 namespace ModengTerm.Terminal.Session
 {

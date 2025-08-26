@@ -1,11 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session
 {

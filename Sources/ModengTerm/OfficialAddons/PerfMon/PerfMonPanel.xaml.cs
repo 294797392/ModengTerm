@@ -1,7 +1,9 @@
 ﻿using DotNEToolkit.Utility;
 using ModengTerm.Addon.Controls;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.OfficialAddons.Broadcast;
 using ModengTerm.Terminal.Watch;
 using ModengTerm.ViewModel.Terminal;
 using System;
@@ -96,7 +98,10 @@ namespace ModengTerm.OfficialAddons.PerfMon
             this.memstatSize = Marshal.SizeOf(memstat);
         }
 
-        private void UpdateSshPerfMon() { }
+        private void UpdateSshPerfMon() 
+        {
+            //IClientSshTab sshTab = this.Tab as IClientSshTab;
+        }
 
         /// <summary>
         /// 

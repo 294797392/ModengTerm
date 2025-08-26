@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 
@@ -66,7 +67,16 @@ namespace ModengTerm.Addon.Interactive
         /// </summary>
         IDrawingContext DrawingContext { get; }
 
+        /// <summary>
+        /// 向主机发送数据
+        /// </summary>
+        /// <param name="bytes"></param>
         void Send(byte[] bytes);
+
+        /// <summary>
+        /// 向主机发送数据
+        /// </summary>
+        /// <param name="text"></param>
         void Send(string text);
 
         VTParagraph GetParagraph(VTParagraphOptions options);
@@ -84,14 +94,24 @@ namespace ModengTerm.Addon.Interactive
         /// </summary>
         void CopySelection();
 
+        /// <summary>
+        /// 清空当前屏幕的内容
+        /// </summary>
         void ClearScreen();
 
         /// <summary>
         /// 对当前视图进行关键字搜索
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">搜索选项</param>
         /// <returns>如果没搜索到，则返回null</returns>
         List<VTextRange> FindMatches(FindOptions options);
+
+        /// <summary>
+        /// 获取Ssh引擎
+        /// 如果该Tab打开的不是一个Ssh会话，则为空
+        /// </summary>
+        /// <returns></returns>
+        ISshEngine GetSshEngine();
     }
 
     /// <summary>

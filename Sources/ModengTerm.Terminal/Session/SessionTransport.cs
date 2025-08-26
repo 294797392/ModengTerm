@@ -53,7 +53,7 @@ namespace ModengTerm.Terminal.Session
         /// <summary>
         /// 获取传输层所使用的驱动对象
         /// </summary>
-        internal SessionDriver Driver { get { return this.driver; } }
+        public SessionDriver Driver { get { return this.driver; } }
 
         /// <summary>
         /// 获取当前Session的连接状态

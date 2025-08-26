@@ -14,6 +14,7 @@ using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModel.Panels;
+using Renci.SshNet;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -754,7 +755,7 @@ namespace ModengTerm.ViewModel.Terminal
                     this.tabEventShellRendered.Timestamp = DateTime.Now.ToFileTime();
                     this.tabEventShellRendered.NewLines.Clear();
                     IEnumerable<VTHistoryLine> newLines = this.GetNewLines(firstRow, lastRow - 1); // lastRow - 1 不包含光标所在行，因为光标所在行有可能还没打印结束
-                    if (newLines != null) 
+                    if (newLines != null)
                     {
                         this.tabEventShellRendered.NewLines.AddRange(newLines);
                     }
@@ -895,7 +896,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         #endregion
 
-        #region IShellTab
+        #region IClientShellTab
 
         public void Send(byte[] bytes)
         {
@@ -1003,6 +1004,11 @@ namespace ModengTerm.ViewModel.Terminal
             }
 
             return result;
+        }
+
+        public ISshEngine GetSshEngine() 
+        {
+            return this.sessionTransport.Driver as ISshEngine;
         }
 
         #endregion
