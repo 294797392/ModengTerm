@@ -484,29 +484,31 @@
                 }
             ]
         },
-        //{
-        //    "id": "8FB10D30-714A-4502-AC8C-9477BBD7152C",
-        //    "name": "系统监控",
-        //    "classEntry": "ModengTerm.Addon.Official.SystemMonitor.SystemMonitorAddon, ModengTerm.Addon",
-        //    "toolbarMenus": [
-        //        {
-        //            "id": "5925209D-E768-4812-B484-18D9894F4AB0",
-        //            "name": "系统监控",
-        //            "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
-        //            "command": "SystemMonitorAddon.ShowSystemMonitorPanel"
-        //        }
-        //    ],
-        //    "sessionPanels": [
-        //        {
-        //            "id": "A86C3967-8CDC-4D0E-8CB6-010364CFCC23",
-        //            "name": "系统监控",
-        //            "owner": 1,
-        //            "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
-        //            "className": "ModengTerm.Addon.Official.SystemMonitor.SystemWatchUserControl, ModengTerm.Addon",
-        //            "vmClassName": "ModengTerm.Addon.Official.SystemMonitor.WatchSystemInfo, ModengTerm.Addon"
-        //        }
-        //    ]
-        //},
+        {
+            "id": "8FB10D30-714A-4502-AC8C-9477BBD7152C",
+            "name": "系统监控",
+            "classEntry": "ModengTerm.OfficialAddons.PerfMon.PerfMonAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "5925209D-E768-4812-B484-18D9894F4AB0",
+                    "name": "系统监控",
+                    "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
+                    "command": "OpenPerfMonPanel"
+                }
+            ],
+            "sidePanels": [
+                {
+                    "id": "A86C3967-8CDC-4D0E-8CB6-010364CFCC23",
+                    "name": "系统监控",
+                    "owner": 1,
+                    "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
+                    "className": "ModengTerm.OfficialAddons.PerfMon.PerfMonPanel, ModengTerm",
+                    "scopes": [ "consoleTab", "sshTab" ],
+                    "commands": [ "OpenPerfMonPanel" ],
+                    "dock": "right"
+                }
+            ]
+        },
         {
             "id": "95C4E0E4-68B7-4643-9A41-3548F62FD615",
             "name": "广播",

@@ -17,9 +17,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Timers\**" />
     <Compile Remove="ViewModel\**" />
+    <EmbeddedResource Remove="Timers\**" />
     <EmbeddedResource Remove="ViewModel\**" />
+    <None Remove="Timers\**" />
     <None Remove="ViewModel\**" />
+    <Page Remove="Timers\**" />
     <Page Remove="ViewModel\**" />
   </ItemGroup>
 

@@ -27,6 +27,8 @@ namespace ModengTerm.Addon.Controls
             this.client = this.factory.GetClient();
         }
 
+        #region 抽象方法
+
         /// <summary>
         /// 当创建面板实例的时候触发
         /// </summary>
@@ -46,5 +48,17 @@ namespace ModengTerm.Addon.Controls
         /// 当面板从界面中移除之后触发
         /// </summary>
         public abstract void Unload();
+
+        #endregion
+
+        protected void StartTimer(Action<object> action, object userData) 
+        {
+
+        }
+
+        protected void StopTimer(Action<object> action, object userData)
+        {
+
+        }
     }
 }
