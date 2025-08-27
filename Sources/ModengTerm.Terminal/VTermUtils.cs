@@ -145,7 +145,7 @@ namespace ModengTerm.Terminal
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
 
             VTypeface typeface = graphicsInterface.GetTypeface(fontSize, fontFamily);
-            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
 
             VTSize displaySize = new VTSize(vpw, vph);
@@ -183,165 +183,165 @@ namespace ModengTerm.Terminal
 
         #region AdbUtility
 
-        /// <summary>
-        /// 确保Adb守护进程已启动
-        /// </summary>
-        /// <param name="session"></param>
-        /// <returns></returns>
-        public static bool StartAdbServer(XTermSession session) 
-        {
-            string exePath = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PATH);
-            int timeout = session.GetOption<int>(OptionKeyEnum.WATCH_ADB_LOGIN_TIMEOUT, OptionDefaultValues.WATCH_ADB_LOGIN_TIMEOUT);
+        ///// <summary>
+        ///// 确保Adb守护进程已启动
+        ///// </summary>
+        ///// <param name="session"></param>
+        ///// <returns></returns>
+        //public static bool StartAdbServer(XTermSession session) 
+        //{
+        //    string exePath = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PATH);
+        //    int timeout = session.GetOption<int>(OptionKeyEnum.WATCH_ADB_LOGIN_TIMEOUT, OptionDefaultValues.WATCH_ADB_LOGIN_TIMEOUT);
 
-            ProcessStartInfo startInfo = new ProcessStartInfo()
-            {
-                FileName = exePath,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true,
-                Arguments = "start-server"
-            };
+        //    ProcessStartInfo startInfo = new ProcessStartInfo()
+        //    {
+        //        FileName = exePath,
+        //        RedirectStandardError = true,
+        //        RedirectStandardInput = true,
+        //        RedirectStandardOutput = true,
+        //        UseShellExecute = false,
+        //        WindowStyle = ProcessWindowStyle.Hidden,
+        //        CreateNoWindow = true,
+        //        Arguments = "start-server"
+        //    };
 
-            try
-            {
-                Process process = Process.Start(startInfo);
-                if (!process.WaitForExit(timeout))
-                {
-                    logger.ErrorFormat("启动adb server失败, 超时了, 可能端口被占用了");
-                    // 进程超时了还没退出
-                    // 此时表示启动失败
-                    process.Kill();
-                    process.Dispose();
-                    return false;
-                }
-                else
-                {
-                    if (process.ExitCode != 0)
-                    {
-                        // 说明进程因为启动失败退出
-                        // 比如5037端口被占用，adb尝试连接5037端口，然后占用5037端口的进程退出，此时exitCode不等于0
-                        logger.ErrorFormat("启动adb server失败, exitCode = {0}", process.ExitCode);
-                        return false;
-                    }
+        //    try
+        //    {
+        //        Process process = Process.Start(startInfo);
+        //        if (!process.WaitForExit(timeout))
+        //        {
+        //            logger.ErrorFormat("启动adb server失败, 超时了, 可能端口被占用了");
+        //            // 进程超时了还没退出
+        //            // 此时表示启动失败
+        //            process.Kill();
+        //            process.Dispose();
+        //            return false;
+        //        }
+        //        else
+        //        {
+        //            if (process.ExitCode != 0)
+        //            {
+        //                // 说明进程因为启动失败退出
+        //                // 比如5037端口被占用，adb尝试连接5037端口，然后占用5037端口的进程退出，此时exitCode不等于0
+        //                logger.ErrorFormat("启动adb server失败, exitCode = {0}", process.ExitCode);
+        //                return false;
+        //            }
 
-                    logger.InfoFormat("adb server启动成功");
+        //            logger.InfoFormat("adb server启动成功");
 
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("启动adb server进程异常", ex);
-                return false;
-            }
-        }
+        //            return true;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("启动adb server进程异常", ex);
+        //        return false;
+        //    }
+        //}
 
-        /// <summary>
-        /// 把设备上的文件拉取到本地
-        /// </summary>
-        /// <param name="adbExePath">adb可执行文件路径</param>
-        /// <param name="remotePath">设备里的文件路径</param>
-        /// <param name="localPath">要拷贝到的本地路径</param>
-        /// <param name="message">adb输出的内容</param>
-        /// <returns>pull指令是否执行成功</returns>
-        public static AdbPullResult AdbPullFile(string adbExePath, string remotePath, string localPath, out string message)
-        {
-            message = string.Empty;
+        ///// <summary>
+        ///// 把设备上的文件拉取到本地
+        ///// </summary>
+        ///// <param name="adbExePath">adb可执行文件路径</param>
+        ///// <param name="remotePath">设备里的文件路径</param>
+        ///// <param name="localPath">要拷贝到的本地路径</param>
+        ///// <param name="message">adb输出的内容</param>
+        ///// <returns>pull指令是否执行成功</returns>
+        //public static AdbPullResult AdbPullFile(string adbExePath, string remotePath, string localPath, out string message)
+        //{
+        //    message = string.Empty;
 
-            //logger.InfoFormat("adb pull, remotePath = {0}, localPath = {1}", remotePath, localPath);
+        //    //logger.InfoFormat("adb pull, remotePath = {0}, localPath = {1}", remotePath, localPath);
 
-            try
-            {
-                if (!File.Exists(localPath))
-                {
-                    File.Create(localPath).Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("adb pull异常, 创建本地文件异常", ex);
-                return AdbPullResult.CreateLocalFileFailed;
-            }
+        //    try
+        //    {
+        //        if (!File.Exists(localPath))
+        //        {
+        //            File.Create(localPath).Close();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("adb pull异常, 创建本地文件异常", ex);
+        //        return AdbPullResult.CreateLocalFileFailed;
+        //    }
 
-            string pullCommand = string.Format("pull {0} {1}", remotePath, localPath);
+        //    string pullCommand = string.Format("pull {0} {1}", remotePath, localPath);
 
-            ProcessStartInfo psi = new ProcessStartInfo()
-            {
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                FileName = adbExePath,
-                Arguments = pullCommand
-            };
+        //    ProcessStartInfo psi = new ProcessStartInfo()
+        //    {
+        //        UseShellExecute = false,
+        //        RedirectStandardError = true,
+        //        RedirectStandardInput = true,
+        //        RedirectStandardOutput = true,
+        //        FileName = adbExePath,
+        //        Arguments = pullCommand
+        //    };
 
-            Process process = null;
+        //    Process process = null;
 
-            try
-            {
-                process = Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("adb pull异常", ex);
-                message = ex.Message;
-                return AdbPullResult.AdbProcessException;
-            }
+        //    try
+        //    {
+        //        process = Process.Start(psi);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("adb pull异常", ex);
+        //        message = ex.Message;
+        //        return AdbPullResult.AdbProcessException;
+        //    }
 
-            message = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-            process.Dispose();
+        //    message = process.StandardOutput.ReadToEnd();
+        //    process.WaitForExit();
+        //    process.Dispose();
 
-            if (message.Contains("remote object") && message.Contains("does not exist"))
-            {
-                return AdbPullResult.DeviceFileNotExist;
-            }
-            else if (message.Contains("file pulled"))
-            {
-                return AdbPullResult.Susccess;
-            }
-            else
-            {
-                logger.ErrorFormat("pull指令执行失败, {0}, {1}", pullCommand, message);
-                return AdbPullResult.UnkownFailed;
-            }
-        }
+        //    if (message.Contains("remote object") && message.Contains("does not exist"))
+        //    {
+        //        return AdbPullResult.DeviceFileNotExist;
+        //    }
+        //    else if (message.Contains("file pulled"))
+        //    {
+        //        return AdbPullResult.Susccess;
+        //    }
+        //    else
+        //    {
+        //        logger.ErrorFormat("pull指令执行失败, {0}, {1}", pullCommand, message);
+        //        return AdbPullResult.UnkownFailed;
+        //    }
+        //}
 
-        /// <summary>
-        /// 读取设备里的文件内容并返回
-        /// 为了防止有些系统需要登录才能读取，做法是先把要读取的文件拷贝到本地，然后读取本地文件内容
-        /// </summary>
-        /// <param name="adbExePath"></param>
-        /// <param name="remotePath"></param>
-        /// <param name="tempPath">要保存本地文件的名字</param>
-        /// <param name="content">保存读取到的文件内容</param>
-        /// <param name="adbMessage">adb输出的消息</param>
-        /// <returns></returns>
-        public static AdbReadResult AdbReadFile(string adbExePath, string remotePath, string tempPath, out string content, out string adbMessage)
-        {
-            content = string.Empty;
+        ///// <summary>
+        ///// 读取设备里的文件内容并返回
+        ///// 为了防止有些系统需要登录才能读取，做法是先把要读取的文件拷贝到本地，然后读取本地文件内容
+        ///// </summary>
+        ///// <param name="adbExePath"></param>
+        ///// <param name="remotePath"></param>
+        ///// <param name="tempPath">要保存本地文件的名字</param>
+        ///// <param name="content">保存读取到的文件内容</param>
+        ///// <param name="adbMessage">adb输出的消息</param>
+        ///// <returns></returns>
+        //public static AdbReadResult AdbReadFile(string adbExePath, string remotePath, string tempPath, out string content, out string adbMessage)
+        //{
+        //    content = string.Empty;
 
-            AdbPullResult pullResult = AdbPullFile(adbExePath, remotePath, tempPath, out adbMessage);
-            if (pullResult != AdbPullResult.Susccess)
-            {
-                return (AdbReadResult)pullResult;
-            }
+        //    AdbPullResult pullResult = AdbPullFile(adbExePath, remotePath, tempPath, out adbMessage);
+        //    if (pullResult != AdbPullResult.Susccess)
+        //    {
+        //        return (AdbReadResult)pullResult;
+        //    }
 
-            try
-            {
-                content = File.ReadAllText(tempPath);
+        //    try
+        //    {
+        //        content = File.ReadAllText(tempPath);
 
-                return AdbReadResult.Susccess;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AdbReadFile异常", ex);
-                return AdbReadResult.ReadFileFailed;
-            }
-        }
+        //        return AdbReadResult.Susccess;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("AdbReadFile异常", ex);
+        //        return AdbReadResult.ReadFileFailed;
+        //    }
+        //}
 
         #endregion
     }

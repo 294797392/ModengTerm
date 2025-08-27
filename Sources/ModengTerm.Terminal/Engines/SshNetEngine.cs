@@ -1,9 +1,9 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Base.Enumerations.Ssh;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.IO;
@@ -105,8 +105,8 @@ namespace ModengTerm.Terminal.Engines
 
             #region 连接服务器
 
-            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
-            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_PORT);
+            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
             ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.HostKeyReceived += SshClient_HostKeyReceived;

@@ -250,7 +250,7 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
                 session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, imageBase64);
             }
             session.SetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, backImageOpacity);
-            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, VTBaseUtils.Color2RgbKey(BackColor));
+            session.SetOption<string>(OptionKeyEnum.THEME_BACK_COLOR, VTBaseUtils.Color2RgbKey(BackColor));
 
             session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, VTBaseUtils.Color2RgbKey(FontColor));
             session.SetOption<int>(OptionKeyEnum.THEME_CURSOR_STYLE, (int)CursorStyles.SelectedItem);
@@ -259,8 +259,6 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
             session.SetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE, ThemeList.SelectedItem.ColorTable);
             session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, VTBaseUtils.Color2RgbKey(HighlightBackColor));
             session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, VTBaseUtils.Color2RgbKey(highlightFontColor));
-
-            session.SetOption<string>(OptionKeyEnum.THEME_BOOKMARK_COLOR, ThemeList.SelectedItem.BookmarkColor);
 
             session.SetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR, VTBaseUtils.Color2RgbKey(SelectionColor));
 

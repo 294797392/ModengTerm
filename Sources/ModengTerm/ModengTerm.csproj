@@ -57,6 +57,7 @@
     <Compile Remove="OfficialAddons\Snippet\QuickInputVM.cs" />
     <Compile Remove="OfficialAddons\Record\PlaybackUserControl.xaml.cs" />
     <Compile Remove="OfficialAddons\Explorer\SessionExplorerPanelVM.cs" />
+    <Compile Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="Windows\Terminals\ParagraphsWindow.xaml.cs" />
@@ -95,6 +96,7 @@
     <Page Remove="Themes\Themes.Default.xaml" />
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
     <Page Remove="Themes\Themes.XShell.xaml" />
+    <Page Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml" />
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
     <Page Remove="UserControls\TerminalUserControls\Graphics\Template.xaml" />
     <Page Remove="UserControls\ViewportUserControl.xaml" />

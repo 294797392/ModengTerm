@@ -1,4 +1,6 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels.Ssh;
+using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Controls;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;

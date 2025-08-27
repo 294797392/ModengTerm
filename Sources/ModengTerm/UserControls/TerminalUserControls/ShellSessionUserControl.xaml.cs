@@ -553,7 +553,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.rightClickActions = this.Session.GetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, OptionDefaultValues.BEHAVIOR_RIGHT_CLICK);
 
             // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
-            string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
             string base64Image = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
             if (!string.IsNullOrEmpty(base64Image))

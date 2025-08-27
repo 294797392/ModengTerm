@@ -67,11 +67,11 @@ namespace ModengTerm.Terminal.Modem
                 return ResponseCode.FAILED;
             }
 
-            bool xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, VTBaseConsts.XMODEM_XMODEM1K);
-            int retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, VTBaseConsts.MODEM_RETRY_TIMES);
-            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, VTBaseConsts.XMODEM_RECV_CRC);
-            byte padchar = this.Session.GetOption<byte>(OptionKeyEnum.XMODEM_RECV_PADCHAR, VTBaseConsts.XMODEM_RECV_PADCHAR);
-            bool ignorePadChar = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, VTBaseConsts.XMODEM_RECV_IGNORE_PADCHAR);
+            bool xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, OptionDefaultValues.XMODEM_XMODEM1K);
+            int retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, OptionDefaultValues.MODEM_RETRY_TIMES);
+            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, OptionDefaultValues.XMODEM_RECV_CRC);
+            byte padchar = this.Session.GetOption<byte>(OptionKeyEnum.XMODEM_RECV_PADCHAR, OptionDefaultValues.XMODEM_RECV_PADCHAR);
+            bool ignorePadChar = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, OptionDefaultValues.XMODEM_RECV_IGNORE_PADCHAR);
             byte[] onebyte = new byte[1];
             int rc = 0;
 
@@ -253,8 +253,8 @@ namespace ModengTerm.Terminal.Modem
                 return ResponseCode.FAILED;
             }
 
-            this.xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, VTBaseConsts.XMODEM_XMODEM1K);
-            this.retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, VTBaseConsts.MODEM_RETRY_TIMES);
+            this.xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, OptionDefaultValues.XMODEM_XMODEM1K);
+            this.retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, OptionDefaultValues.MODEM_RETRY_TIMES);
 
             byte[] onebyte = new byte[1];
 
@@ -424,7 +424,7 @@ namespace ModengTerm.Terminal.Modem
             byte[] onebyte = new byte[1];
 
             int rc = 0;
-            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, VTBaseConsts.XMODEM_RECV_CRC);
+            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, OptionDefaultValues.XMODEM_RECV_CRC);
             byte[] startbyte = new byte[1];
             startbyte[0] = crc ? (byte)'C' : NAK;
 

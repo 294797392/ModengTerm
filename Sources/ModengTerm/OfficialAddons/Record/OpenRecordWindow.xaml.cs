@@ -96,7 +96,7 @@ namespace ModengTerm.OfficialAddons.Record
 
             this.scrollDelta = session.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
 
-            string background = session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            string background = session.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
             double padding = session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;

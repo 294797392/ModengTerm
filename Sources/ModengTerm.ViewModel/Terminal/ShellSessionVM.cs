@@ -248,7 +248,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         protected override int OnOpen()
         {
-            scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
+            //scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             HistoryCommands = new BindableCollection<string>();
 
             writeEncoding = Encoding.GetEncoding(Session.GetOption(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
@@ -374,8 +374,8 @@ namespace ModengTerm.ViewModel.Terminal
                 case SessionTypeEnum.SSH:
                     {
                         string userName = Session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
-                        string hostName = Session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
-                        int port = Session.GetOption<int>(OptionKeyEnum.SSH_PORT);
+                        string hostName = Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+                        int port = Session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
                         uri = string.Format("ssh://{0}@{1}:{2}", userName, hostName, port);
                         break;
                     }
@@ -408,6 +408,8 @@ namespace ModengTerm.ViewModel.Terminal
 
         private void HandleScript()
         {
+            return;
+
             if (scriptItems.Count == 0)
             {
                 return;

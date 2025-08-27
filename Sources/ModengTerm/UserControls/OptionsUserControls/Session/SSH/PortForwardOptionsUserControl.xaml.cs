@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Windows.SSH;

@@ -10,6 +10,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Enumerations;
 using ModengTerm.Terminal;
@@ -131,12 +132,12 @@ namespace ModengTerm
             // 如果是Win10或者更高版本的操作系统，那么使用PseudoConsoleAPI
             if (VTBaseUtils.IsWin10())
             {
-                defaultSession.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDriverEnum.Win10PseudoConsoleApi);
+                defaultSession.SetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER, Win32ConsoleEngineEnum.Win10PseudoConsoleApi);
             }
             else
             {
                 // 如果是Win10以下的系统，使用winpty.dll
-                defaultSession.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDriverEnum.winpty);
+                defaultSession.SetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER, Win32ConsoleEngineEnum.winpty);
             }
 
             this.OpenSession(defaultSession, false);

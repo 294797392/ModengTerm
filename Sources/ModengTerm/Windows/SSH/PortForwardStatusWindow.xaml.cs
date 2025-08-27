@@ -18,6 +18,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ModengTerm.Base.Enumerations.Ssh;
+using ModengTerm.Base.DataModels.Ssh;
 
 namespace ModengTerm.Windows.SSH
 {

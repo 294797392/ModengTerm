@@ -11,6 +11,11 @@ using System.Windows.Media;
 using XTerminal.Base.Enumerations;
 using ModengTerm.Base.DataModels;
 using System.IO;
+using ModengTerm.Base.Definitions;
+using System.Security.Permissions;
+using ModengTerm.Base.DataModels.Terminal;
+using System.IO.Ports;
+using ModengTerm.Base.DataModels.Ssh;
 
 namespace ModengTerm.Base
 {
@@ -19,6 +24,55 @@ namespace ModengTerm.Base
     /// </summary>
     public static class OptionDefaultValues
     {
+        public static readonly TerminalSizeModeEnum SSH_TERM_SIZE_MODE = TerminalSizeModeEnum.AutoFit;
+        public static readonly string THEME_FONT_FAMILY = "宋体";
+        public static readonly double THEME_FONT_SIZE = 14;
+        public static readonly string THEME_FONT_COLOR = "242,242,242,255";
+        public static readonly VTCursorSpeeds THEME_CURSOR_SPEED = VTCursorSpeeds.NormalSpeed;
+        public static readonly VTCursorStyles THEME_CURSOR_STYLE = VTCursorStyles.Line;
+        public static readonly string THEME_CURSOR_COLOR = "255,255,255,255";
+        public static readonly string THEME_ID = "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827";
+        public static readonly VTColorTable TEHEM_COLOR_TABLE = new VTColorTable()
+        {
+            RgbKeys = new List<string>()
+            {
+                "54,52,46,255", "165,100,52,255", "0,128,0,255", "153,150,6,255", "70,70,255,255", "123,81,117,255", "0,162,196,255", "207,216,211,255",
+                "83,87,85,255", "207,158,114,255", "28,196,112,255", "226,226,52,255", "111,111,244,255", "169,126,173,255", "80,235,252,255", "236,238,238,255"
+            }
+        };
+        public static readonly string THEME_BACK_COLOR = "36,36,36,255";
+        public static readonly string THEME_SELECTION_COLOR = "255,255,255,100";
+        public static readonly double SSH_THEME_DOCUMENT_PADDING = 5;
+        public static readonly List<PortForward> SSH_PORT_FORWARDS = new List<PortForward>();
+        public static readonly int TERM_MAX_ROLLBACK = 250712;
+        public static readonly int TERM_MAX_CLIPBOARD_HISTORY = 99;
+        public static readonly bool TERM_DISABLE_BELL = false;
+        public static readonly string CMD_STARTUP_ARGUMENT = string.Empty;
+        public static readonly string CMD_STARTUP_DIR = AppDomain.CurrentDomain.BaseDirectory;
+        public static readonly Win32ConsoleEngineEnum CMD_DRIVER = Win32ConsoleEngineEnum.Win10PseudoConsoleApi;
+        public static readonly string SERIAL_PORT_NAME = "COM1";
+        public static readonly int SERIAL_PORT_BAUD_RATE = 115200;
+        public static readonly int SERIAL_PORT_DATA_BITS = 8;
+        public static readonly StopBits SERIAL_PORT_STOP_BITS = StopBits.None;
+        public static readonly Parity SERIAL_PORT_PARITY = Parity.None;
+        public static readonly Handshake SERIAL_PORT_HANDSHAKE = Handshake.None;
+        public static readonly RenderModeEnum TERM_ADVANCE_RENDER_MODE = RenderModeEnum.Default;
+        public static readonly bool TERM_ADVANCE_AUTO_WRAP_MODE = false;
+        public static readonly RawTcpTypeEnum RAW_TCP_TYPE = RawTcpTypeEnum.Client;
+        public static readonly string RAW_TCP_ADDRESS = "192.168.1.1";
+        public static readonly int RAW_TCP_PORT = 8000;
+        public static readonly int MODEM_RETRY_TIMES = 10;
+        public static readonly bool XMODEM_XMODEM1K = false;
+        public static readonly bool XMODEM_RECV_CRC = false;
+        public static readonly byte XMODEM_RECV_PADCHAR = 0x1A;
+        public static readonly bool XMODEM_RECV_IGNORE_PADCHAR = true;
+        public static readonly string SFTP_SERVER_ADDRESS = "192.168.1.1";
+        public static readonly int SFTP_SERVER_PORT = 22;
+        public static readonly string SFTP_USER_NAME = string.Empty;
+        public static readonly string SFTP_USER_PASSWORD = string.Empty;
+        public static readonly string SFTP_SERVER_INITIAL_DIRECTORY = "~/";
+        public static readonly string SFTP_CLIENT_INITIAL_DIRECTORY = AppDomain.CurrentDomain.BaseDirectory;
+
         public const int SSH_TERM_ROW = 24;
         public const int SSH_TERM_COL = 80;
         public static readonly int SSH_READ_BUFFER_SIZE = 16384;

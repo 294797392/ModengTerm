@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Enumerations
+namespace ModengTerm.Base.Enumerations.Terminal
 {
     public enum RawTcpTypeEnum
     {

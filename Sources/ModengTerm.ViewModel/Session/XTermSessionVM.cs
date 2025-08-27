@@ -83,7 +83,7 @@ namespace ModengTerm.ViewModel.Session
 
                 case SessionTypeEnum.SSH:
                     {
-                        URI = session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
+                        URI = session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
                         break;
                     }
 

@@ -4,6 +4,7 @@ using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;

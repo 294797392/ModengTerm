@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Terminal.Enumerations;
 
 namespace ModengTerm.Terminal.Engines
@@ -13,16 +14,16 @@ namespace ModengTerm.Terminal.Engines
                 case SessionTypeEnum.SSH: return new SshNetEngine(options);
                 case SessionTypeEnum.Localhost:
                     {
-                        CmdDriverEnum driver = options.GetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER);
+                        Win32ConsoleEngineEnum driver = options.GetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER);
 
                         switch (driver)
                         {
-                            case CmdDriverEnum.Win10PseudoConsoleApi:
+                            case Win32ConsoleEngineEnum.Win10PseudoConsoleApi:
                                 {
                                     return new PseudoConsoleEngine(options);
                                 }
 
-                            case CmdDriverEnum.winpty:
+                            case Win32ConsoleEngineEnum.winpty:
                                 {
                                     return new WinptyEngine(options);
                                 }

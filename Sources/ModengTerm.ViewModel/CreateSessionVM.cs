@@ -1,11 +1,11 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.ViewModel.CreateSession;
 using ModengTerm.ViewModel.Session;
@@ -81,7 +81,6 @@ namespace ModengTerm.ViewModel
 
         #endregion
 
-
         private string rawTcpAddress;
         private int rawTcpPort;
 
@@ -89,6 +88,11 @@ namespace ModengTerm.ViewModel
         /// 当前选中的菜单节点
         /// </summary>
         private MenuItemVM selectedMenuNode;
+
+        /// <summary>
+        /// 当前正在编辑的会话
+        /// </summary>
+        private XTermSession session;
 
         #endregion
 
@@ -410,7 +414,7 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public BindableCollection<CmdDriverEnum> CmdDrivers { get; private set; }
+        public BindableCollection<Win32ConsoleEngineEnum> CmdDrivers { get; private set; }
 
         #endregion
 
@@ -549,6 +553,8 @@ namespace ModengTerm.ViewModel
 
             this.appManifest = VTApp.Context.Manifest;
 
+            this.session = this.CreateDefaultSession();
+
             //this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             this.Name = "新建会话";
 
@@ -588,16 +594,16 @@ namespace ModengTerm.ViewModel
 
             StartupPath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             StartupDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            CmdDrivers = new BindableCollection<CmdDriverEnum>();
-            CmdDrivers.AddRange(VTBaseUtils.GetEnumValues<CmdDriverEnum>());
+            CmdDrivers = new BindableCollection<Win32ConsoleEngineEnum>();
+            CmdDrivers.AddRange(VTBaseUtils.GetEnumValues<Win32ConsoleEngineEnum>());
             // 如果是Win10或更高版本那么默认选择PseudoConsoleApi
             if (VTBaseUtils.IsWin10())
             {
-                CmdDrivers.SelectedItem = CmdDriverEnum.Win10PseudoConsoleApi;
+                CmdDrivers.SelectedItem = Win32ConsoleEngineEnum.Win10PseudoConsoleApi;
             }
             else
             {
-                CmdDrivers.SelectedItem = CmdDriverEnum.winpty;
+                CmdDrivers.SelectedItem = Win32ConsoleEngineEnum.winpty;
             }
 
             #endregion
@@ -762,8 +768,8 @@ namespace ModengTerm.ViewModel
                     throw new NotImplementedException();
             }
 
-            session.SetOption<string>(OptionKeyEnum.SSH_ADDR, SSHServerAddress);
-            session.SetOption<int>(OptionKeyEnum.SSH_PORT, port);
+            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR, SSHServerAddress);
+            session.SetOption<int>(OptionKeyEnum.SSH_SERVER_PORT, port);
             session.SetOption<string>(OptionKeyEnum.SSH_USER_NAME, SSHUserName);
             session.SetOption<string>(OptionKeyEnum.SSH_PASSWORD, SSHPassword);
             session.SetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, SSHPrivateKeyId);
@@ -842,7 +848,7 @@ namespace ModengTerm.ViewModel
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, VTBaseConsts.DefaultContentMargin);
-            session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, BookmarkVisible);
+            //session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, BookmarkVisible);
             session.SetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL, DisableBell);
 
             return true;
@@ -906,7 +912,7 @@ namespace ModengTerm.ViewModel
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, StartupPath);
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_ARGUMENT, StartupArgument);
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_DIR, StartupDirectory);
-            session.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDrivers.SelectedItem);
+            session.SetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER, CmdDrivers.SelectedItem);
 
             return true;
         }
@@ -1008,7 +1014,7 @@ namespace ModengTerm.ViewModel
 
         private bool SaveAllOptions(XTermSession session)
         {
-            List<OptionMenuItemVM> menuItems = optionTreeVM.Context.AllItems.Cast<OptionMenuItemVM>().ToList();
+            List<OptionMenuItemVM> menuItems = this.optionTreeVM.Context.AllItems.Cast<OptionMenuItemVM>().ToList();
 
             foreach (OptionMenuItemVM menuItem in menuItems)
             {
@@ -1027,22 +1033,10 @@ namespace ModengTerm.ViewModel
                     continue;
                 }
 
-                // 如果有没保存的参数，那么先创建ViewModel的实例保存
                 OptionContentVM optionContentVM = menuItem.ContentVM as OptionContentVM;
                 if (optionContentVM == null)
                 {
-                    try
-                    {
-                        optionContentVM = ConfigFactory<OptionContentVM>.CreateInstance(menuItem.VMClassName);
-                    }
-                    catch (Exception ex)
-                    {
-                        MTMessageBox.Error("保存失败");
-                        logger.Error("创建OptionVM实例异常", ex);
-                        return false;
-                    }
-
-                    optionContentVM.OnInitialize();
+                    continue;
                 }
 
                 if (!optionContentVM.SaveOptions(session))
@@ -1052,6 +1046,93 @@ namespace ModengTerm.ViewModel
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 创建一个所有选项都是默认值的会话
+        /// </summary>
+        /// <returns></returns>
+        private XTermSession CreateDefaultSession() 
+        {
+            XTermSession session = new XTermSession();
+
+            session.SetOption(OptionKeyEnum.SSH_TERM_ROW, OptionDefaultValues.SSH_TERM_ROW);
+            session.SetOption(OptionKeyEnum.SSH_TERM_COL, OptionDefaultValues.SSH_TERM_COL);
+            session.SetOption(OptionKeyEnum.SSH_TERM_TYPE, OptionDefaultValues.SSH_TERM_TYPE);
+            session.SetOption(OptionKeyEnum.SSH_TERM_SIZE_MODE, OptionDefaultValues.SSH_TERM_SIZE_MODE);
+            session.SetOption(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING);
+            session.SetOption(OptionKeyEnum.SSH_READ_BUFFER_SIZE, OptionDefaultValues.SSH_READ_BUFFER_SIZE);
+            session.SetOption(OptionKeyEnum.THEME_FONT_FAMILY, OptionDefaultValues.THEME_FONT_FAMILY);
+            session.SetOption(OptionKeyEnum.THEME_FONT_SIZE, OptionDefaultValues.THEME_FONT_SIZE);
+            session.SetOption(OptionKeyEnum.THEME_FONT_COLOR, OptionDefaultValues.THEME_FONT_COLOR);
+            session.SetOption(OptionKeyEnum.THEME_CURSOR_SPEED, OptionDefaultValues.THEME_CURSOR_SPEED);
+            session.SetOption(OptionKeyEnum.THEME_CURSOR_STYLE, OptionDefaultValues.THEME_CURSOR_STYLE);
+            session.SetOption(OptionKeyEnum.THEME_CURSOR_COLOR, OptionDefaultValues.THEME_CURSOR_COLOR);
+            session.SetOption(OptionKeyEnum.THEME_ID, OptionDefaultValues.THEME_ID);
+            session.SetOption(OptionKeyEnum.TEHEM_COLOR_TABLE, OptionDefaultValues.TEHEM_COLOR_TABLE);
+            session.SetOption(OptionKeyEnum.THEME_BACK_COLOR, OptionDefaultValues.THEME_BACK_COLOR);
+            session.SetOption(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_FORECOLOR);
+            session.SetOption(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            session.SetOption(OptionKeyEnum.THEME_SELECTION_COLOR, OptionDefaultValues.THEME_SELECTION_COLOR);
+
+            session.SetOption(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
+            session.SetOption(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
+            session.SetOption(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, OptionDefaultValues.SSH_THEME_DOCUMENT_PADDING);
+            session.SetOption(OptionKeyEnum.SSH_SERVER_ADDR, OptionDefaultValues.SSH_ADDR);
+            session.SetOption(OptionKeyEnum.SSH_SERVER_PORT, OptionDefaultValues.SSH_PORT);
+            session.SetOption(OptionKeyEnum.SSH_USER_NAME, OptionDefaultValues.SSH_USER_NAME);
+            session.SetOption(OptionKeyEnum.SSH_PASSWORD, OptionDefaultValues.SSH_PASSWORD);
+            session.SetOption(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, OptionDefaultValues.SSH_PRIVATE_KEY_FILE);
+            session.SetOption(OptionKeyEnum.SSH_Passphrase, OptionDefaultValues.SSH_Passphrase);
+            session.SetOption(OptionKeyEnum.SSH_AUTH_TYPE, OptionDefaultValues.SSH_AUTH_TYPE);
+            session.SetOption(OptionKeyEnum.SSH_PORT_FORWARDS, OptionDefaultValues.SSH_PORT_FORWARDS);
+
+            session.SetOption(OptionKeyEnum.TERM_MAX_ROLLBACK, OptionDefaultValues.TERM_MAX_ROLLBACK);
+            session.SetOption(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, OptionDefaultValues.TERM_MAX_CLIPBOARD_HISTORY);
+            session.SetOption(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
+            session.SetOption(OptionKeyEnum.TERM_DISABLE_BELL, OptionDefaultValues.TERM_DISABLE_BELL);
+            session.SetOption(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
+            session.SetOption(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, OptionDefaultValues.BEHAVIOR_RIGHT_CLICK);
+
+            session.SetOption(OptionKeyEnum.CMD_STARTUP_PATH, OptionDefaultValues.CMD_STARTUP_PATH);
+            session.SetOption(OptionKeyEnum.CMD_STARTUP_ARGUMENT, OptionDefaultValues.CMD_STARTUP_ARGUMENT);
+            session.SetOption(OptionKeyEnum.CMD_STARTUP_DIR, OptionDefaultValues.CMD_STARTUP_DIR);
+            session.SetOption(OptionKeyEnum.CMD_DRIVER, OptionDefaultValues.CMD_DRIVER);
+
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_NAME, OptionDefaultValues.SERIAL_PORT_NAME);
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_BAUD_RATE, OptionDefaultValues.SERIAL_PORT_BAUD_RATE);
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_DATA_BITS, OptionDefaultValues.SERIAL_PORT_DATA_BITS);
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_STOP_BITS, OptionDefaultValues.SERIAL_PORT_STOP_BITS);
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_PARITY, OptionDefaultValues.SERIAL_PORT_PARITY);
+            session.SetOption(OptionKeyEnum.SERIAL_PORT_HANDSHAKE, OptionDefaultValues.SERIAL_PORT_HANDSHAKE);
+
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, OptionDefaultValues.TERM_ADVANCE_RENDER_MODE);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, OptionDefaultValues.TERM_ADVANCE_CLICK_TO_CURSOR);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, OptionDefaultValues.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, OptionDefaultValues.TERM_ADVANCE_AUTO_WRAP_MODE);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_SEND_COLOR, OptionDefaultValues.TERM_ADVANCE_SEND_COLOR);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_RECV_COLOR, OptionDefaultValues.TERM_ADVANCE_RECV_COLOR);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
+
+            session.SetOption(OptionKeyEnum.RAW_TCP_TYPE, OptionDefaultValues.RAW_TCP_TYPE);
+            session.SetOption(OptionKeyEnum.RAW_TCP_ADDRESS, OptionDefaultValues.RAW_TCP_ADDRESS);
+            session.SetOption(OptionKeyEnum.RAW_TCP_PORT, OptionDefaultValues.RAW_TCP_PORT);
+
+            session.SetOption(OptionKeyEnum.MODEM_RETRY_TIMES, OptionDefaultValues.MODEM_RETRY_TIMES);
+            session.SetOption(OptionKeyEnum.XMODEM_XMODEM1K, OptionDefaultValues.XMODEM_XMODEM1K);
+            session.SetOption(OptionKeyEnum.XMODEM_RECV_CRC, OptionDefaultValues.XMODEM_RECV_CRC);
+            session.SetOption(OptionKeyEnum.XMODEM_RECV_PADCHAR, OptionDefaultValues.XMODEM_RECV_PADCHAR);
+            session.SetOption(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, OptionDefaultValues.XMODEM_RECV_IGNORE_PADCHAR);
+
+            session.SetOption(OptionKeyEnum.SFTP_SERVER_ADDRESS, OptionDefaultValues.SFTP_SERVER_ADDRESS);
+            session.SetOption(OptionKeyEnum.SFTP_SERVER_PORT, OptionDefaultValues.SFTP_SERVER_PORT);
+            session.SetOption(OptionKeyEnum.SFTP_USER_NAME, OptionDefaultValues.SFTP_USER_NAME);
+            session.SetOption(OptionKeyEnum.SFTP_USER_PASSWORD, OptionDefaultValues.SFTP_USER_PASSWORD);
+            //session.SetOption(OptionKeyEnum.SFTP_AUTH_TYPE, OptionDefaultValues.SFTP_AUTH_TYPE);
+            session.SetOption(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, OptionDefaultValues.SFTP_SERVER_INITIAL_DIRECTORY);
+            session.SetOption(OptionKeyEnum.SFTP_CLIENT_INITIAL_DIRECTORY, OptionDefaultValues.SFTP_CLIENT_INITIAL_DIRECTORY);
+
+            return session;
         }
 
         #endregion
@@ -1064,14 +1145,14 @@ namespace ModengTerm.ViewModel
         {
             if (string.IsNullOrEmpty(this.Name))
             {
-                MessageBoxUtils.Info("请输入会话名称");
+                MTMessageBox.Info("请输入会话名称");
                 return null;
             }
 
             SessionTypeVM sessionType = SelectedSessionType;
             if (sessionType == null)
             {
-                MessageBoxUtils.Info("请选择会话类型");
+                MTMessageBox.Info("请选择会话类型");
                 return null;
             }
 
@@ -1082,14 +1163,11 @@ namespace ModengTerm.ViewModel
                 groupId = SessionGroups.Context.SelectedItem.ID.ToString();
             }
 
-            XTermSession session = new XTermSession()
-            {
-                ID = Guid.NewGuid().ToString(),
-                CreationTime = DateTime.Now,
-                Name = this.Name,
-                Type = (int)sessionType.Type,
-                GroupId = groupId
-            };
+            this.session.ID = Guid.NewGuid().ToString();
+            this.session.CreationTime = DateTime.Now;
+            this.session.Name = this.Name;
+            this.session.Type = (int)sessionType.Type;
+            this.session.GroupId = groupId;
 
             if (!SaveAllOptions(session))
             {

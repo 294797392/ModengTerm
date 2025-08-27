@@ -1,28 +1,18 @@
-﻿using DotNEToolkit.DataModels;
-using ModengTerm.Terminal.Enumerations;
+﻿using ModengTerm.Base.Enumerations.Ssh;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.DataModels
+namespace ModengTerm.Base.DataModels.Ssh
 {
     /// <summary>
-    /// 存储端口转发信息
+    /// 存储端口转发状态
     /// </summary>
-    public class PortForward : ModelBase
+    public class PortForwardState
     {
-        /// <summary>
-        /// 端口转发类型
-        /// </summary>
-        [EnumDataType(typeof(PortForwardTypeEnum))]
-        [JsonProperty("type")]
-        public int Type { get; set; }
-
         /// <summary>
         /// 源主机
         /// </summary>
@@ -52,5 +42,12 @@ namespace ModengTerm.Terminal.DataModels
         /// </summary>
         [JsonProperty("autoOpen")]
         public bool AutoOpen { get; set; }
+
+        public PortForwardStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 驱动里的端口转发状态
+        /// </summary>
+        public object DriverObject { get; set; }
     }
 }

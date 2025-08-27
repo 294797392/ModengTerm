@@ -41,15 +41,10 @@ namespace ModengTerm.Base.Enumerations
         SSH_TERM_SIZE_MODE = 3,
 
         /// <summary>
-        /// 回放文件路径
-        /// </summary>
-        SSH_PLAYBACK_FILE_PATH = 4,
-
-        /// <summary>
         /// 输出编码格式
         /// </summary>
         TERM_WRITE_ENCODING = 5,
-        SSH_WRITE_BUFFER_SIZE = 6,
+        //SSH_WRITE_BUFFER_SIZE = 6,
         SSH_READ_BUFFER_SIZE = 7,
 
         // Theme 100 - 200
@@ -69,9 +64,15 @@ namespace ModengTerm.Base.Enumerations
         /// 选择的主题ID
         /// </summary>
         THEME_ID = 107,
+        /// <summary>
+        /// SGR颜色表
+        /// </summary>
         TEHEM_COLOR_TABLE = 108,
 
-        THEME_BACKGROUND_COLOR = 112,
+        /// <summary>
+        /// 终端背景颜色
+        /// </summary>
+        THEME_BACK_COLOR = 112,
         //THEME_BACKGROUND_EFFECT = 113,
 
         /// <summary>
@@ -100,15 +101,10 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         SSH_THEME_DOCUMENT_PADDING = 501,
 
-        /// <summary>
-        /// 是否显示书签
-        /// </summary>
-        SSH_BOOKMARK_VISIBLE = 502,
-        THEME_BOOKMARK_COLOR = 503,
 
         // Server 201 - 300
-        SSH_ADDR = 504,
-        SSH_PORT,
+        SSH_SERVER_ADDR = 504,
+        SSH_SERVER_PORT,
         SSH_USER_NAME,
         SSH_PASSWORD,
         SSH_PRIVATE_KEY_FILE,
@@ -235,13 +231,13 @@ namespace ModengTerm.Base.Enumerations
 
         #region 会话 - 系统监控 4501 - 5000
 
-        WATCH_FREQUENCY = 4501,
-        WATCH_ADB_ENABLED = 4502,
-        WATCH_ADB_PASSWORDS = 4503,
-        WATCH_ADB_PROMPT = 4504,
-        WATCH_ADB_LOGIN_TIMEOUT = 4505,
-        WATCH_ADB_PATH = 4506,
-        WATCH_ADB_TEMP_DIR = 4507,
+        //WATCH_FREQUENCY = 4501,
+        //WATCH_ADB_ENABLED = 4502,
+        //WATCH_ADB_PASSWORDS = 4503,
+        //WATCH_ADB_PROMPT = 4504,
+        //WATCH_ADB_LOGIN_TIMEOUT = 4505,
+        //WATCH_ADB_PATH = 4506,
+        //WATCH_ADB_TEMP_DIR = 4507,
 
         #endregion
 
@@ -276,7 +272,7 @@ namespace ModengTerm.Base.Enumerations
 
         #region 终端 - 登录脚本 5501 - 6000
 
-        LOGIN_SCRIPT_ITEMS = 5501,
+        //LOGIN_SCRIPT_ITEMS = 5501,
 
         #endregion
 
@@ -286,7 +282,7 @@ namespace ModengTerm.Base.Enumerations
         SFTP_SERVER_PORT = 10001,
         SFTP_USER_NAME = 10002,
         SFTP_USER_PASSWORD = 10003,
-        SFTP_AUTH_TYPE = 10004,
+        //SFTP_AUTH_TYPE = 10004,
         SFTP_SERVER_INITIAL_DIRECTORY = 10005,
         SFTP_CLIENT_INITIAL_DIRECTORY = 10006,
 

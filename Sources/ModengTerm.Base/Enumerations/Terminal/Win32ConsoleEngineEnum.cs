@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Enumerations
+namespace ModengTerm.Base.Enumerations.Terminal
 {
     /// <summary>
-    /// 表示命令行驱动程序
+    /// 表示实现Win32控制台的引擎
     /// </summary>
-    public enum CmdDriverEnum
+    public enum Win32ConsoleEngineEnum
     {
         /// <summary>
         /// 使用winpty驱动命令行
