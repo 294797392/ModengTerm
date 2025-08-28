@@ -12,6 +12,12 @@ namespace ModengTerm.Base.Enumerations.Terminal
     public enum Win32ConsoleEngineEnum
     {
         /// <summary>
+        /// 自动选择
+        /// 如果操作系统版本高于等于Win10，那么使用PseudoConsole，否则使用winpty
+        /// </summary>
+        Auto,
+
+        /// <summary>
         /// 使用winpty驱动命令行
         /// </summary>
         winpty,

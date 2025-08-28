@@ -5,6 +5,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Terminal;

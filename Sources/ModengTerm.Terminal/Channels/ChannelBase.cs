@@ -10,7 +10,7 @@ namespace ModengTerm.Terminal.Engines
     /// 由SessionTransport封装为非阻塞接口
     /// 上层调用SessionTransport接口来和SessionDriver打交道
     /// </summary>
-    public abstract class AbstractEngin
+    public abstract class ChannelBase
     {
         #region 常量
 
@@ -27,24 +27,30 @@ namespace ModengTerm.Terminal.Engines
 
         #region 实例变量
 
-        protected XTermSession session;
+        protected ChannelOptions options;
 
         #endregion
 
         #region 属性
 
-        /// <summary>
-        /// 通道类型
-        /// </summary>
-        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.Type; } }
+        public ChannelOptions Options
+        {
+            get { return this.options; }
+            set
+            {
+                if (this.options != value)
+                {
+                    this.options = value;
+                }
+            }
+        }
 
         #endregion
 
         #region 构造方法
 
-        public AbstractEngin(XTermSession session)
+        public ChannelBase()
         {
-            this.session = session;
         }
 
         #endregion
@@ -88,7 +94,7 @@ namespace ModengTerm.Terminal.Engines
         /// <param name="col">新的列数</param>
         public abstract void Resize(int row, int col);
 
-        public virtual int Control(int command, object parameter, out object result) 
+        public virtual int Control(int command, object parameter, out object result)
         {
             result = null;
 

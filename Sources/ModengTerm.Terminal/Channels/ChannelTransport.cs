@@ -1,13 +1,15 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 
 namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
-    /// 封装SessionDriver
+    /// 封装Engine接口，处理Engine接口出现的各种异常情况
+    /// 给上层模块提供可以安全调用的接口，确保上层模块调用不会出现崩溃
     /// </summary>
-    public class EngineTransport
+    public class ChannelTransport
     {
         #region 类变量
 
@@ -25,70 +27,63 @@ namespace ModengTerm.Terminal.Engines
         /// <summary>
         /// 当收到数据流的时候触发
         /// </summary>
-        public event Action<EngineTransport, byte[], int> DataReceived;
+        public event Action<ChannelTransport, byte[], int> DataReceived;
 
         #endregion
 
         #region 实例变量
 
-        private XTermSession session;
-        private AbstractEngin driver;
+        private ChannelBase channel;
 
         private Task backgroundTask;
         private bool isRunning;
-
-        private byte[] readBuffer;
-
         private int row;
         private int col;
 
+        private byte[] readBuffer;
+
         private SessionStatusEnum status;
-        
+
+        private ChannelOptions channelOptions;
+
         #endregion
 
         #region 属性
 
-        public XTermSession Session { get { return this.session; } }
-
         /// <summary>
         /// 获取传输层所使用的驱动对象
         /// </summary>
-        public AbstractEngin Engine { get { return this.driver; } }
+        public ChannelBase Engine { get { return this.channel; } }
 
         /// <summary>
         /// 获取当前Session的连接状态
         /// </summary>
-        public SessionStatusEnum Status
-        {
-            get { return this.status; }
-        }
+        public SessionStatusEnum Status { get { return this.status; } }
 
         #endregion
 
         #region 公开接口
 
-        public int Initialize(XTermSession session)
+        public int Initialize(ChannelOptions options)
         {
-            this.session = session;
-
-            int bufferSize = session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
-            this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-
-            this.readBuffer = new byte[bufferSize];
-            this.driver = EngineFactory.Create(session);
+            this.channelOptions = options;
+            this.row = options.Row;
+            this.col = options.Column;
+            this.readBuffer = new byte[this.channelOptions.ReceiveBufferSize];
+            this.channel = ChannelFactory.Create(options);
+            this.channel.Options = options;
 
             return ResponseCode.SUCCESS;
         }
 
         public void Release()
         {
-            if (this.driver == null)
+            if (this.channel == null)
             {
                 return;
             }
 
-            this.driver = null;
+            this.channel = null;
         }
 
         /// <summary>
@@ -124,7 +119,7 @@ namespace ModengTerm.Terminal.Engines
 
             try
             {
-                this.driver.Write(bytes);
+                this.channel.Write(bytes);
                 return ResponseCode.SUCCESS;
             }
             catch (Exception ex)
@@ -155,7 +150,7 @@ namespace ModengTerm.Terminal.Engines
 
             try
             {
-                this.driver.Resize(row, col);
+                this.channel.Resize(row, col);
             }
             catch (Exception ex)
             {
@@ -180,7 +175,7 @@ namespace ModengTerm.Terminal.Engines
         /// <returns>执行动作的返回值</returns>
         public int Control(int command, object parameter, out object result)
         {
-            return this.driver.Control(command, parameter, out result);
+            return this.channel.Control(command, parameter, out result);
         }
 
         #endregion
@@ -189,7 +184,7 @@ namespace ModengTerm.Terminal.Engines
 
         private void CloseDriver()
         {
-            this.driver.Close();
+            this.channel.Close();
             this.isRunning = false;
         }
 
@@ -202,7 +197,7 @@ namespace ModengTerm.Terminal.Engines
         /// </returns>
         private bool CheckStatus()
         {
-            if (this.driver == null)
+            if (this.channel == null)
             {
                 return false;
             }
@@ -249,7 +244,7 @@ namespace ModengTerm.Terminal.Engines
             {
                 try
                 {
-                    n = this.driver.Read(this.readBuffer);
+                    n = this.channel.Read(this.readBuffer);
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -315,7 +310,7 @@ namespace ModengTerm.Terminal.Engines
 
             try
             {
-                if ((code = this.driver.Open()) != ResponseCode.SUCCESS)
+                if ((code = this.channel.Open()) != ResponseCode.SUCCESS)
                 {
                     this.NotifyStatusChanged(SessionStatusEnum.ConnectError);
                     return;
@@ -340,7 +335,7 @@ namespace ModengTerm.Terminal.Engines
             // 主动关闭isRunning == false
             if (this.isRunning)
             {
-                this.driver.Close();
+                this.channel.Close();
                 this.isRunning = false;
             }
 

@@ -34,10 +34,9 @@ namespace ModengTerm.Addon.Interactive
         /// 读取该会话的选项
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="optionKey">要读取的选项key</param>
-        /// <param name="defaultValue">如果该选项不存在，指定默认值</param>
+        /// <param name="key">要读取的选项key</param>
         /// <returns></returns>
-        T GetOption<T>(OptionKeyEnum key, T defaultValue);
+        T GetOption<T>(string key);
 
         /// <summary>
         /// 存储Tab相关的数据
@@ -111,7 +110,7 @@ namespace ModengTerm.Addon.Interactive
         /// 如果该Tab打开的不是一个Ssh会话，则为空
         /// </summary>
         /// <returns></returns>
-        ISshEngine GetSshEngine();
+        ISshChannel GetSshEngine();
     }
 
     /// <summary>

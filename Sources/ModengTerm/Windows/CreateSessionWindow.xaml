@@ -24,7 +24,7 @@
             <local:SelectedGroupNameConverter x:Key="SelectedGroupNameConverter"/>
             <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
-            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions" ItemsSource="{Binding Path=MenuItems}">
+            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions" ItemsSource="{Binding Path=Children}">
                 <Grid>
                     <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
                 </Grid>
@@ -123,8 +123,8 @@
             <Border Grid.Column="0" Grid.ColumnSpan="999" Background="White"/>
 
             <GroupBox Grid.Column="0" Header="分类">
-                <TreeView x:Name="TreeViewOptions" DataContext="{Binding Path=OptionTreeVM}"
-                          ItemsSource="{Binding Path=MenuItems}"
+                <TreeView x:Name="TreeViewOptions" DataContext="{Binding Path=PreferenceTreeVM}"
+                          ItemsSource="{Binding Path=Roots}"
                           ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateOptions}"
                           SelectedItemChanged="TreeViewOptions_SelectedItemChanged" 
                           ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemOption}"

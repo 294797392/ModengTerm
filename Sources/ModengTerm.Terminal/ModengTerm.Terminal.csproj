@@ -62,8 +62,8 @@
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="DataModels\VTCharacterSM.cs" />
     <Compile Remove="DataModels\Wallpaper.cs" />
-    <Compile Remove="Engines\libvt.cs" />
-    <Compile Remove="Engines\libvtsshSession.cs" />
+    <Compile Remove="Channels\libvt.cs" />
+    <Compile Remove="Channels\libvtsshSession.cs" />
     <Compile Remove="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="Parsing\VTActions.cs" />
@@ -71,8 +71,8 @@
     <Compile Remove="Parsing\VTDispatchHandler.cs" />
     <Compile Remove="Parsing\VTParserEventDlg.cs" />
     <Compile Remove="PrimaryScreen.cs" />
-    <Compile Remove="Engines\AdbShellSession.cs" />
-    <Compile Remove="Engines\PlaybackSession.cs" />
+    <Compile Remove="Channels\AdbShellSession.cs" />
+    <Compile Remove="Channels\PlaybackSession.cs" />
     <Compile Remove="Triggers\Trigger.cs" />
     <Compile Remove="Triggers\TriggerAction.cs" />
     <Compile Remove="VTBookmark.cs" />

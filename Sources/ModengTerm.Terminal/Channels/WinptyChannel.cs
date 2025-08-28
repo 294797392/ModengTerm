@@ -217,7 +217,7 @@ namespace ModengTerm.Terminal.Engines
     /// <summary>
     /// 使用winpty库实现与Windows命令行通信
     /// </summary>
-    public class WinptyEngine : AbstractEngin
+    public class WinptyChannel : ChannelBase
     {
         #region 类变量
 
@@ -237,16 +237,17 @@ namespace ModengTerm.Terminal.Engines
 
         #region 构造方法
 
-        public WinptyEngine(XTermSession options) :
-            base(options)
+        public WinptyChannel()
         { }
 
         #endregion
 
-        #region SessionDriver
+        #region ChannelBase
 
         public override int Open()
         {
+            LocalConsoleChannelOptions channelOptions = this.options as LocalConsoleChannelOptions;
+
             IntPtr winpty_error;
 
             // 看了winpty的源码，winpty_error这个参数没使用
@@ -258,8 +259,8 @@ namespace ModengTerm.Terminal.Engines
             }
 
             // 设置终端初始大小
-            int cols = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            int cols = channelOptions.Column;
+            int rows = channelOptions.Row;
             winpty.winpty_config_set_initial_size(this.winpty_config, cols, rows);
 
             // winpty_error也没用
@@ -272,7 +273,7 @@ namespace ModengTerm.Terminal.Engines
                 return ResponseCode.FAILED;
             }
 
-            string exePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            string exePath = channelOptions.StartupPath;
             string envPath = Environment.GetEnvironmentVariable("PATH");
             string env = string.Empty;
             if (!string.IsNullOrEmpty(envPath))

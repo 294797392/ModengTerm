@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Windows.SSH;
 using System;
 using System.Collections.Generic;

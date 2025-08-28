@@ -18,5 +18,13 @@ namespace ModengTerm.Base.DataModels
         /// </summary>
         [JsonProperty("value")]
         public string Value { get; set; }
+
+        public SessionOption() { }
+
+        public SessionOption(int key, string value)
+        {
+            this.Key = key;
+            this.Value = value;
+        }
     }
 }

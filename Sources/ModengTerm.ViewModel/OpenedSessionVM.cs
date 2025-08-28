@@ -5,6 +5,7 @@ using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using System.Windows;
@@ -29,6 +30,8 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 实例变量
+
+        protected XTermSession session;
 
         private SessionStatusEnum status;
         private DependencyObject content;
@@ -65,7 +68,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 对应的会话信息
         /// </summary>
-        public XTermSession Session { get; private set; }
+        public XTermSession Session { get { return this.session; } }
 
         /// <summary>
         /// 与会话的连接状态
@@ -98,7 +101,7 @@ namespace ModengTerm.ViewModel
 
         public OpenedSessionVM(XTermSession session)
         {
-            this.Session = session;
+            this.session = session;
             this.dataMap = new Dictionary<AddonModule, Dictionary<string, object>>();
             this.sidePanels = new List<SidePanelVM>();
             this.overlayPanels = new BindableCollection<OverlayPanelVM>();
@@ -234,9 +237,9 @@ namespace ModengTerm.ViewModel
 
         #region IClientTab
 
-        public T GetOption<T>(OptionKeyEnum key, T defaultValue)
+        public T GetOption<T>(string key)
         {
-            return this.Session.GetOption<T>(key, defaultValue);
+            return this.Session.GetOption<T>(key);
         }
 
         public void SetData(AddonModule addon, string key, object value)

@@ -13,12 +13,12 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 本地控制台会话
         /// </summary>
-        Localhost,
+        LocalConsole,
 
         /// <summary>
         /// 是一个SSH远程主机
         /// </summary>
-        SSH,
+        Ssh,
 
         /// <summary>
         /// 是一个串口设备
@@ -28,7 +28,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// SFTP会话
         /// </summary>
-        SFTP,
+        Sftp,
 
         /// <summary>
         /// Tcp会话

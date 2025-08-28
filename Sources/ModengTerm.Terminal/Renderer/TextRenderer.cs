@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using System.Text;
 
@@ -34,11 +34,11 @@ namespace ModengTerm.Terminal.Renderer
 
         public override void Initialize()
         {
-            string sendColor = this.session.GetOption<string>(OptionKeyEnum.TERM_ADVANCE_SEND_COLOR, OptionDefaultValues.TERM_ADVANCE_SEND_COLOR);
+            string sendColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADVANCE_SEND_COLOR);
             this.writeTextAttr = this.CreateForegroundAttribute(sendColor);
-            string recvColor = this.session.GetOption<string>(OptionKeyEnum.TERM_ADVANCE_RECV_COLOR, OptionDefaultValues.TERM_ADVANCE_RECV_COLOR);
+            string recvColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADVANCE_RECV_COLOR);
             this.readTextAttr = this.CreateForegroundAttribute(recvColor);
-            string encodeName = this.session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
+            string encodeName = this.session.GetOption<string>(PredefinedOptions.TERM_READ_ENCODING);
             this.encoding = Encoding.GetEncoding(encodeName);
         }
 

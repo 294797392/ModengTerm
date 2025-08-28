@@ -9,7 +9,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 定义Ssh客户端可以执行的动作
     /// </summary>
-    public interface ISshEngine
+    public interface ISshChannel
     {
         /// <summary>
         /// 在远程主机上执行一个脚本

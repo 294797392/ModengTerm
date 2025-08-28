@@ -3,6 +3,7 @@ using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Graphics;
@@ -117,7 +118,7 @@ namespace ModengTerm.OfficialAddons.Find
         {
             this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
-            string backColorRgbKey = this.Tab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            string backColorRgbKey = this.Tab.GetOption<string>(PredefinedOptions.THEME_FIND_HIGHLIGHT_BACKCOLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
             IClientShellTab shellTab = this.Tab as IClientShellTab;
             this.drawingContext = shellTab.DrawingContext;

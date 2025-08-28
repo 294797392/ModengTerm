@@ -2,7 +2,11 @@
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.DataModels.Ssh;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Ssh;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
@@ -12,10 +16,13 @@ using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Engines;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Modem;
+using Renci.SshNet;
 using System.IO;
+using System.IO.Ports;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Media;
 using WPFToolkit.MVVM;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -38,7 +45,7 @@ namespace ModengTerm.ViewModel.Terminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private EngineTransport engineTransport;
+        private ChannelTransport channelTransport;
 
         /// <summary>
         /// 终端引擎
@@ -139,12 +146,12 @@ namespace ModengTerm.ViewModel.Terminal
         public IDrawingContext DrawingContext { get; set; }
 
         /// <summary>
-        /// 获取或设置终端宽度
+        /// 获取或设置终端宽度，单位是像素
         /// </summary>
         public double Width { get; set; }
 
         /// <summary>
-        /// 获取或设置终端高度
+        /// 获取或设置终端高度，单位是像素
         /// </summary>
         public double Height { get; set; }
 
@@ -251,11 +258,11 @@ namespace ModengTerm.ViewModel.Terminal
             //scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             HistoryCommands = new BindableCollection<string>();
 
-            writeEncoding = Encoding.GetEncoding(Session.GetOption(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
-            readEncoding = Encoding.GetEncoding(Session.GetOption(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING));
+            writeEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_WRITE_ENCODING));
+            readEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_READ_ENCODING));
             clipboard = new VTClipboard()
             {
-                MaximumHistory = Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
+                MaximumHistory = Session.GetOption<int>(PredefinedOptions.TERM_MAX_CLIPBOARD_HISTORY)
             };
 
             #region 初始化上下文菜单
@@ -263,7 +270,7 @@ namespace ModengTerm.ViewModel.Terminal
             ContextMenus = new BindableCollection<ContextMenuVM>();
             ContextMenus.AddRange(VMUtils.CreateContextMenuVMs(false));
 
-            RightClickActions brc = Session.GetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+            RightClickActions brc = Session.GetOption<RightClickActions>(PredefinedOptions.BEHAVIOR_RIGHT_CLICK);
             if (brc == RightClickActions.ContextMenu)
             {
                 ContextMenuVisibility = Visibility.Visible;
@@ -277,19 +284,39 @@ namespace ModengTerm.ViewModel.Terminal
 
             #region 初始化终端
 
+            #region 计算终端的行数和列数
+
+            string fontFamily = this.session.GetOption<string>(PredefinedOptions.THEME_FONT_FAMILY);
+            double fontSize = this.session.GetOption<double>(PredefinedOptions.THEME_FONT_SIZE);
+            VTypeface typeface = this.MainDocument.GetTypeface(fontSize, fontFamily);
+            typeface.ForegroundColor = this.session.GetOption<string>(PredefinedOptions.THEME_FONT_COLOR);
+            VTSize displaySize = new VTSize(this.Width, this.Height);
+            TerminalSizeModeEnum sizeMode = this.session.GetOption<TerminalSizeModeEnum>(PredefinedOptions.SSH_TERM_SIZE_MODE);
+            int rows = this.session.GetOption<int>(PredefinedOptions.SSH_TERM_ROW);
+            int cols = this.session.GetOption<int>(PredefinedOptions.SSH_TERM_COL);
+            if (sizeMode == TerminalSizeModeEnum.AutoFit)
+            {
+                /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
+                /// 如果SizeMode等于AutoFit，那么动态计算行和列
+                VTDocUtils.CalculateAutoFitSize(displaySize, typeface, out rows, out cols);
+            }
+
+            #endregion
+
             VTOptions options = new VTOptions()
             {
                 Session = Session,
-                SessionTransport = new EngineTransport(),
+                SessionTransport = new ChannelTransport(),
                 AlternateDocument = AlternateDocument,
                 MainDocument = MainDocument,
-                Width = Width,
-                Height = Height
+                Row = rows,
+                Column = cols,
+                Typeface = typeface
             };
 
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.OnViewportChanged += VideoTerminal_ViewportChanged;
-            videoTerminal.DisableBell = Session.GetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL);
+            videoTerminal.DisableBell = Session.GetOption<bool>(PredefinedOptions.TERM_DISABLE_BELL);
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
 
@@ -299,26 +326,28 @@ namespace ModengTerm.ViewModel.Terminal
 
             AutoCompletionVM = new AutoCompletionVM();
             AutoCompletionVM.Initialize(this);
-            AutoCompletionVM.Enabled = Session.GetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, OptionDefaultValues.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
+            AutoCompletionVM.Enabled = Session.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
 
             #endregion
 
             #region 连接终端通道
 
+            ChannelOptions channelOptions = this.CreateChannelOptions(rows, cols);
+
             // 连接SSH服务器
-            EngineTransport transport = options.SessionTransport;
+            ChannelTransport transport = options.SessionTransport;
             transport.StatusChanged += SessionTransport_StatusChanged;
             transport.DataReceived += SessionTransport_DataReceived;
-            transport.Initialize(Session);
+            transport.Initialize(channelOptions);
             transport.OpenAsync();
 
-            engineTransport = transport;
+            this.channelTransport = transport;
 
             #endregion
 
             Uri = InitializeURI();
 
-            isRunning = true;
+            this.isRunning = true;
 
             return ResponseCode.SUCCESS;
         }
@@ -332,10 +361,10 @@ namespace ModengTerm.ViewModel.Terminal
 
             AutoCompletionVM.Release();
 
-            engineTransport.StatusChanged -= SessionTransport_StatusChanged;
-            engineTransport.DataReceived -= SessionTransport_DataReceived;
-            engineTransport.Close();
-            engineTransport.Release();
+            channelTransport.StatusChanged -= SessionTransport_StatusChanged;
+            channelTransport.DataReceived -= SessionTransport_DataReceived;
+            channelTransport.Close();
+            channelTransport.Release();
 
             videoTerminal.OnViewportChanged -= VideoTerminal_ViewportChanged;
             videoTerminal.Release();
@@ -350,6 +379,81 @@ namespace ModengTerm.ViewModel.Terminal
 
         #region 实例方法
 
+        private ChannelOptions CreateChannelOptions(int rows, int cols)
+        {
+            int recvBufferSize = this.session.GetOption<int>(PredefinedOptions.SSH_READ_BUFFER_SIZE);
+
+            switch ((SessionTypeEnum)this.session.Type)
+            {
+                case SessionTypeEnum.SerialPort: 
+                    {
+                        return new SerialPortChannelOptions()
+                        {
+                            ReceiveBufferSize = recvBufferSize,
+                            Column = cols,
+                            Row = rows,
+                            StopBits = this.session.GetOption<StopBits>(PredefinedOptions.SERIAL_PORT_STOP_BITS),
+                            BaudRate = this.session.GetOption<int>(PredefinedOptions.SERIAL_PORT_BAUD_RATE),
+                            DataBits = this.session.GetOption<int>(PredefinedOptions.SERIAL_PORT_DATA_BITS),
+                            Handshake = this.session.GetOption<Handshake>(PredefinedOptions.SERIAL_PORT_HANDSHAKE),
+                            Parity = this.session.GetOption<Parity>(PredefinedOptions.SERIAL_PORT_PARITY),
+                            PortName = this.session.GetOption<string>(PredefinedOptions.SERIAL_PORT_NAME)
+                        };
+                    }
+
+                case SessionTypeEnum.Ssh:
+                    {
+                        return new SshChannelOptions()
+                        {
+                            ReceiveBufferSize = recvBufferSize,
+                            Column = cols,
+                            Row = rows,
+                            AuthenticationType = this.session.GetOption<SSHAuthTypeEnum>(PredefinedOptions.SSH_AUTH_TYPE),
+                            UserName = this.session.GetOption<string>(PredefinedOptions.SFTP_USER_NAME),
+                            Password = this.session.GetOption<string>(PredefinedOptions.SFTP_USER_PASSWORD),
+                            PrivateKeyId = this.session.GetOption<string>(PredefinedOptions.SSH_PRIVATE_KEY_FILE),
+                            Passphrase = this.session.GetOption<string>(PredefinedOptions.SSH_Passphrase),
+                            ServerPort = this.session.GetOption<int>(PredefinedOptions.SFTP_SERVER_PORT),
+                            ServerAddress = this.session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR),
+                            TerminalType = this.session.GetOption<string>(PredefinedOptions.SSH_TERM_TYPE),
+                            PortForwards = this.session.GetOption<List<PortForward>>(PredefinedOptions.SSH_PORT_FORWARDS)
+                        };
+                    }
+
+                case SessionTypeEnum.LocalConsole:
+                    {
+                        return new LocalConsoleChannelOptions() 
+                        {
+                            ReceiveBufferSize = recvBufferSize,
+                            Column = cols,
+                            Row = rows,
+                            ConsoleEngin = this.session.GetOption<Win32ConsoleEngineEnum>(PredefinedOptions.CMD_CONSOLE_ENGINE),
+                            StartupDir = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_DIR),
+                            StartupPath = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH),
+                            Arguments = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_ARGUMENT)
+                        };
+                    }
+
+                case SessionTypeEnum.Tcp:
+                    {
+                        return new TcpChannelOptions() 
+                        {
+                            ReceiveBufferSize = recvBufferSize,
+                            Column = cols,
+                            Row = rows,
+                            Type = this.session.GetOption<RawTcpTypeEnum>(PredefinedOptions.RAW_TCP_TYPE),
+                            IPAddress = this.session.GetOption<string>(PredefinedOptions.RAW_TCP_ADDRESS),
+                            Port = this.session.GetOption<int>(PredefinedOptions.RAW_TCP_PORT)
+                        };
+                    }
+
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+            }
+        }
+
         private string InitializeURI()
         {
             string uri = string.Empty;
@@ -358,32 +462,32 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 case SessionTypeEnum.Tcp:
                     {
-                        string addr = this.Session.GetOption<string>(OptionKeyEnum.RAW_TCP_ADDRESS);
-                        string port = this.Session.GetOption<string>(OptionKeyEnum.RAW_TCP_PORT);
+                        string addr = this.Session.GetOption<string>(PredefinedOptions.RAW_TCP_ADDRESS);
+                        string port = this.Session.GetOption<string>(PredefinedOptions.RAW_TCP_PORT);
                         uri = string.Format("tcp://{0}:{1}", addr, port);
                         break;
                     }
 
-                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.LocalConsole:
                     {
-                        string cmdPath = Session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
+                        string cmdPath = Session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);
                         break;
                     }
 
-                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.Ssh:
                     {
-                        string userName = Session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
-                        string hostName = Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
-                        int port = Session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+                        string userName = Session.GetOption<string>(PredefinedOptions.SSH_USER_NAME);
+                        string hostName = Session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR);
+                        int port = Session.GetOption<int>(PredefinedOptions.SSH_SERVER_PORT);
                         uri = string.Format("ssh://{0}@{1}:{2}", userName, hostName, port);
                         break;
                     }
 
                 case SessionTypeEnum.SerialPort:
                     {
-                        string portName = Session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
-                        int baudRate = Session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
+                        string portName = Session.GetOption<string>(PredefinedOptions.SERIAL_PORT_NAME);
+                        int baudRate = Session.GetOption<int>(PredefinedOptions.SERIAL_PORT_BAUD_RATE);
                         uri = string.Format("serialPort://{0} {1}", portName, baudRate);
                         break;
                     }
@@ -449,7 +553,7 @@ namespace ModengTerm.ViewModel.Terminal
 
             // 这里不同步向其他会话发送，单独发送到本会话
             byte[] bytes = writeEncoding.GetBytes(send);
-            int code = engineTransport.Write(bytes);
+            int code = channelTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("执行script失败, 发送数据失败, {0}", code);
@@ -524,7 +628,7 @@ namespace ModengTerm.ViewModel.Terminal
                 Type = modemType,
                 Session = Session,
                 FilePaths = filePaths,
-                Transport = engineTransport
+                Transport = channelTransport
             };
             viewModel.ProgressChanged += ViewModel_ProgressChanged;
             viewModel.StartAsync();
@@ -649,7 +753,7 @@ namespace ModengTerm.ViewModel.Terminal
         /// <param name="kbdInput">用户输入信息</param>
         public void SendInput(VTKeyboardInput kbdInput)
         {
-            if (engineTransport.Status != SessionStatusEnum.Connected)
+            if (channelTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
@@ -683,7 +787,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public int Control(int command, object parameter, out object result)
         {
-            return engineTransport.Control(command, parameter, out result);
+            return channelTransport.Control(command, parameter, out result);
         }
 
         public int Control(int code)
@@ -718,7 +822,7 @@ namespace ModengTerm.ViewModel.Terminal
             ViewportColumn = newColumn;
         }
 
-        private void SessionTransport_DataReceived(EngineTransport transport, byte[] buffer, int size)
+        private void SessionTransport_DataReceived(ChannelTransport transport, byte[] buffer, int size)
         {
             VTDebug.Context.WriteRawRead(buffer, size);
 
@@ -897,7 +1001,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public void Send(byte[] bytes)
         {
-            if (this.engineTransport.Status != SessionStatusEnum.Connected)
+            if (this.channelTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
@@ -1003,9 +1107,9 @@ namespace ModengTerm.ViewModel.Terminal
             return result;
         }
 
-        public ISshEngine GetSshEngine() 
+        public ISshChannel GetSshEngine()
         {
-            return this.engineTransport.Engine as ISshEngine;
+            return this.channelTransport.Engine as ISshChannel;
         }
 
         #endregion

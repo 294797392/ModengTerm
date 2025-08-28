@@ -18,7 +18,7 @@ namespace ModengTerm.Terminal.Engines
     /// 参考：
     /// https://github.com/microsoft/terminal/tree/main/samples/ConPTY/GUIConsole/GUIConsole.ConPTY
     /// </summary>
-    public class PseudoConsoleEngine : AbstractEngin
+    public class PseudoConsoleChannel : ChannelBase
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("PseudoConsoleSession");
 
@@ -26,19 +26,19 @@ namespace ModengTerm.Terminal.Engines
         private Stream consoleInStream;
         private Stream consoleOutStream;
 
-        public PseudoConsoleEngine(XTermSession session) :
-            base(session)
+        public PseudoConsoleChannel()
         {
         }
 
         public override int Open()
         {
-            int row = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int col = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            LocalConsoleChannelOptions channelOptions = this.options as LocalConsoleChannelOptions;
 
-            string startupPath = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
-            string startupArgs = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_ARGUMENT);
-            string startupDirectory = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_DIR);
+            int row = channelOptions.Row;
+            int col = channelOptions.Column;
+            string startupPath = channelOptions.StartupPath;
+            string startupArgs = channelOptions.Arguments;
+            string startupDirectory = channelOptions.StartupDir;
             string path = string.Format("{0} {1}", startupPath, startupArgs);
 
             this.terminal = new ConPTYTerminal();

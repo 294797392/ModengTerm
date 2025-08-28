@@ -2,7 +2,6 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
@@ -134,46 +133,27 @@ namespace ModengTerm.Terminal
         /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="vpw">文档可视区域的宽度, 不包含Padding</param>
-        /// <param name="vph">文档可视区域的高度, 不包含Padding</param>
+        /// <param name="viewportRow">终端高度</param>
+        /// <param name="viewportColumn">终端宽度</param>
         /// <param name="sessionInfo"></param>
         /// <param name="graphicsInterface"></param>
         /// <returns></returns>
-        public static VTDocumentOptions CreateDocumentOptions(string name, double vpw, double vph, XTermSession sessionInfo, GraphicsFactory graphicsInterface)
+        public static VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, GraphicsFactory graphicsInterface, VTOptions options)
         {
-            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
-            double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
-
-            VTypeface typeface = graphicsInterface.GetTypeface(fontSize, fontFamily);
-            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
-            typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
-
-            VTSize displaySize = new VTSize(vpw, vph);
-            TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
-
-            int viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int viewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            if (sizeMode == TerminalSizeModeEnum.AutoFit)
-            {
-                /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
-                /// 如果SizeMode等于AutoFit，那么动态计算行和列
-                VTDocUtils.CalculateAutoFitSize(displaySize, typeface, out viewportRow, out viewportColumn);
-            }
-
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 Name = name,
-                ViewportRow = viewportRow,
-                ViewportColumn = viewportColumn,
+                ViewportRow = options.Row,
+                ViewportColumn = options.Column,
                 AutoWrapMode = false,
-                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.THEME_CURSOR_STYLE),
-                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR),
-                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.THEME_CURSOR_SPEED),
-                ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
-                RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK),
-                Typeface = typeface,
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(PredefinedOptions.THEME_CURSOR_STYLE),
+                CursorColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_CURSOR_COLOR),
+                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(PredefinedOptions.THEME_CURSOR_SPEED),
+                ScrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA),
+                RollbackMax = sessionInfo.GetOption<int>(PredefinedOptions.TERM_MAX_ROLLBACK),
+                Typeface = options.Typeface,
                 GraphicsInterface = graphicsInterface,
-                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR)
+                SelectionColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_SELECTION_COLOR)
             };
 
             return documentOptions;

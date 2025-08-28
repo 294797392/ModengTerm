@@ -1,6 +1,5 @@
-﻿using DotNEToolkit;
-using ModengTerm.Addon.Interactive;
-using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.Metadatas;
 using WPFToolkit.MVVM;
 using Panel = ModengTerm.Addon.Controls.Panel;
 

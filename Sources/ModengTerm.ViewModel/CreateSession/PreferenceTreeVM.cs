@@ -7,12 +7,10 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.CreateSession
 {
-    public class OptionMenuVM : MenuVM
+    public class PreferenceTreeVM : TreeViewModel<TreeViewModelContext>
     {
-        public OptionMenuVM(MenuItemFactory factory) :
-            base(factory)
+        public PreferenceTreeVM()
         {
-
         }
     }
 }

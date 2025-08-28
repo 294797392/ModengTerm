@@ -28,12 +28,15 @@
 
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
+    <Compile Remove="DataModels\SessionOption.cs" />
     <Compile Remove="DataModels\ShellCommand.cs" />
     <Compile Remove="Enumerations\Terminal\CommandTypeEnum.cs" />
     <Compile Remove="HotkeyScopes.cs" />
+    <Compile Remove="Metadatas\MetadataScopes.cs" />
     <Compile Remove="Metadatas\OptionDefinition.cs" />
     <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />
     <Compile Remove="ICloneable.cs" />
+    <Compile Remove="UnitValue.cs" />
   </ItemGroup>
 
   <ItemGroup>

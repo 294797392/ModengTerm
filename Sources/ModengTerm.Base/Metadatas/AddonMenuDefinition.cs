@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace ModengTerm.Base.Definitions
+namespace ModengTerm.Base.Metadatas
 {
     /// <summary>
     /// 定义一个插件菜单

@@ -8,14 +8,13 @@ using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.IO;
 using System.Text;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Engines
 {
     /// <summary>
     /// 使用Rench.SshNet库实现的ssh会话
     /// </summary>
-    public class SshNetEngine : AbstractEngin, ISshEngine
+    public class SshNetChannel : ChannelBase, ISshChannel
     {
         #region 类变量
 
@@ -41,8 +40,7 @@ namespace ModengTerm.Terminal.Engines
 
         #region 构造方法
 
-        public SshNetEngine(XTermSession options) :
-            base(options)
+        public SshNetChannel()
         {
         }
 
@@ -52,36 +50,32 @@ namespace ModengTerm.Terminal.Engines
 
         #endregion
 
-        #region SessionDriver
+        #region ChannelBase
 
         public override int Open()
         {
+            SshChannelOptions channelOptions = this.options as SshChannelOptions;
+
             #region 初始化身份验证方式
 
-            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
-            string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
-            string password = this.session.GetOption<string>(OptionKeyEnum.SSH_PASSWORD);
-            string privateKeyId = this.session.GetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE);
-            string passphrase = this.session.GetOption<string>(OptionKeyEnum.SSH_Passphrase);
-
             AuthenticationMethod authentication = null;
-            switch (authType)
+            switch (channelOptions.AuthenticationType)
             {
                 case SSHAuthTypeEnum.None:
                     {
-                        authentication = new NoneAuthenticationMethod(userName);
+                        authentication = new NoneAuthenticationMethod(channelOptions.UserName);
                         break;
                     }
 
                 case SSHAuthTypeEnum.Password:
                     {
-                        authentication = new PasswordAuthenticationMethod(userName, password);
+                        authentication = new PasswordAuthenticationMethod(channelOptions.UserName, channelOptions.Password);
                         break;
                     }
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        PrivateKey privateKey = VTApp.Context.ServiceAgent.GetPrivateKey(privateKeyId);
+                        PrivateKey privateKey = VTApp.Context.ServiceAgent.GetPrivateKey(channelOptions.PrivateKeyId);
                         if (privateKey == null)
                         {
                             logger.ErrorFormat("登录失败, 密钥不存在");
@@ -91,8 +85,8 @@ namespace ModengTerm.Terminal.Engines
                         byte[] privateKeyData = Encoding.ASCII.GetBytes(privateKey.Content);
                         using (MemoryStream ms = new MemoryStream(privateKeyData))
                         {
-                            var keyFile = new PrivateKeyFile(ms, passphrase);
-                            authentication = new PrivateKeyAuthenticationMethod(userName, keyFile);
+                            var keyFile = new PrivateKeyFile(ms, channelOptions.Passphrase);
+                            authentication = new PrivateKeyAuthenticationMethod(channelOptions.UserName, keyFile);
                         }
                         break;
                     }
@@ -105,9 +99,7 @@ namespace ModengTerm.Terminal.Engines
 
             #region 连接服务器
 
-            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
-            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
-            ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
+            ConnectionInfo connectionInfo = new ConnectionInfo(channelOptions.ServerAddress, channelOptions.ServerPort, channelOptions.UserName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.HostKeyReceived += SshClient_HostKeyReceived;
             this.sshClient.ServerIdentificationReceived += SshClient_ServerIdentificationReceived;
@@ -118,18 +110,18 @@ namespace ModengTerm.Terminal.Engines
 
             #region 创建终端
 
-            string terminalType = this.session.GetOption<string>(OptionKeyEnum.SSH_TERM_TYPE);
-            int columns = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int readBufferSize = this.session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
-            this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, readBufferSize, null);
+            string terminalType = channelOptions.TerminalType;
+            int columns = channelOptions.Column;
+            int rows = channelOptions.Row;
+            int recvBufferSize = channelOptions.ReceiveBufferSize;
+            this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, recvBufferSize, null);
 
             #endregion
 
             #region 初始化端口转发
 
             this.portForwardStates = new List<PortForwardState>();
-            List<PortForward> portForwards = this.session.GetOption<List<PortForward>>(OptionKeyEnum.SSH_PORT_FORWARDS);
+            List<PortForward> portForwards = channelOptions.PortForwards;
             foreach (PortForward portForward in portForwards)
             {
                 ForwardedPort forwardedPort = this.CreateForwardPort(portForward);

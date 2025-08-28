@@ -97,20 +97,37 @@ namespace ModengTerm.Windows
 
         private void TreeViewOptions_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            OptionMenuItemVM selectedOption = TreeViewOptions.SelectedItem as OptionMenuItemVM;
-            if (selectedOption == null)
+            PreferenceNodeVM selectedPreference = TreeViewOptions.SelectedItem as PreferenceNodeVM;
+            if (selectedPreference == null)
             {
                 return;
             }
 
-            OptionMenuVM optionTreeVM = TreeViewOptions.DataContext as OptionMenuVM;
-            optionTreeVM.LoadContent(selectedOption);
-            if (optionTreeVM.CurrentContent == null)
+            if (string.IsNullOrEmpty(selectedPreference.ClassName))
             {
                 return;
             }
 
-            ContentControlContent.Content = optionTreeVM.CurrentContent;
+            if (selectedPreference.FrameworkElement == null)
+            {
+                FrameworkElement frameworkElement = null;
+
+                try
+                {
+                    frameworkElement = ConfigFactory<FrameworkElement>.CreateInstance(selectedPreference.ClassName);
+                }
+                catch (Exception ex)
+                {
+                    // TODO：显示一个错误页面
+                    MTMessageBox.Error("加载预选项页面失败");
+                    logger.ErrorFormat(string.Format("创建Preference界面异常, {0}, {1}", selectedPreference.ClassName, ex));
+                    return;
+                }
+
+                selectedPreference.FrameworkElement = frameworkElement;
+            }
+
+            ContentControlContent.Content = selectedPreference.FrameworkElement;
         }
 
         #endregion

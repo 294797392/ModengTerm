@@ -4,19 +4,21 @@ using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Metadatas;
 using System;
 using System.Collections.Generic;
 
 namespace ModengTerm.Addon
 {
+    /// <summary>
+    /// 点击顶部菜单栏或者右键菜单所执行的事件处理器
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void AddonCommandDelegate(CommandArgs e);
 
     /// <summary>
     /// 插件生命周期管理
     /// 插件事件管理
-    /// 根据Activitions的值确定插件实例化的时机：
-    /// 1. 在应用程序启动的时候就实例化
-    /// 2. 在打开某个会话的时候实例化
     /// </summary>
     public abstract class AddonModule
     {

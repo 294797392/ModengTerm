@@ -32,17 +32,22 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 用来发送数据给主机（比如终端的窗口大小改变了）
         /// </summary>
-        public EngineTransport SessionTransport { get; set; }
+        public ChannelTransport SessionTransport { get; set; }
 
         /// <summary>
-        /// 终端的宽度
+        /// 终端的列大小
         /// </summary>
-        public double Width { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
-        /// 终端的高度
+        /// 终端的行大小
         /// </summary>
-        public double Height { get; set; }
+        public int Row { get; set; }
+
+        /// <summary>
+        /// 字体信息
+        /// </summary>
+        public VTypeface Typeface { get; set; }
     }
 
     public enum VTDocumentTypes
@@ -118,7 +123,7 @@ namespace ModengTerm.Terminal
 
         private string name;
 
-        private EngineTransport sessionTransport;
+        private ChannelTransport sessionTransport;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -361,14 +366,14 @@ namespace ModengTerm.Terminal
             this.name = sessionInfo.Name;
             this.isRunning = true;
             this.sessionTransport = options.SessionTransport;
-            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
-            this.readEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING));
-            this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-            this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE);
-            this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
-            this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
-            this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true); // DECAWM
-            this.renderWrite = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
+            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_WRITE_ENCODING));
+            this.readEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_READ_ENCODING));
+            this.scrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA);
+            this.colorTable = sessionInfo.GetOption<VTColorTable>(PredefinedOptions.TEHEM_COLOR_TABLE);
+            this.foregroundColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_FONT_COLOR);
+            this.backgroundColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_BACK_COLOR);
+            this.autoWrapMode = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_AUTO_WRAP_MODE); // DECAWM
+            this.renderWrite = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_RENDER_WRITE);
 
             #region 初始化数据解析器
 
@@ -392,23 +397,18 @@ namespace ModengTerm.Terminal
 
             #region 初始化文档模型
 
-            VTDocumentOptions mainOptions = VTermUtils.CreateDocumentOptions("MainDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.MainDocument);
+            VTDocumentOptions mainOptions = VTermUtils.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument, vtOptions);
             this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.Initialize();
             this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
-            VTDocumentOptions alternateOptions = VTermUtils.CreateDocumentOptions("AlternateDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.AlternateDocument);
+            VTDocumentOptions alternateOptions = VTermUtils.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument, vtOptions);
             alternateOptions.RollbackMax = 0;
             this.alternateDocument = new VTDocument(alternateOptions);
             this.alternateDocument.Initialize();
 
             this.activeDocument = this.mainDocument;
             this.Typeface = this.mainDocument.Typeface;
-
-            // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来并保存到了VTDocumentOptions里
-            // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
-            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, mainOptions.ViewportRow);
-            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, mainOptions.ViewportColumn);
 
             this.OnViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
 
@@ -1084,7 +1084,7 @@ namespace ModengTerm.Terminal
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.LocalConsole:
                     {
                         // 对Windows命令行做特殊处理
                         // Windows的命令行比较特殊，在窗口放大的时候，它不会把上面被隐藏的行显示出来，而是在下面增加了新的行
@@ -1239,7 +1239,7 @@ namespace ModengTerm.Terminal
         {
             XTermSession session = this.vtOptions.Session;
 
-            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, RenderModeEnum.Default);
+            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(PredefinedOptions.TERM_ADVANCE_RENDER_MODE);
 
             switch (renderMode)
             {

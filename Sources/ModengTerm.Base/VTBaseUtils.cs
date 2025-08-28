@@ -47,13 +47,13 @@ namespace ModengTerm.Base
             {
                 case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
-                case SessionTypeEnum.SSH:
-                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.Ssh:
+                case SessionTypeEnum.LocalConsole:
                     {
                         return true;
                     }
 
-                case SessionTypeEnum.SFTP:
+                case SessionTypeEnum.Sftp:
                     {
                         return false;
                     }
@@ -121,6 +121,10 @@ namespace ModengTerm.Base
             return true;
         }
 
+        /// <summary>
+        /// 检测当前操作系统是否是Win10或更高版本
+        /// </summary>
+        /// <returns></returns>
         public static bool IsWin10()
         {
             return Environment.OSVersion.Version.Major >= 10;
@@ -134,18 +138,6 @@ namespace ModengTerm.Base
         public static bool IsValidNetworkPort(int port)
         {
             return port > 0 && port < 65535;
-        }
-
-        public static int GetWatchInterval(WatchFrequencyEnum frequency)
-        {
-            switch (frequency)
-            {
-                case WatchFrequencyEnum.Normal: return VTBaseConsts.WatchIntervalNormal;
-                case WatchFrequencyEnum.High: return VTBaseConsts.WatchIntervalHigh;
-                case WatchFrequencyEnum.Low: return VTBaseConsts.WatchIntervalLow;
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         public static string TrimInvalidFileNameChars(string srcFileName)
@@ -162,100 +154,18 @@ namespace ModengTerm.Base
             return srcFileName;
         }
 
-        //public static VTManifest GetManifest() 
-        //{
-        //    string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
-        //    return JSONHelper.ParseFile<VTManifest>(path);
-        //}
-
-        public static System.Windows.Media.Color RgbKey2Color(string rgbKey)
-        {
-            VTColor vtColor = VTColor.CreateFromRgbKey(rgbKey);
-            return System.Windows.Media.Color.FromRgb(vtColor.R, vtColor.G, vtColor.B);
-        }
-
-        public static string Color2RgbKey(System.Windows.Media.Color color)
-        {
-            return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
-        }
-
         public static string GetSessionTypeName(SessionTypeEnum sessionType)
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.Localhost: return "local";
+                case SessionTypeEnum.LocalConsole: return "local";
                 case SessionTypeEnum.SerialPort: return "serial";
                 case SessionTypeEnum.Tcp: return "tcp";
-                case SessionTypeEnum.SFTP: return "sftp";
-                case SessionTypeEnum.SSH: return "ssh";
+                case SessionTypeEnum.Sftp: return "sftp";
+                case SessionTypeEnum.Ssh: return "ssh";
                 default:
                     throw new NotImplementedException();
             }
         }
-
-        #region UnitValue
-
-        /// <summary>
-        /// 根据大小自动计算一个用来显示的大小单位
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="unit"></param>
-        /// <returns></returns>
-        public static double ConvertToHumanReadableUnit(double bytes, out UnitType unit, int decimals = 2)
-        {
-            unit = UnitType.KB;
-
-            if (bytes == 0)
-            {
-                return 0;
-            }
-
-            double size = bytes / 1024;
-
-            if (size < 1024)
-            {
-                unit = UnitType.KB;
-                return Math.Round(size, decimals);
-            }
-
-            size = size / 1024;
-            if (size < 1024)
-            {
-                unit = UnitType.MB;
-                return Math.Round(size, decimals);
-            }
-
-            size = size / 1024;
-            if (size < 1024)
-            {
-                unit = UnitType.GB;
-                return Math.Round(size, decimals);
-            }
-
-            size = size / 1024;
-            if (size < 1024)
-            {
-                unit = UnitType.TB;
-                return Math.Round(size, decimals);
-            }
-
-            throw new NotImplementedException();
-        }
-
-        public static string Unit2Suffix(UnitType unit)
-        {
-            switch (unit)
-            {
-                case UnitType.Byte: return "Byte";
-                case UnitType.GB: return "GB";
-                case UnitType.TB: return "TB";
-                case UnitType.KB: return "KB";
-                case UnitType.MB: return "MB";
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        #endregion
     }
 }

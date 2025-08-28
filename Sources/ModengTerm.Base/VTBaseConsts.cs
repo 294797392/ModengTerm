@@ -29,25 +29,10 @@ namespace ModengTerm.Base
             Name = "根节点"
         };
 
-        public static readonly List<LineTerminators> LineTerminators = VTBaseUtils.GetEnumValues<LineTerminators>();
-
-        #region 光标闪烁时间
-
-        public const int LowSpeedBlinkInterval = 300;
-        public const int NormalSpeedBlinkInterval = 200;
-        public const int HighSpeedBlinkInterval = 100;
-
-        public const VTCursorSpeeds DefaultCursorBlinkSpeed = VTCursorSpeeds.NormalSpeed;
-        public const VTCursorStyles DefaultCursorStyle = VTCursorStyles.Line;
-
-        #endregion
-
         /// <summary>
         /// 最多保存10个最近打开的会话
         /// </summary>
         public const int MaxRecentSessions = 10;
-
-        public const int DrawFrameInterval = 40;
 
         public const int MIN_PORT = 1;
         public const int MAX_PORT = 65535;
@@ -56,35 +41,8 @@ namespace ModengTerm.Base
         public const int TerminalRows = 24;
         public const TerminalTypeEnum DefaultTerminalType = TerminalTypeEnum.XTerm256Color;
 
-        /// <summary>
-        /// 每次读取的数据缓冲区大小
-        /// </summary>
-        public const int DefaultReadBufferSize = 16384;
-
-        /// <summary>
-        /// 默认打开的会话
-        /// </summary>
-        public static readonly XTermSession DefaultSession = new XTermSession()
-        {
-            ID = Guid.Empty.ToString(),
-            Name = "命令行",
-            Type = (int)SessionTypeEnum.Localhost,
-        };
-
-        public const int DefaultTerminalColumns = 80;
-        public const int DefaultTerminalRows = 24;
         public const int DefaultTerminalScrollback = 99999;
         public const int DefaultMaxClipboardHistory = 50;
-
-        /// <summary>
-        /// 文档外边距
-        /// </summary>
-        public const int DefaultContentMargin = 5;
-
-        /// <summary>
-        /// 滚动条宽度
-        /// </summary>
-        public const int DefaultScrollbarWidth = 10;
 
         /// <summary>
         /// 默认的串口波特率列表
@@ -116,13 +74,6 @@ namespace ModengTerm.Base
         /// </summary>
         public const int DefaultScrollDelta = 1;
 
-        #region 终端字体
-
-        public static readonly Brush Foreground = Brushes.Black;
-        public static readonly double FontSize = 14;
-
-        #endregion
-
         #region SFTP
 
         public const string SFTPServerInitialDirectory = "/";
@@ -135,25 +86,9 @@ namespace ModengTerm.Base
 
         #endregion
 
-        public const string VTermAppKey_WatchInterval = "watch_interval";
-        public const int DefaultWatchInterval = 3000;
-
         /// <summary>
         /// TreeViewItem的缩进
         /// </summary>
         public const int TreeViewItemIndent = 15;
-
-        /// <summary>
-        /// 默认的输入编码方式
-        /// </summary>
-        public const string DefaultWriteEncoding = "UTF-8";
-        public const string DefaultReadEncoding = "UTF-8";
-
-        public const int WatchIntervalNormal = 2000;
-        public const int WatchIntervalHigh = 1000;
-        public const int WatchIntervalLow = 3000;
-
-        public const double DefaultMainWindowWidth = 900;
-        public const double DefaultMainWindowHeight = 700;
     }
 }

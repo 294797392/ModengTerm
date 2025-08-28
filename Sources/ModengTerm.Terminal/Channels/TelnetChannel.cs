@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Engines
 {
-    public class TelnetEngine : AbstractEngin
+    public class TelnetChannel : ChannelBase
     {
-        public TelnetEngine(XTermSession session) : 
-            base(session)
+        public TelnetChannel() 
         {
         }
 

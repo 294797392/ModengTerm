@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using XTerminal.Base.Enumerations;
 using ModengTerm.Base.DataModels;
 using System.IO;
 using ModengTerm.Base.Definitions;
@@ -16,6 +15,7 @@ using System.Security.Permissions;
 using ModengTerm.Base.DataModels.Terminal;
 using System.IO.Ports;
 using ModengTerm.Base.DataModels.Ssh;
+using ModengTerm.Base.Enumerations.Ssh;
 
 namespace ModengTerm.Base
 {
@@ -28,7 +28,7 @@ namespace ModengTerm.Base
         public static readonly string THEME_FONT_FAMILY = "宋体";
         public static readonly double THEME_FONT_SIZE = 14;
         public static readonly string THEME_FONT_COLOR = "242,242,242,255";
-        public static readonly VTCursorSpeeds THEME_CURSOR_SPEED = VTCursorSpeeds.NormalSpeed;
+        public static readonly VTCursorSpeeds THEME_CURSOR_SPEED = VTCursorSpeeds.Normal;
         public static readonly VTCursorStyles THEME_CURSOR_STYLE = VTCursorStyles.Line;
         public static readonly string THEME_CURSOR_COLOR = "255,255,255,255";
         public static readonly string THEME_ID = "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827";

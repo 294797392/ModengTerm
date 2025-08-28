@@ -1,36 +1,29 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
-using ModengTerm.Terminal.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Engines
 {
-    public class RawTcpEngine : AbstractEngin
+    public class RawTcpChannel : ChannelBase
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("RawTcpSession");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("RawTcpChannel");
 
         private TcpListener tcpListener;
         private TcpClient client;
         private NetworkStream stream;
 
-        public RawTcpEngine(XTermSession session) :
-            base(session)
+        public RawTcpChannel()
         {
         }
 
         public override int Open()
         {
-            RawTcpTypeEnum type = this.session.GetOption<RawTcpTypeEnum>(OptionKeyEnum.RAW_TCP_TYPE);
-            string ipaddr = this.session.GetOption<string>(OptionKeyEnum.RAW_TCP_ADDRESS);
-            int port = this.session.GetOption<int>(OptionKeyEnum.RAW_TCP_PORT);
+            TcpChannelOptions channelOptions = this.options as TcpChannelOptions;
+
+            RawTcpTypeEnum type = channelOptions.Type;
+            string ipaddr = channelOptions.IPAddress;
+            int port = channelOptions.Port;
 
             switch (type)
             {

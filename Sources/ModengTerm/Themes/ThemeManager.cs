@@ -40,9 +40,9 @@ namespace ModengTerm.Themes
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.Localhost: return ThemeManager.GetResource<ImageSource>("501");
+                case SessionTypeEnum.LocalConsole: return ThemeManager.GetResource<ImageSource>("501");
                 case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("503");
-                case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("502");
+                case SessionTypeEnum.Ssh: return ThemeManager.GetResource<ImageSource>("502");
                 case SessionTypeEnum.Tcp: return ThemeManager.GetResource<ImageSource>("504");
                 default:
                     throw new NotImplementedException();

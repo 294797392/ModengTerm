@@ -86,9 +86,9 @@ namespace ModengTerm
 
             switch ((VTCursorSpeeds)value)
             {
-                case VTCursorSpeeds.HighSpeed: return "快";
-                case VTCursorSpeeds.LowSpeed: return "慢";
-                case VTCursorSpeeds.NormalSpeed: return "普通";
+                case VTCursorSpeeds.High: return "快";
+                case VTCursorSpeeds.Low: return "慢";
+                case VTCursorSpeeds.Normal: return "普通";
                 default:
                     throw new NotImplementedException();
             }
@@ -488,9 +488,9 @@ namespace ModengTerm
                         switch (type)
                         {
                             case SessionTypeEnum.SerialPort: return "串口";
-                            case SessionTypeEnum.SSH: return "SSH";
-                            case SessionTypeEnum.Localhost: return "命令行";
-                            case SessionTypeEnum.SFTP: return "SFTP";
+                            case SessionTypeEnum.Ssh: return "SSH";
+                            case SessionTypeEnum.LocalConsole: return "命令行";
+                            case SessionTypeEnum.Sftp: return "SFTP";
 
                             default:
                                 throw new NotImplementedException();

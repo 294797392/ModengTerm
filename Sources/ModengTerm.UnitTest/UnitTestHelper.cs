@@ -2,7 +2,6 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
@@ -234,10 +233,10 @@ namespace ModengTerm.UnitTest
 
             // 重写测试使用的Session参数
             XTermSession session = manifest.DefaultSession;
-            session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, 1000);
-            session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.Fixed);
-            session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
-            session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, col);
+            session.SetOption<int>(PredefinedOptions.TERM_MAX_ROLLBACK, 1000);
+            session.SetOption<TerminalSizeModeEnum>(PredefinedOptions.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.Fixed);
+            session.SetOption<int>(PredefinedOptions.SSH_TERM_ROW, row);
+            session.SetOption<int>(PredefinedOptions.SSH_TERM_COL, col);
 
             return session;
         }
@@ -277,7 +276,7 @@ namespace ModengTerm.UnitTest
 
             // 重写测试使用的Session参数
             XTermSession session = manifest.DefaultSession;
-            session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, 1000);
+            session.SetOption<int>(PredefinedOptions.TERM_MAX_ROLLBACK, 1000);
 
             VTOptions options = new VTOptions()
             {

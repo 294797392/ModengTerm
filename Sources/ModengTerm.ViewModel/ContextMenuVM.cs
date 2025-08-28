@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Metadatas;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel

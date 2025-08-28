@@ -411,7 +411,7 @@
                                               Style="{StaticResource ExpandCollapseToggleStyle}" />
 
                                 <ContentPresenter Grid.Column="1" x:Name="PART_Header" ContentSource="Header" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
 
                             </Grid>
 

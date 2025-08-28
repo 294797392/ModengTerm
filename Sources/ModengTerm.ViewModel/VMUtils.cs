@@ -1,10 +1,7 @@
-﻿using DotNEToolkit;
-using ModengTerm.Addon.Interactive;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Document;
 using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Session;
 using WPFToolkit.MVVM;

@@ -13,8 +13,8 @@ namespace ModengTerm.Terminal.Keyboard
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.Localhost:
-                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Ssh:
                     return new DefaultKeyboard();
 
                 case SessionTypeEnum.Tcp: return new TcpKeyboard();

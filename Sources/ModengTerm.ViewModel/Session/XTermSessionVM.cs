@@ -77,19 +77,19 @@ namespace ModengTerm.ViewModel.Session
             {
                 case SessionTypeEnum.SerialPort:
                     {
-                        URI = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+                        URI = session.GetOption<string>(PredefinedOptions.SERIAL_PORT_NAME);
                         break;
                     }
 
-                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.Ssh:
                     {
-                        URI = session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+                        URI = session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR);
                         break;
                     }
 
-                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.LocalConsole:
                     {
-                        URI = session.GetOption(OptionKeyEnum.CMD_STARTUP_PATH, OptionDefaultValues.CMD_STARTUP_PATH);
+                        URI = session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH);
                         break;
                     }
 

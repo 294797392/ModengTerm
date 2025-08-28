@@ -5,7 +5,7 @@ using System.IO.Ports;
 
 namespace ModengTerm.Terminal.Engines
 {
-    public class SerialPortEngine : AbstractEngin
+    public class SerialPortChannel : ChannelBase
     {
         #region 类变量
 
@@ -21,23 +21,24 @@ namespace ModengTerm.Terminal.Engines
 
         #region 构造方法
 
-        public SerialPortEngine(XTermSession options) :
-            base(options)
+        public SerialPortChannel()
         {
         }
 
         #endregion
 
-        #region SessionDriver
+        #region ChannelBase
 
         public override int Open()
         {
-            string portName = this.session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
-            int baudRate = this.session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
-            int dataBits = this.session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_DATA_BITS);
-            StopBits stopBits = this.session.GetOption<StopBits>(OptionKeyEnum.SERIAL_PORT_STOP_BITS);
-            Parity parity = this.session.GetOption<Parity>(OptionKeyEnum.SERIAL_PORT_PARITY);
-            Handshake handshake = this.session.GetOption<Handshake>(OptionKeyEnum.SERIAL_PORT_HANDSHAKE);
+            SerialPortChannelOptions channelOptions = this.options as SerialPortChannelOptions;
+
+            string portName = channelOptions.PortName;
+            int baudRate = channelOptions.BaudRate;
+            int dataBits = channelOptions.DataBits;
+            StopBits stopBits = channelOptions.StopBits;
+            Parity parity = channelOptions.Parity;
+            Handshake handshake = channelOptions.Handshake;
 
             try
             {

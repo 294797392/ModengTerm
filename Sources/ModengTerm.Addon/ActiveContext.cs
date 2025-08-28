@@ -1,12 +1,6 @@
-﻿using ModengTerm.Addon;
-using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
-using ModengTerm.Base.Definitions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ModengTerm.Base.Metadatas;
 
 namespace ModengTerm.Addon
 {

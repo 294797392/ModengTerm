@@ -43,7 +43,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public XTermSession Session { get; set; }
 
-        public EngineTransport Transport { get; set; }
+        public ChannelTransport Transport { get; set; }
 
         public ModemTypeEnum Type { get; set; }
 
@@ -175,7 +175,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         #region 事件处理器
 
-        private void Transport_DataReceived(EngineTransport transport, byte[] buffer, int size)
+        private void Transport_DataReceived(ChannelTransport transport, byte[] buffer, int size)
         {
             synchronizedStream.Write(buffer, size);
         }

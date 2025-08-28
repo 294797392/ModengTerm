@@ -27,7 +27,7 @@ namespace ModengTerm.Terminal.FileWatch
 
         public XTermSession Session { get; set; }
 
-        public AbstractEngin SessionDriver { get; set; }
+        public ChannelBase SessionDriver { get; set; }
 
         /// <summary>
         /// 判断是否有数据可读

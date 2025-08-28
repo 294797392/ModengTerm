@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Animation;
 
-namespace ModengTerm.Base.Definitions
+namespace ModengTerm.Base.Metadatas
 {
     /// <summary>
     /// 定义一个插件的所有内容
@@ -55,12 +55,19 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("overlayPanels")]
         public List<OverlayPanelMetadata> OverlayPanels { get; private set; }
 
+        /// <summary>
+        /// 首选项面板
+        /// </summary>
+        [JsonProperty("preferences")]
+        public List<PreferenceMetadata> Preferences { get; private set; }
+
         public AddonMetadata()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
             this.SidePanels = new List<SidePanelMetadata>();
             this.OverlayPanels = new List<OverlayPanelMetadata>();
+            this.Preferences = new List<PreferenceMetadata>();
         }
     }
 }

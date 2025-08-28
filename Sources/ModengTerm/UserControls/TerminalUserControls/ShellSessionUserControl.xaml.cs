@@ -548,14 +548,14 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         public int Open(OpenedSessionVM sessionVM)
         {
-            this.scrollDelta = this.Session.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
-            this.clickToCursor = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, OptionDefaultValues.TERM_ADVANCE_CLICK_TO_CURSOR);
-            this.rightClickActions = this.Session.GetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, OptionDefaultValues.BEHAVIOR_RIGHT_CLICK);
+            this.scrollDelta = this.Session.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA);
+            this.clickToCursor = this.Session.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_CLICK_TO_CURSOR);
+            this.rightClickActions = this.Session.GetOption<RightClickActions>(PredefinedOptions.BEHAVIOR_RIGHT_CLICK);
 
             // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
-            string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACK_COLOR);
+            string background = this.Session.GetOption<string>(PredefinedOptions.THEME_BACK_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
-            string base64Image = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
+            string base64Image = this.Session.GetOption<string>(PredefinedOptions.THEME_BACKGROUND_IMAGE_DATA);
             if (!string.IsNullOrEmpty(base64Image))
             {
                 try
@@ -569,7 +569,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     logger.Error("加载背景图片异常", ex);
                 }
 
-                ImageBackground.Opacity = this.Session.GetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
+                ImageBackground.Opacity = this.Session.GetOption<double>(PredefinedOptions.THEME_BACKGROUND_IMAGE_OPACITY);
             }
 
             this.shellSession = sessionVM as ShellSessionVM;
@@ -578,7 +578,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             // DispatcherPriority.Loaded保证DrawArea不为空
             base.Dispatcher.BeginInvoke(new Action(() =>
             {
-                double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+                double padding = this.Session.GetOption<double>(PredefinedOptions.SSH_THEME_DOCUMENT_PADDING);
                 DocumentAlternate.Visibility = Visibility.Collapsed;
                 DocumentAlternate.Padding = new Thickness(padding);
                 DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;

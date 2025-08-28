@@ -11,6 +11,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
+using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Enumerations;
 using ModengTerm.Terminal;
@@ -120,27 +121,7 @@ namespace ModengTerm
 
         private void OpenDefaultSession()
         {
-            XTermSession defaultSession = VTApp.Context.Manifest.DefaultSession;
-            if (defaultSession == null)
-            {
-                return;
-            }
-
-            string cmdPath = System.IO.Path.Combine(Environment.SystemDirectory, "cmd.exe");
-            defaultSession.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, cmdPath);
-
-            // 如果是Win10或者更高版本的操作系统，那么使用PseudoConsoleAPI
-            if (VTBaseUtils.IsWin10())
-            {
-                defaultSession.SetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER, Win32ConsoleEngineEnum.Win10PseudoConsoleApi);
-            }
-            else
-            {
-                // 如果是Win10以下的系统，使用winpty.dll
-                defaultSession.SetOption<Win32ConsoleEngineEnum>(OptionKeyEnum.CMD_DRIVER, Win32ConsoleEngineEnum.winpty);
-            }
-
-            this.OpenSession(defaultSession, false);
+            this.OpenSession(ClientUtils.DefaultSession, false);
         }
 
         private void CloseSession(OpenedSessionVM session)
@@ -315,7 +296,7 @@ namespace ModengTerm
                 return false;
             }
 
-            Key pressedKey = VTClientUtils.GetPressedKey(e);
+            Key pressedKey = ClientUtils.GetPressedKey(e);
             if (pressedKey == Key.ImeProcessed)
             {
                 this.kstat = HotkeyState.Key1;
@@ -326,7 +307,7 @@ namespace ModengTerm
             if (this.lastPressedKey == pressedKey)
             {
                 // 只处理重复的快捷键
-                if (!VTClientUtils.IsLetter(pressedKey) && !VTClientUtils.IsNumeric(pressedKey))
+                if (!ClientUtils.IsLetter(pressedKey) && !ClientUtils.IsNumeric(pressedKey))
                 {
                     return false;
                 }
@@ -355,7 +336,7 @@ namespace ModengTerm
                             // 没有按其他修饰键
 
                             // 只处理数字键和字母键
-                            if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                            if (ClientUtils.IsLetter(pressedKey) || ClientUtils.IsNumeric(pressedKey))
                             {
                                 logger.DebugFormat("SingleKey exec");
 
@@ -396,7 +377,7 @@ namespace ModengTerm
 
                         // 此时修饰键没变，看是否按了快捷键
 
-                        if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                        if (ClientUtils.IsLetter(pressedKey) || ClientUtils.IsNumeric(pressedKey))
                         {
                             logger.DebugFormat("DoubleModKey exec");
 
@@ -419,7 +400,7 @@ namespace ModengTerm
                     {
                         // 处理类似于Ctrl+A,B的情况
 
-                        if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                        if (ClientUtils.IsLetter(pressedKey) || ClientUtils.IsNumeric(pressedKey))
                         {
                             execute = true;
 
@@ -461,7 +442,7 @@ namespace ModengTerm
                 modKeys = this.secondPressedModKeys;
             }
 
-            string hotKey = VTClientUtils.GetHotkeyName(modKeys, this.pressedKeys, doubleModKeys);
+            string hotKey = ClientUtils.GetHotkeyName(modKeys, this.pressedKeys, doubleModKeys);
             if (string.IsNullOrEmpty(hotKey))
             {
                 return false;
@@ -479,7 +460,7 @@ namespace ModengTerm
         {
             AddonMetadata metadata = addon.Metadata;
 
-            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scopes.Contains(PanelScope.Client)).ToList();
+            List<SidePanelMetadata> panelMetadatas = metadata.SidePanels.Where(v => v.Scopes.Count == 0).ToList();
 
             foreach (SidePanelMetadata panelMetadata in panelMetadatas)
             {
@@ -491,25 +472,25 @@ namespace ModengTerm
         /// 初始化会话侧边栏窗口
         /// </summary>
         /// <param name="openedSessionVM"></param>
-        private void CreateTabedSidePanel(OpenedSessionVM openedSessionVM)
+        private void CreateScopedSidePanel(OpenedSessionVM openedSessionVM)
         {
             foreach (AddonModule addon in this.addons)
             {
                 AddonMetadata metadata = addon.Metadata;
 
-                List<SidePanelMetadata> sidePanelMetadatas = VTClientUtils.GetTabedPanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
+                List<SidePanelMetadata> sidePanelMetadatas = ClientUtils.GetScopedPanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
 
                 openedSessionVM.CreateSidePanels(sidePanelMetadatas);
             }
         }
 
-        private void CreateTabedOverlayPanel(OpenedSessionVM openedSessionVM) 
+        private void CreateScopedOverlayPanel(OpenedSessionVM openedSessionVM) 
         {
             foreach (AddonModule addon in this.addons)
             {
                 AddonMetadata metadata = addon.Metadata;
 
-                List<OverlayPanelMetadata> overlayPanelMetadatas = VTClientUtils.GetTabedPanelMetadatas(metadata.OverlayPanels, openedSessionVM.Type);
+                List<OverlayPanelMetadata> overlayPanelMetadatas = ClientUtils.GetScopedPanelMetadatas(metadata.OverlayPanels, openedSessionVM.Type);
 
                 openedSessionVM.CreateOverlayPanels(overlayPanelMetadatas);
             }
@@ -955,8 +936,8 @@ namespace ModengTerm
 
             // 会话打开之后再创建需要显示的面板
             // 面板里可能会用到会话里的数据
-            this.CreateTabedSidePanel(openedSessionVM);
-            this.CreateTabedOverlayPanel(openedSessionVM);
+            this.CreateScopedSidePanel(openedSessionVM);
+            this.CreateScopedOverlayPanel(openedSessionVM);
             this.mainWindowVM.AddSidePanels(openedSessionVM.SidePanels);
         }
 
@@ -991,49 +972,6 @@ namespace ModengTerm
         #endregion
 
         #region 命令响应
-
-        private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            throw new RefactorImplementedException();
-
-            //CommandVM shellCommand = e.Parameter as CommandVM;
-            //if (shellCommand == null)
-            //{
-            //    return;
-            //}
-
-            //InputSessionVM inputSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-            //if (inputSession == null)
-            //{
-            //    return;
-            //}
-
-            //switch (shellCommand.Type)
-            //{
-            //    case CommandTypeEnum.PureText:
-            //        {
-            //            string command = shellCommand.Command;
-            //            inputSession.SendText(command);
-            //            break;
-            //        }
-
-            //    case CommandTypeEnum.HexData:
-            //        {
-            //            byte[] bytes;
-            //            if (!VTBaseUtils.TryParseHexString(shellCommand.Command, out bytes))
-            //            {
-            //                MTMessageBox.Info("发送失败, 十六进制数据格式错误");
-            //                return;
-            //            }
-
-            //            inputSession.SendRawData(bytes);
-            //            break;
-            //        }
-
-            //    default:
-            //        throw new NotImplementedException();
-            //}
-        }
 
         private void OpenSessionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {

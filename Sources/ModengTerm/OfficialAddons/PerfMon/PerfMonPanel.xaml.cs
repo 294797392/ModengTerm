@@ -113,7 +113,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
         private void UpdateSshPerfMon() 
         {
             IClientShellTab shellTab = this.Tab as IClientShellTab;
-            ISshEngine sshEngine = shellTab.GetSshEngine();
+            ISshChannel sshEngine = shellTab.GetSshEngine();
 
             this.UpdateSshMem(sshEngine);
             this.UpdateSshCpu(sshEngine);
@@ -122,7 +122,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
             this.UpdateSshProcess(sshEngine);
         }
 
-        private void UpdateSshMem(ISshEngine sshEngine) 
+        private void UpdateSshMem(ISshChannel sshEngine) 
         {
             string meminfo = sshEngine.ExecuteScript("cat /proc/meminfo");
             string[] items = meminfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -151,7 +151,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
             this.cpuMem.MemoryPercent = Math.Round((double)usageMem / totalMem * 100, 2);
         }
 
-        private void UpdateSshCpu(ISshEngine sshEngine) 
+        private void UpdateSshCpu(ISshChannel sshEngine) 
         {
             ulong userProcessorTime, kernelProcesstorTime, idleProcesstorTime;
 
@@ -185,7 +185,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
             this.prevUserProcessorTime = userProcessorTime;
         }
 
-        private void UpdateSshDisks(ISshEngine sshEngine)
+        private void UpdateSshDisks(ISshChannel sshEngine)
         {
             string df = sshEngine.ExecuteScript("df");
 
@@ -268,7 +268,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
             }
         }
 
-        private void UpdateSshNetDevices(ISshEngine sshEngine)
+        private void UpdateSshNetDevices(ISshChannel sshEngine)
         {
             string netdev = sshEngine.ExecuteScript(FetchNetworkInterfaces);
 
@@ -320,7 +320,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
             }
         }
 
-        private void UpdateSshProcess(ISshEngine sshEngine)
+        private void UpdateSshProcess(ISshChannel sshEngine)
         {
             string process = sshEngine.ExecuteScript(FetchProcess);
 
@@ -811,13 +811,13 @@ namespace ModengTerm.OfficialAddons.PerfMon
 
             switch (this.Tab.Type)
             {
-                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.Ssh:
                     {
                         this.UpdateSshPerfMon();
                         break;
                     }
 
-                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.LocalConsole:
                     {
                         this.UpdateWin32PerfMon();
                         break;

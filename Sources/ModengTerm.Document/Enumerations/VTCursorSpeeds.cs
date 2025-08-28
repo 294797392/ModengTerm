@@ -15,16 +15,16 @@ namespace ModengTerm.Document.Enumerations
         /// <summary>
         /// 高速闪烁
         /// </summary>
-        HighSpeed = 300,
+        High = 300,
 
         /// <summary>
         /// 中速
         /// </summary>
-        NormalSpeed = 600,
+        Normal = 600,
 
         /// <summary>
         /// 低速
         /// </summary>
-        LowSpeed = 900,
+        Low = 900,
     }
 }

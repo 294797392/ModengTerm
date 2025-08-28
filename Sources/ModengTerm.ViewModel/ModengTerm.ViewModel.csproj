@@ -17,9 +17,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CreateSession\SessionOptions\**" />
+    <Compile Remove="CreateSession\TerminalOptions\**" />
+    <EmbeddedResource Remove="CreateSession\SessionOptions\**" />
+    <EmbeddedResource Remove="CreateSession\TerminalOptions\**" />
+    <None Remove="CreateSession\SessionOptions\**" />
+    <None Remove="CreateSession\TerminalOptions\**" />
+    <Page Remove="CreateSession\SessionOptions\**" />
+    <Page Remove="CreateSession\TerminalOptions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="ContextMenuData.cs" />
-    <Compile Remove="CreateSession\SessionOptions\LoginScriptOptionVM.cs" />
-    <Compile Remove="CreateSession\SessionOptions\SystemWatchOptionVM.cs" />
+    <Compile Remove="CreateSession\OptionContentVM.cs" />
     <Compile Remove="Panels\HostOverlayPanel.cs" />
     <Compile Remove="Terminal\InputSessionVM.cs" />
     <Compile Remove="Terminal\PlaybackSessionVM.cs" />
