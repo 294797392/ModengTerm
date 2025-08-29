@@ -42,7 +42,7 @@ namespace ModengTerm.Windows.SSH
 
         private void InitializeWindow() 
         {
-            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.serviceAgent = ServiceAgentFactory.Get();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)

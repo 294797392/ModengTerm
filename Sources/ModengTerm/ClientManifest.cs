@@ -9,14 +9,8 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base
 {
-    public class VTManifest : AppManifest
+    public class ClientManifest : AppManifest
     {
-        /// <summary>
-        /// 支持的会话列表
-        /// </summary>
-        [JsonProperty("sessions")]
-        public List<SessionDefinition> SessionList { get; private set; }
-
         /// <summary>
         /// 默认顶部根菜单
         /// </summary>
@@ -53,9 +47,8 @@ namespace ModengTerm.Base
         [JsonProperty("addons")]
         public List<AddonMetadata> Addons { get; private set; }
 
-        public VTManifest()
+        public ClientManifest()
         {
-            this.SessionList = new List<SessionDefinition>();
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.AppThemes = new List<AppTheme>();
             this.FontSizeList = new List<FontSizeDefinition>();
@@ -64,5 +57,4 @@ namespace ModengTerm.Base
             this.Addons = new List<AddonMetadata>();
         }
     }
-
 }

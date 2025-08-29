@@ -217,8 +217,6 @@ namespace ModengTerm.Terminal
         /// </summary>
         private RendererBase renderer;
 
-        private BellPlayer bellPlayer;
-
         private VTextPointer textPointer;
 
         /// <summary>
@@ -359,7 +357,6 @@ namespace ModengTerm.Terminal
 
             #endregion
 
-            this.bellPlayer = VTApp.Context.Factory.LookupModule<BellPlayer>();
             this.textPointer = new VTextPointer();
 
             // 初始化变量
@@ -1944,7 +1941,7 @@ namespace ModengTerm.Terminal
                         // 响铃
                         if (!this.DisableBell)
                         {
-                            this.bellPlayer.Enqueue();
+                            BellPlayer.Enqueue();
                         }
                         break;
                     }

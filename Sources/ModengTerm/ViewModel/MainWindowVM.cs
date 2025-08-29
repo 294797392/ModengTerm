@@ -1,14 +1,15 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon.Controls;
-using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Terminal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -86,9 +87,9 @@ namespace ModengTerm.ViewModel
 
         #region 构造方法
 
-        private MainWindowVM()
+        public MainWindowVM()
         {
-            serviceAgent = VTApp.Context.ServiceAgent;
+            this.serviceAgent = ServiceAgentFactory.Get();
 
             this.PanelContainers = new Dictionary<SidePanelDocks, PanelContainer>();
             List<SidePanelDocks> docks = VTBaseUtils.GetEnumValues<SidePanelDocks>();
@@ -102,9 +103,9 @@ namespace ModengTerm.ViewModel
             this.SessionList = new BindableCollection<SessionItemVM>();
             this.SessionList.Add(OpenSessionVM);
 
-            List<XTermSession> sessions = serviceAgent.GetSessions();
+            List<XTermSession> sessions = this.serviceAgent.GetSessions();
             this.RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();
-            List<RecentlySession> recentSessions = serviceAgent.GetRecentSessions();
+            List<RecentlySession> recentSessions = this.serviceAgent.GetRecentSessions();
             foreach (RecentlySession recentSession in recentSessions)
             {
                 RecentlySessionVM recentlySessionVM = new RecentlySessionVM(recentSession);
@@ -115,7 +116,7 @@ namespace ModengTerm.ViewModel
             this.TitleMenus.AddRange(VMUtils.CreateContextMenuVMs(true));
 
             this.Themes = new BindableCollection<AppThemeVM>();
-            this.Themes.AddRange(VTApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
+            this.Themes.AddRange(ClientContext.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
             this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
         }
 
@@ -230,19 +231,6 @@ namespace ModengTerm.ViewModel
         {
             PanelContainer container = this.PanelContainers[metadata.Dock];
             return container.Panels.FirstOrDefault(v => v.Metadata == metadata);
-        }
-
-        /// <summary>
-        /// 获取MainWindowVM的实例
-        /// </summary>
-        /// <returns></returns>
-        public static MainWindowVM GetInstance()
-        {
-            if (instance == null)
-            {
-                instance = new MainWindowVM();
-            }
-            return instance;
         }
 
         #endregion

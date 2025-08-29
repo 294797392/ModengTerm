@@ -41,7 +41,7 @@ namespace ModengTerm.Base.DataModels
         }
 
         /// <summary>
-        /// TODO：删除该方法，改用带有defaultValue的方法
+        /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
@@ -50,23 +50,7 @@ namespace ModengTerm.Base.DataModels
         public T GetOption<T>(string key)
         {
             Dictionary<string, object> options = this.Options["3738D66F-9B8A-BB45-C823-22DAF39AAAF6"];
-
-            object value = options[key];
-
-            Type type = typeof(T);
-
-            if (type == typeof(string))
-            {
-                return (T)options[key];
-            }
-
-            if (type.IsClass)
-            {
-                string svalue = options[key].ToString();
-                return JsonConvert.DeserializeObject<T>(svalue);
-            }
-         
-            return options.GetValue<T>(key);
+            return options.GetOptions<T>(key);
         }
     }
 }

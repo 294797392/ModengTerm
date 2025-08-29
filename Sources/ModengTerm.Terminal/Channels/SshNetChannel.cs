@@ -4,6 +4,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Ssh;
+using ModengTerm.Base.ServiceAgents;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.IO;
@@ -75,7 +76,9 @@ namespace ModengTerm.Terminal.Engines
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        PrivateKey privateKey = VTApp.Context.ServiceAgent.GetPrivateKey(channelOptions.PrivateKeyId);
+                        ServiceAgent serviceAgent = ServiceAgentFactory.Get();
+
+                        PrivateKey privateKey = serviceAgent.GetPrivateKey(channelOptions.PrivateKeyId);
                         if (privateKey == null)
                         {
                             logger.ErrorFormat("登录失败, 密钥不存在");

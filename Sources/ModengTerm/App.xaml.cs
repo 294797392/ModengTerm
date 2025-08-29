@@ -44,7 +44,7 @@ namespace ModengTerm
         {
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
 
-            VTApp.Context.Initialize("app.json");
+            ClientContext.Context.Initialize("app.json");
         }
     }
 }

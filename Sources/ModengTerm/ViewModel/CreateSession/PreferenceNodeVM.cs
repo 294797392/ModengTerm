@@ -14,7 +14,7 @@ namespace ModengTerm.ViewModel.CreateSession
         /// <summary>
         /// 界面入口类
         /// </summary>
-        public string ClassName { get { return this.Metadata.ClassName; } }
+        public string ClassName { get; set; }
 
         /// <summary>
         /// 界面实例
@@ -27,13 +27,14 @@ namespace ModengTerm.ViewModel.CreateSession
         public AddonMetadata AddonMetadata { get; set; }
 
         /// <summary>
-        /// 配置项的元数据
+        /// 配置项的默认值列表
         /// </summary>
-        public PreferenceMetadata Metadata { get; set; }
+        public Dictionary<string, object> DefaultOptions { get; private set; }
 
         public PreferenceNodeVM(TreeViewModelContext context) :
             base(context)
         {
+            this.DefaultOptions = new Dictionary<string, object>();
         }
     }
 }

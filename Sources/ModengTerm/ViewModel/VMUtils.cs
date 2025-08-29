@@ -4,6 +4,8 @@ using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Session;
+using System.Collections.Generic;
+using System.Linq;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -19,7 +21,7 @@ namespace ModengTerm.ViewModel
         /// <param name="includeRootNode">是否包含根节点分组（Root）</param>
         public static SessionTreeVM CreateSessionTreeVM(bool onlyGroup = false, bool includeRootNode = false)
         {
-            ServiceAgent serviceAgent = VTApp.Context.ServiceAgent;
+            ServiceAgent serviceAgent = ServiceAgentFactory.Get();
 
             SessionTreeVM sessionTreeVM = new SessionTreeVM();
             TreeViewModelContext context = sessionTreeVM.Context;
@@ -95,11 +97,11 @@ namespace ModengTerm.ViewModel
             if (toolbarMenu)
             {
                 // 先加载所有的根节点菜单
-                menuItems.AddRange(VTApp.Context.Manifest.ToolbarMenus);
+                menuItems.AddRange(ClientContext.Context.Manifest.ToolbarMenus);
             }
 
             // 再加载所有的插件菜单
-            foreach (AddonMetadata addon in VTApp.Context.Manifest.Addons)
+            foreach (AddonMetadata addon in ClientContext.Context.Manifest.Addons)
             {
                 List<AddonMenuDefinition> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
 

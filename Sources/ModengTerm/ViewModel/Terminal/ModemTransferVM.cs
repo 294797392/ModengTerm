@@ -3,6 +3,9 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Engines;
 using ModengTerm.Terminal.Modem;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Terminal

@@ -89,7 +89,7 @@ namespace ModengTerm.ViewModel.Session
 
                 case SessionTypeEnum.LocalConsole:
                     {
-                        URI = session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH);
+                        URI = session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH);
                         break;
                     }
 

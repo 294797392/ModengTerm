@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
 using System.Windows.Controls;

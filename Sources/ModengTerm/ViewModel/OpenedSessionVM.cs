@@ -8,6 +8,8 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using WPFToolkit.MVVM;
 
@@ -43,11 +45,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 属性
-
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        public ServiceAgent ServiceAgent { get; set; }
 
         /// <summary>
         /// 界面上的控件

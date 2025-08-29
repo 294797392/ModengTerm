@@ -7,6 +7,7 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using WPFToolkit.MVVM;
 using Color = System.Windows.Media.Color;
 
@@ -25,7 +26,6 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
         private string backImageUri;
         private double backImageOpacity;
         private string backImageName;
-        private VTManifest manifest;
 
         #endregion
 
@@ -178,9 +178,7 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
 
         public override void OnInitialize()
         {
-            VTManifest manifest = VTApp.Context.Manifest;
-
-            this.manifest = manifest;
+            ClientManifest manifest = ClientContext.Context.Manifest;
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             InstalledFontCollection installedFont = new InstalledFontCollection();

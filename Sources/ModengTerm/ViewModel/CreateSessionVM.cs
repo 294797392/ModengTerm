@@ -1,4 +1,6 @@
-﻿using ModengTerm.Addon.Controls;
+﻿using log4net.Appender;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Ssh;
@@ -7,12 +9,14 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.Metadatas;
-using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.CreateSession;
 using ModengTerm.ViewModel.Session;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Net;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
@@ -52,10 +56,6 @@ namespace ModengTerm.ViewModel
         private string sftpServerInitialDir;
         private string sftpClientInitialDir;
 
-        private ServiceAgent serviceAgent;
-
-        private VTManifest appManifest;
-
         private bool bookmarkVisible;
 
         #region 命令行
@@ -85,11 +85,6 @@ namespace ModengTerm.ViewModel
         /// 当前选中的菜单节点
         /// </summary>
         private MenuItemVM selectedMenuNode;
-
-        /// <summary>
-        /// 当前正在编辑的会话
-        /// </summary>
-        private XTermSession session;
 
         /// <summary>
         /// 当前选择的SessionType -> SessionType要显示的首选项界面列表
@@ -142,7 +137,7 @@ namespace ModengTerm.ViewModel
                         #endregion
 
                         // 选中第一个有界面的节点
-                        PreferenceNodeVM node = preferenceItems.FirstOrDefault(v => !string.IsNullOrEmpty(v.Metadata.ClassName));
+                        PreferenceNodeVM node = preferenceItems.FirstOrDefault(v => !string.IsNullOrEmpty(v.ClassName));
                         if (node != null)
                         {
                             node.IsSelected = true;
@@ -555,13 +550,9 @@ namespace ModengTerm.ViewModel
 
         #region 构造方法
 
-        public CreateSessionVM(ServiceAgent serviceAgent)
+        public CreateSessionVM()
         {
             this.Name = "新建会话";
-            this.serviceAgent = serviceAgent;
-            this.appManifest = VTApp.Context.Manifest;
-            this.session = this.CreateDefaultSession();
-            //this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             this.sessionType2Preference = new Dictionary<SessionTypeEnum, List<PreferenceNodeVM>>();
 
             #region 加载参数树形列表
@@ -576,7 +567,7 @@ namespace ModengTerm.ViewModel
             #region 会话类型和会话分组
 
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
-            foreach (SessionDefinition session in appManifest.SessionList)
+            foreach (SessionMetadata session in VTBaseConsts.SessionMetadatas)
             {
                 this.SessionTypeList.Add(new SessionTypeVM(session));
             }
@@ -692,25 +683,45 @@ namespace ModengTerm.ViewModel
 
         private void InitializePreferenceTree()
         {
-            foreach (AddonMetadata metadata in VTApp.Context.Manifest.Addons)
+            foreach (AddonMetadata metadata in ClientContext.Context.Manifest.Addons)
             {
-                this.LoadChildrenPreference(metadata, null, metadata.Preferences);
+                if (metadata.Preferences.Count == 0)
+                {
+                    continue;
+                }
+
+                this.LoadChildPreference(metadata, null, metadata.Preferences);
             }
         }
 
-        private void LoadChildrenPreference(AddonMetadata addonMetadata, PreferenceNodeVM parent, List<PreferenceMetadata> children)
+        private void LoadChildPreference(AddonMetadata addonMetadata, PreferenceNodeVM parent, List<PreferenceMetadata> children)
         {
-            foreach (PreferenceMetadata preferenceMetadata in children)
+            foreach (PreferenceMetadata metadata in children)
             {
                 PreferenceNodeVM pivm = new PreferenceNodeVM(this.PreferenceTreeVM.Context);
-                pivm.ID = preferenceMetadata.ID;
-                pivm.Name = preferenceMetadata.Name;
-                pivm.Metadata = preferenceMetadata;
+                pivm.ID = metadata.ID;
+                pivm.Name = metadata.Name;
+                pivm.ClassName = metadata.ClassName;
                 pivm.AddonMetadata = addonMetadata;
                 pivm.IsVisible = false;
                 pivm.Level = parent == null ? 0 : parent.Level + 1;
 
-                foreach (SessionTypeEnum scope in preferenceMetadata.Scopes)
+                // 加载树形列表的时候就把配置项里的变量解析掉，这样就不用每次保存的时候再解析一遍了
+                foreach (KeyValuePair<string, object> kv in metadata.DefaultOptions)
+                {
+                    if (kv.Value is string)
+                    {
+                        // 如果默认配置项是字符串类型，那么判断是否包含变量
+                        pivm.DefaultOptions[kv.Key] = VTBaseUtils.ReplaceVariable(kv.Value.ToString());
+                    }
+                    else
+                    {
+                        pivm.DefaultOptions[kv.Key] = kv.Value;
+                    }
+                }
+
+                // 保存不同的会话所需要显示的配置项界面列表
+                foreach (SessionTypeEnum scope in metadata.Scopes)
                 {
                     List<PreferenceNodeVM> pivms;
                     if (!this.sessionType2Preference.TryGetValue(scope, out pivms))
@@ -722,8 +733,10 @@ namespace ModengTerm.ViewModel
                     pivms.Add(pivm);
                 }
 
-                this.LoadChildrenPreference(addonMetadata, pivm, preferenceMetadata.Children);
+                // 加载子级配置项
+                this.LoadChildPreference(addonMetadata, pivm, metadata.Children);
 
+                // 配置项添加到树里
                 if (parent == null)
                 {
                     this.PreferenceTreeVM.AddRootNode(pivm);
@@ -1067,7 +1080,7 @@ namespace ModengTerm.ViewModel
                 if (preferencePanel == null)
                 {
                     // 如果没有打开过配置项界面，或者配置项界面没有实现IPreferencePanel，那么保存默认配置项
-                    foreach (KeyValuePair<string, object> kv in pNode.Metadata.DefaultOptions)
+                    foreach (KeyValuePair<string, object> kv in pNode.DefaultOptions)
                     {
                         sessionOptions[kv.Key] = kv.Value;
                     }
@@ -1087,93 +1100,6 @@ namespace ModengTerm.ViewModel
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// 创建一个所有选项都是默认值的会话
-        /// </summary>
-        /// <returns></returns>
-        private XTermSession CreateDefaultSession()
-        {
-            XTermSession session = new XTermSession();
-
-            //session.SetOption(OptionKeyEnum.SSH_TERM_ROW, OptionDefaultValues.SSH_TERM_ROW);
-            //session.SetOption(OptionKeyEnum.SSH_TERM_COL, OptionDefaultValues.SSH_TERM_COL);
-            //session.SetOption(OptionKeyEnum.SSH_TERM_TYPE, OptionDefaultValues.SSH_TERM_TYPE);
-            //session.SetOption(OptionKeyEnum.SSH_TERM_SIZE_MODE, OptionDefaultValues.SSH_TERM_SIZE_MODE);
-            //session.SetOption(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING);
-            //session.SetOption(OptionKeyEnum.SSH_READ_BUFFER_SIZE, OptionDefaultValues.SSH_READ_BUFFER_SIZE);
-            //session.SetOption(OptionKeyEnum.THEME_FONT_FAMILY, OptionDefaultValues.THEME_FONT_FAMILY);
-            //session.SetOption(OptionKeyEnum.THEME_FONT_SIZE, OptionDefaultValues.THEME_FONT_SIZE);
-            //session.SetOption(OptionKeyEnum.THEME_FONT_COLOR, OptionDefaultValues.THEME_FONT_COLOR);
-            //session.SetOption(OptionKeyEnum.THEME_CURSOR_SPEED, OptionDefaultValues.THEME_CURSOR_SPEED);
-            //session.SetOption(OptionKeyEnum.THEME_CURSOR_STYLE, OptionDefaultValues.THEME_CURSOR_STYLE);
-            //session.SetOption(OptionKeyEnum.THEME_CURSOR_COLOR, OptionDefaultValues.THEME_CURSOR_COLOR);
-            //session.SetOption(OptionKeyEnum.THEME_ID, OptionDefaultValues.THEME_ID);
-            //session.SetOption(OptionKeyEnum.TEHEM_COLOR_TABLE, OptionDefaultValues.TEHEM_COLOR_TABLE);
-            //session.SetOption(OptionKeyEnum.THEME_BACK_COLOR, OptionDefaultValues.THEME_BACK_COLOR);
-            //session.SetOption(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_FORECOLOR);
-            //session.SetOption(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
-            //session.SetOption(OptionKeyEnum.THEME_SELECTION_COLOR, OptionDefaultValues.THEME_SELECTION_COLOR);
-
-            //session.SetOption(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
-            //session.SetOption(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
-            //session.SetOption(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, OptionDefaultValues.SSH_THEME_DOCUMENT_PADDING);
-            //session.SetOption(OptionKeyEnum.SSH_SERVER_ADDR, OptionDefaultValues.SSH_ADDR);
-            //session.SetOption(OptionKeyEnum.SSH_SERVER_PORT, OptionDefaultValues.SSH_PORT);
-            //session.SetOption(OptionKeyEnum.SSH_USER_NAME, OptionDefaultValues.SSH_USER_NAME);
-            //session.SetOption(OptionKeyEnum.SSH_PASSWORD, OptionDefaultValues.SSH_PASSWORD);
-            //session.SetOption(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, OptionDefaultValues.SSH_PRIVATE_KEY_FILE);
-            //session.SetOption(OptionKeyEnum.SSH_Passphrase, OptionDefaultValues.SSH_Passphrase);
-            //session.SetOption(OptionKeyEnum.SSH_AUTH_TYPE, OptionDefaultValues.SSH_AUTH_TYPE);
-            //session.SetOption(OptionKeyEnum.SSH_PORT_FORWARDS, OptionDefaultValues.SSH_PORT_FORWARDS);
-
-            //session.SetOption(OptionKeyEnum.TERM_MAX_ROLLBACK, OptionDefaultValues.TERM_MAX_ROLLBACK);
-            //session.SetOption(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, OptionDefaultValues.TERM_MAX_CLIPBOARD_HISTORY);
-            //session.SetOption(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
-            //session.SetOption(OptionKeyEnum.TERM_DISABLE_BELL, OptionDefaultValues.TERM_DISABLE_BELL);
-            //session.SetOption(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
-            //session.SetOption(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, OptionDefaultValues.BEHAVIOR_RIGHT_CLICK);
-
-            //session.SetOption(OptionKeyEnum.CMD_STARTUP_PATH, OptionDefaultValues.CMD_STARTUP_PATH);
-            //session.SetOption(OptionKeyEnum.CMD_STARTUP_ARGUMENT, OptionDefaultValues.CMD_STARTUP_ARGUMENT);
-            //session.SetOption(OptionKeyEnum.CMD_STARTUP_DIR, OptionDefaultValues.CMD_STARTUP_DIR);
-            //session.SetOption(OptionKeyEnum.CMD_CONSOLE_ENGINE, OptionDefaultValues.CMD_DRIVER);
-
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_NAME, OptionDefaultValues.SERIAL_PORT_NAME);
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_BAUD_RATE, OptionDefaultValues.SERIAL_PORT_BAUD_RATE);
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_DATA_BITS, OptionDefaultValues.SERIAL_PORT_DATA_BITS);
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_STOP_BITS, OptionDefaultValues.SERIAL_PORT_STOP_BITS);
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_PARITY, OptionDefaultValues.SERIAL_PORT_PARITY);
-            //session.SetOption(OptionKeyEnum.SERIAL_PORT_HANDSHAKE, OptionDefaultValues.SERIAL_PORT_HANDSHAKE);
-
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, OptionDefaultValues.TERM_ADVANCE_RENDER_MODE);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, OptionDefaultValues.TERM_ADVANCE_CLICK_TO_CURSOR);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, OptionDefaultValues.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, OptionDefaultValues.TERM_ADVANCE_AUTO_WRAP_MODE);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_SEND_COLOR, OptionDefaultValues.TERM_ADVANCE_SEND_COLOR);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_RECV_COLOR, OptionDefaultValues.TERM_ADVANCE_RECV_COLOR);
-            //session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
-
-            //session.SetOption(OptionKeyEnum.RAW_TCP_TYPE, OptionDefaultValues.RAW_TCP_TYPE);
-            //session.SetOption(OptionKeyEnum.RAW_TCP_ADDRESS, OptionDefaultValues.RAW_TCP_ADDRESS);
-            //session.SetOption(OptionKeyEnum.RAW_TCP_PORT, OptionDefaultValues.RAW_TCP_PORT);
-
-            //session.SetOption(OptionKeyEnum.MODEM_RETRY_TIMES, OptionDefaultValues.MODEM_RETRY_TIMES);
-            //session.SetOption(OptionKeyEnum.XMODEM_XMODEM1K, OptionDefaultValues.XMODEM_XMODEM1K);
-            //session.SetOption(OptionKeyEnum.XMODEM_RECV_CRC, OptionDefaultValues.XMODEM_RECV_CRC);
-            //session.SetOption(OptionKeyEnum.XMODEM_RECV_PADCHAR, OptionDefaultValues.XMODEM_RECV_PADCHAR);
-            //session.SetOption(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, OptionDefaultValues.XMODEM_RECV_IGNORE_PADCHAR);
-
-            //session.SetOption(OptionKeyEnum.SFTP_SERVER_ADDRESS, OptionDefaultValues.SFTP_SERVER_ADDRESS);
-            //session.SetOption(OptionKeyEnum.SFTP_SERVER_PORT, OptionDefaultValues.SFTP_SERVER_PORT);
-            //session.SetOption(OptionKeyEnum.SFTP_USER_NAME, OptionDefaultValues.SFTP_USER_NAME);
-            //session.SetOption(OptionKeyEnum.SFTP_USER_PASSWORD, OptionDefaultValues.SFTP_USER_PASSWORD);
-            ////session.SetOption(OptionKeyEnum.SFTP_AUTH_TYPE, OptionDefaultValues.SFTP_AUTH_TYPE);
-            //session.SetOption(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, OptionDefaultValues.SFTP_SERVER_INITIAL_DIRECTORY);
-            //session.SetOption(OptionKeyEnum.SFTP_CLIENT_INITIAL_DIRECTORY, OptionDefaultValues.SFTP_CLIENT_INITIAL_DIRECTORY);
-
-            return session;
         }
 
         #endregion
@@ -1204,11 +1130,12 @@ namespace ModengTerm.ViewModel
                 groupId = SessionGroups.Context.SelectedItem.ID.ToString();
             }
 
-            this.session.ID = Guid.NewGuid().ToString();
-            this.session.CreationTime = DateTime.Now;
-            this.session.Name = this.Name;
-            this.session.Type = (int)sessionType.Type;
-            this.session.GroupId = groupId;
+            XTermSession session = new XTermSession();
+            session.ID = Guid.NewGuid().ToString();
+            session.CreationTime = DateTime.Now;
+            session.Name = this.Name;
+            session.Type = (int)sessionType.Type;
+            session.GroupId = groupId;
 
             if (!SaveAllOptions(session))
             {

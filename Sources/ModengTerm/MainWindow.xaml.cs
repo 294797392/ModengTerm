@@ -80,12 +80,12 @@ namespace ModengTerm
 
         private void InitializeWindow()
         {
-            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.serviceAgent = ServiceAgentFactory.Get();
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.pressedKeys = new List<Key>();
 
-            this.mainWindowVM = MainWindowVM.GetInstance();
+            this.mainWindowVM = new MainWindowVM();
             base.DataContext = this.mainWindowVM;
 
             this.userInput = new VTKeyboardInput();
@@ -121,7 +121,7 @@ namespace ModengTerm
 
         private void OpenDefaultSession()
         {
-            this.OpenSession(ClientUtils.DefaultSession, false);
+            this.OpenSession(VTBaseConsts.DefaultSession, false);
         }
 
         private void CloseSession(OpenedSessionVM session)
@@ -197,7 +197,7 @@ namespace ModengTerm
 
             #region 创建插件实例
 
-            foreach (AddonMetadata metadata in VTApp.Context.Manifest.Addons)
+            foreach (AddonMetadata metadata in ClientContext.Context.Manifest.Addons)
             {
                 #region 创建插件实例
 
@@ -904,7 +904,6 @@ namespace ModengTerm
             openedSessionVM.Name = session.Name;
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
-            openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 

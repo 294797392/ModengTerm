@@ -2,45 +2,40 @@
 using DotNEToolkit.Media.Audio;
 using DotNEToolkit.Modular;
 using ModengTerm.Base;
+using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 
 namespace ModengTerm.Base.Modules
 {
     /// <summary>
     /// 播放响铃的播放器
     /// </summary>
-    public class BellPlayer : ModuleBase
+    public static class BellPlayer
     {
         private static readonly object Object = new object();
 
-        private BufferQueue<object> playQueue;
+        private static BufferQueue<object> playQueue = new BufferQueue<object>();
 
-        protected override int OnInitialize()
+        static BellPlayer()
         {
-            this.playQueue = new BufferQueue<object>();
-            Task.Factory.StartNew(this.PlayThreadProc);
-
-            return ResponseCode.SUCCESS;
+            Task.Factory.StartNew(PlayThreadProc);
         }
 
-        protected override void OnRelease()
+        public static void Enqueue()
         {
+            playQueue.Enqueue(Object);
         }
 
-        public void Enqueue() 
+        private static void PlayThreadProc()
         {
-            this.playQueue.Enqueue(Object);
-        }
-
-        private void PlayThreadProc() 
-        {
-            while (true) 
+            while (true)
             {
-                object playItem = this.playQueue.Dequeue();
+                object playItem = playQueue.Dequeue();
 
                 Console.Beep(800, 10);
             }

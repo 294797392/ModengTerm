@@ -94,7 +94,7 @@ namespace ModengTerm.UnitTest
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DotNEToolkit.Log4net.InitializeLog4net();
 
-            VTApp.Context.Initialize();
+            ClientContext.Context.Initialize();
 
             logger.InfoFormat("--- TestVTDocumentInterface ---");
 

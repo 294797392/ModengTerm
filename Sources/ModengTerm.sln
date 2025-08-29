@@ -23,8 +23,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winpty", "winpty\msvc\winpt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.UnitTest", "ModengTerm.UnitTest\ModengTerm.UnitTest.csproj", "{C18FAFF7-3C63-4F1F-903E-25857C4F433E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.ViewModel", "ModengTerm.ViewModel\ModengTerm.ViewModel.csproj", "{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Addon", "ModengTerm.Addon\ModengTerm.Addon.csproj", "{D3F03F6D-F822-481D-A09C-73A7A8A087E6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Controls", "ModengTerm.Controls\ModengTerm.Controls.csproj", "{17471BEE-F0A3-414E-AE88-C9580CAF8369}"
@@ -147,18 +145,6 @@ Global
 		{C18FAFF7-3C63-4F1F-903E-25857C4F433E}.Release|x64.Build.0 = Release|Any CPU
 		{C18FAFF7-3C63-4F1F-903E-25857C4F433E}.Release|x86.ActiveCfg = Release|Any CPU
 		{C18FAFF7-3C63-4F1F-903E-25857C4F433E}.Release|x86.Build.0 = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|x64.Build.0 = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Debug|x86.Build.0 = Debug|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|x64.ActiveCfg = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|x64.Build.0 = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|x86.ActiveCfg = Release|Any CPU
-		{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}.Release|x86.Build.0 = Release|Any CPU
 		{D3F03F6D-F822-481D-A09C-73A7A8A087E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D3F03F6D-F822-481D-A09C-73A7A8A087E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3F03F6D-F822-481D-A09C-73A7A8A087E6}.Debug|x64.ActiveCfg = Debug|Any CPU

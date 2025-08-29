@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,7 +113,8 @@ namespace ModengTerm.ViewModel.Session
                 return null;
             }
 
-            int code = VTApp.Context.ServiceAgent.DeleteSessionGroup(selectedGroup.ID.ToString());
+            ServiceAgent serviceAgent = ServiceAgentFactory.Get();
+            int code = serviceAgent.DeleteSessionGroup(selectedGroup.ID.ToString());
             if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Info("删除分组失败, {0}", code);

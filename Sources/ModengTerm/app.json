@@ -1,52 +1,4 @@
 ﻿{
-    "modules": [
-        {
-            "ID": "6E61B172-0DCF-0916-7778-C31E5FA222F6",
-            "Name": "BellPlayer",
-            "ClassName": "ModengTerm.Base.Modules.BellPlayer, ModengTerm.Base",
-            "Inputs": {
-            }
-        }
-    ],
-
-    "sessions": [
-        {
-            "id": "0",
-            "name": "命令行",
-            "description": "",
-            "icon": "",
-            "type": 0,
-            "menuId": "91A9E520-E632-471B-B238-E070AFE742DB"
-        },
-
-        {
-            "id": "1",
-            "name": "SSH",
-            "description": "",
-            "icon": "",
-            "type": 1,
-            "menuId": "7E893889-F18F-4F23-B5EF-7646FDB859EE"
-        },
-
-        {
-            "id": "2",
-            "name": "串口",
-            "description": "",
-            "icon": "",
-            "type": 2,
-            "menuId": "9CCE099F-DBC2-4193-B557-239CA48F3F4C"
-        },
-
-        {
-            "id": "3",
-            "name": "Tcp",
-            "description": "",
-            "icon": "",
-            "type": 4,
-            "menuId": "B940611E-C437-4E3B-A490-15F3E4C7E197"
-        }
-    ],
-
     "toolbarMenus": [
         {
             "id": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A",
@@ -415,7 +367,7 @@
         },
         {
             "id": "3738D66F-9B8A-BB45-C823-22DAF39AAAF6",
-            "name": "预选项",
+            "name": "配置参数界面",
             "classEntry": "ModengTerm.OfficialAddons.Preference.PreferenceAddon, ModengTerm",
             "preferences": [
                 {
@@ -427,8 +379,14 @@
                         {
                             "id": "91A9E520-E632-471B-B238-E070AFE742DB",
                             "name": "命令行",
-                            "className": "ModengTerm.UserControls.OptionsUserControl.CommandLineOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole" ]
+                            "className": "ModengTerm.UserControls.OptionsUserControl.Session.LocalConsoleOptionsUserControl, ModengTerm",
+                            "scopes": [ "localConsole" ],
+                            "defaultOptions": {
+                                "console_startup_path": "%SYS_DIR%/cmd.exe",
+                                "console_startup_directory": "%CLI_DIR%",
+                                "console_startup_argument": "",
+                                "console_engine": "auto"
+                            }
                         },
                         {
                             "id": "7E893889-F18F-4F23-B5EF-7646FDB859EE",
@@ -461,7 +419,7 @@
                 {
                     "id": "24AFB18B-79BB-435A-B4F1-A62006F1A026",
                     "name": "终端",
-                    "className": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm",
+                    "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.TerminalOptionsUserControl, ModengTerm",
                     "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ],
                     "child": [
                         {

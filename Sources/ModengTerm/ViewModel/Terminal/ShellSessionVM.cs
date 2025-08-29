@@ -17,11 +17,15 @@ using ModengTerm.Terminal.Engines;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Modem;
 using Renci.SshNet;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -427,10 +431,10 @@ namespace ModengTerm.ViewModel.Terminal
                             ReceiveBufferSize = recvBufferSize,
                             Column = cols,
                             Row = rows,
-                            ConsoleEngin = this.session.GetOption<Win32ConsoleEngineEnum>(PredefinedOptions.CMD_CONSOLE_ENGINE),
-                            StartupDir = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_DIR),
-                            StartupPath = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH),
-                            Arguments = this.session.GetOption<string>(PredefinedOptions.CMD_STARTUP_ARGUMENT)
+                            ConsoleEngin = this.session.GetOption<Win32ConsoleEngineEnum>(PredefinedOptions.CONSOLE_ENGINE),
+                            StartupDir = this.session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_DIR),
+                            StartupPath = this.session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH),
+                            Arguments = this.session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_ARGUMENT)
                         };
                     }
 
@@ -470,7 +474,7 @@ namespace ModengTerm.ViewModel.Terminal
 
                 case SessionTypeEnum.LocalConsole:
                     {
-                        string cmdPath = Session.GetOption<string>(PredefinedOptions.CMD_STARTUP_PATH);
+                        string cmdPath = Session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);
                         break;
                     }
@@ -931,68 +935,6 @@ namespace ModengTerm.ViewModel.Terminal
         private void SelectAll()
         {
             videoTerminal.SelectAll();
-        }
-
-        /// <summary>
-        /// 显示剪贴板历史记录
-        /// </summary>
-        private void ClipboardHistory()
-        {
-            ClipboardParagraphSource clipboardParagraphSource = new ClipboardParagraphSource(clipboard);
-            clipboardParagraphSource.Session = Session;
-
-            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this);
-
-            //ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
-            //paragraphsWindow.Title = "剪贴板历史";
-            //paragraphsWindow.Owner = Window.GetWindow(this.Content);
-            //paragraphsWindow.Show();
-        }
-
-        /// <summary>
-        /// 选中的内容添加到收藏夹
-        /// </summary>
-        private void AddFavorites()
-        {
-            VTParagraph paragraph = videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-            if (paragraph.IsEmpty)
-            {
-                return;
-            }
-
-            Favorites favorites = new Favorites()
-            {
-                ID = Guid.NewGuid().ToString(),
-                Typeface = videoTerminal.ActiveDocument.Typeface,
-                SessionID = Session.ID,
-            };
-
-            throw new NotImplementedException();
-
-            //int code = this.TerminalAgent.AddFavorites(favorites);
-            //if (code != ResponseCode.SUCCESS)
-            //{
-            //    MTMessageBox.Info("保存失败");
-            //}
-        }
-
-        /// <summary>
-        /// 显示收藏夹列表
-        /// </summary>
-        private void FaviritesList()
-        {
-            throw new NotImplementedException();
-
-            //FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.TerminalAgent);
-            //favoritesParagraphSource.Session = this.Session;
-
-            //FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this);
-            //favoritesVM.SendToAllTerminalDlg = this.SendToAllCallback;
-
-            //ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
-            //paragraphsWindow.Title = "收藏夹列表";
-            //paragraphsWindow.Owner = Window.GetWindow(this.Content);
-            //paragraphsWindow.Show();
         }
 
         #endregion

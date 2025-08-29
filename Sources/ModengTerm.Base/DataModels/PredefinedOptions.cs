@@ -154,23 +154,24 @@ namespace ModengTerm.Base.DataModels
         /// <summary>
         /// 命令行可执行程序路径
         /// </summary>
-        public const string CMD_STARTUP_PATH = " 2001";
+        public const string CONSOLE_STARTUP_PATH = "console_startup_path";
 
         /// <summary>
         /// 命令行参数
         /// </summary>
-        public const string CMD_STARTUP_ARGUMENT = " 2002";
+        public const string CONSOLE_STARTUP_ARGUMENT = "console_startup_argument";
 
         /// <summary>
         /// 初始目录
         /// </summary>
-        public const string CMD_STARTUP_DIR = " 2003";
+        public const string CONSOLE_STARTUP_DIR = "console_startup_directory";
 
         /// <summary>
         /// 命令行驱动程序
         /// winpty/PesudoConsoleAPI
         /// </summary>
-        public const string CMD_CONSOLE_ENGINE = " 2004";
+        [EnumDataType(typeof(Win32ConsoleEngineEnum))]
+        public const string CONSOLE_ENGINE = "console_engine";
 
         #endregion
 

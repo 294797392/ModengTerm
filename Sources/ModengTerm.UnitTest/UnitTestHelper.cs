@@ -229,7 +229,7 @@ namespace ModengTerm.UnitTest
 
         public static XTermSession CreateSession(int row, int col)
         {
-            VTManifest manifest = JSONHelper.File2Object<VTManifest>("app.json");
+            ClientManifest manifest = JSONHelper.File2Object<ClientManifest>("app.json");
 
             // 重写测试使用的Session参数
             XTermSession session = manifest.DefaultSession;
@@ -272,7 +272,7 @@ namespace ModengTerm.UnitTest
 
         public static VideoTerminal CreateVideoTerminal(int width, int height)
         {
-            VTManifest manifest = JSONHelper.File2Object<VTManifest>("app.json");
+            ClientManifest manifest = JSONHelper.File2Object<ClientManifest>("app.json");
 
             // 重写测试使用的Session参数
             XTermSession session = manifest.DefaultSession;

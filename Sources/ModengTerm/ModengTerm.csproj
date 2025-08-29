@@ -28,15 +28,23 @@
     <Compile Remove="DataModels\**" />
     <Compile Remove="OfficialAddons\Record\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Compile Remove="ViewModel\CreateSession\SessionOptions\**" />
+    <Compile Remove="ViewModel\CreateSession\TerminalOptions\**" />
     <EmbeddedResource Remove="DataModels\**" />
     <EmbeddedResource Remove="OfficialAddons\Record\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <EmbeddedResource Remove="ViewModel\CreateSession\SessionOptions\**" />
+    <EmbeddedResource Remove="ViewModel\CreateSession\TerminalOptions\**" />
     <None Remove="DataModels\**" />
     <None Remove="OfficialAddons\Record\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <None Remove="ViewModel\CreateSession\SessionOptions\**" />
+    <None Remove="ViewModel\CreateSession\TerminalOptions\**" />
     <Page Remove="DataModels\**" />
     <Page Remove="OfficialAddons\Record\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Page Remove="ViewModel\CreateSession\SessionOptions\**" />
+    <Page Remove="ViewModel\CreateSession\TerminalOptions\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +72,14 @@
     <Compile Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
+    <Compile Remove="ViewModel\CreateSession\OptionContentVM.cs" />
+    <Compile Remove="ViewModel\Terminal\BookmarksVM.cs" />
+    <Compile Remove="ViewModel\Terminal\ClipboardVM.cs" />
+    <Compile Remove="ViewModel\Terminal\FavoritesVM.cs" />
+    <Compile Remove="ViewModel\Terminal\ParagraphSource.cs" />
+    <Compile Remove="ViewModel\Terminal\ParagraphsVM.cs" />
+    <Compile Remove="ViewModel\Terminal\ParagraphVM.cs" />
+    <Compile Remove="ViewModel\Terminal\PlaybackSessionVM.cs" />
     <Compile Remove="Windows\Terminals\ParagraphsWindow.xaml.cs" />
   </ItemGroup>
 
@@ -129,7 +145,6 @@
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
-    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

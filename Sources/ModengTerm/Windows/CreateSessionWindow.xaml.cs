@@ -21,6 +21,7 @@ using System.Windows.Shapes;
 using XTerminal.Base.Enumerations;
 using ModengTerm.ViewModel.CreateSession;
 using ModengTerm.Base;
+using ModengTerm.Addon.Controls;
 
 namespace ModengTerm.Windows
 {
@@ -63,7 +64,7 @@ namespace ModengTerm.Windows
         {
             this.contentMap = new Dictionary<string, Control>();
 
-            CreateSessionVM createSessionVM = new CreateSessionVM(VTApp.Context.ServiceAgent);
+            CreateSessionVM createSessionVM = new CreateSessionVM();
             base.DataContext = createSessionVM;
             if (selectedGroup != null)
             {
@@ -125,6 +126,12 @@ namespace ModengTerm.Windows
                 }
 
                 selectedPreference.FrameworkElement = frameworkElement;
+
+                IPreferencePanel preferencePanel = frameworkElement as IPreferencePanel;
+                if (preferencePanel != null)
+                {
+                    preferencePanel.SetOptions(selectedPreference.DefaultOptions);
+                }
             }
 
             ContentControlContent.Content = selectedPreference.FrameworkElement;

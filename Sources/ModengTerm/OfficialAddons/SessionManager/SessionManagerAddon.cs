@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,8 @@ namespace ModengTerm.OfficialAddons.SessionManager
             XTermSession session = window.Session;
 
             // 在数据库里新建会话
-            int code = VTApp.Context.ServiceAgent.AddSession(session);
+            ServiceAgent serviceAgent = ServiceAgentFactory.Get();
+            int code = serviceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
                 MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);

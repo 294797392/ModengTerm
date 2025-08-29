@@ -27,18 +27,12 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        /// <summary>
-        /// 该会话类型对应的选项菜单ID
-        /// </summary>
-        public string MenuId { get; private set; }
-
-        public SessionTypeVM(SessionDefinition session)
+        public SessionTypeVM(SessionMetadata session)
         {
             this.ID = session.ID;
             this.Name = session.Name;
             this.Description = session.Description;
-            Type = (SessionTypeEnum)session.Type;
-            MenuId = session.MenuId;
+            this.Type = session.Type;
         }
     }
 }

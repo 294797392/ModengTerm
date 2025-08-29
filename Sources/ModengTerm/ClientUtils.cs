@@ -19,60 +19,6 @@ namespace ModengTerm
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientUtils");
 
-        /// <summary>
-        /// 默认要打开的会话
-        /// </summary>
-        public static readonly XTermSession DefaultSession = new XTermSession() 
-        {
-            ID = "0",
-            Name = "控制台会话",
-            Type = (int)SessionTypeEnum.LocalConsole,
-            Options = new Dictionary<string, Dictionary<string, object>>()
-            {
-                {
-                    "3738D66F-9B8A-BB45-C823-22DAF39AAAF6", 
-                    new Dictionary<string, object>() 
-                    {
-                        { PredefinedOptions.CMD_STARTUP_DIR, AppDomain.CurrentDomain.BaseDirectory },
-                        { PredefinedOptions.CMD_STARTUP_ARGUMENT, string.Empty },
-                        { PredefinedOptions.CMD_CONSOLE_ENGINE, "auto" },
-                        { PredefinedOptions.CMD_STARTUP_PATH, Path.Combine(Environment.SystemDirectory, "cmd.exe") },
-                        { PredefinedOptions.TERM_ADVANCE_RENDER_WRITE, false },
-                        { PredefinedOptions.TERM_ADVANCE_AUTO_WRAP_MODE, false },
-                        { PredefinedOptions.THEME_BACKGROUND_IMAGE_DATA, string.Empty },
-                        { PredefinedOptions.TERM_ADVANCE_CLICK_TO_CURSOR, false },
-                        { PredefinedOptions.THEME_ID, "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827" },
-                        { PredefinedOptions.THEME_FONT_FAMILY, "新宋体" },
-                        { PredefinedOptions.THEME_FONT_SIZE, 16 },
-                        { PredefinedOptions.THEME_BACK_COLOR, "36,36,36,255" },
-                        { PredefinedOptions.THEME_FONT_COLOR, "242,242,242,255" },
-                        { PredefinedOptions.THEME_CURSOR_STYLE, "line" },
-                        { PredefinedOptions.THEME_CURSOR_SPEED, "normal" },
-                        { PredefinedOptions.THEME_CURSOR_COLOR, "255,255,255,255" },
-                        { PredefinedOptions.TEHEM_COLOR_TABLE, "{ \"rgbKeys\":[\"54,52,46,255\",\"165,100,52,255\",\"0,128,0,255\",\"153,150,6,255\",\"70,70,255,255\",\"123,81,117,255\",\"0,162,196,255\",\"207,216,211,255\",\"83,87,85,255\",\"207,158,114,255\",\"28,196,112,255\",\"226,226,52,255\",\"111,111,244,255\",\"169,126,173,255\",\"80,235,252,255\",\"236,238,238,255\"] }" },
-                        { PredefinedOptions.THEME_FIND_HIGHLIGHT_BACKCOLOR, "236,238,238,100" },
-                        { PredefinedOptions.THEME_FIND_HIGHLIGHT_FORECOLOR, "54,52,46,255" },
-                        { PredefinedOptions.THEME_SELECTION_COLOR, "255,255,255,100" },
-                        { PredefinedOptions.SSH_TERM_ROW, 24 },
-                        { PredefinedOptions.SSH_TERM_COL, 80 },
-                        { PredefinedOptions.SSH_TERM_TYPE, "xterm-256color" },
-                        { PredefinedOptions.SSH_TERM_SIZE_MODE, "autoFit" },
-                        { PredefinedOptions.TERM_READ_ENCODING, "UTF-8" },
-                        { PredefinedOptions.TERM_WRITE_ENCODING, "UTF-8" },
-                        { PredefinedOptions.SSH_READ_BUFFER_SIZE, 8192 },
-                        { PredefinedOptions.TERM_MAX_ROLLBACK, 99999 },
-                        { PredefinedOptions.TERM_MAX_CLIPBOARD_HISTORY, 50 },
-                        { PredefinedOptions.SSH_THEME_DOCUMENT_PADDING, 5 },
-                        { PredefinedOptions.MOUSE_SCROLL_DELTA, 1 },
-                        { PredefinedOptions.TERM_DISABLE_BELL, false },
-                        { PredefinedOptions.BEHAVIOR_RIGHT_CLICK, "contextMenu" },
-                        { PredefinedOptions.TERM_ADVANCE_RENDER_MODE, "default" },
-                        { PredefinedOptions.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, false },
-                    }
-                }
-            }
-        };
-
         public static string GetHotkeyName(ModifierKeys modKeys, List<Key> keys, bool doubleModKeys)
         {
             // 如果按了多个快捷键，判断快捷键顺序

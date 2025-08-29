@@ -1,5 +1,4 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Addon.Controls;
+﻿using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
 using ModengTerm.Base;

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ModengTerm.UserControls.OptionsUserControl.CommandLineOptionsUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.OptionsUserControl.Session.LocalConsoleOptionsUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -33,25 +33,23 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="启动路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <Grid Grid.Row="0" Grid.Column="1">
-            <TextBox x:Name="StartupPath" Text="{Binding Path=StartupPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <TextBox x:Name="TextBoxStartupPath" Margin="3,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
             <Button x:Name="ButtonBrowser" Content="浏览" HorizontalAlignment="Right" Width="60" Click="ButtonBrowserCommandLinePath_Click"
                     Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </Grid>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="初始目录：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <Grid Grid.Row="1" Grid.Column="1">
-            <TextBox x:Name="StartupDirectory" Text="{Binding Path=StartupDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <TextBox x:Name="TextBoxStartupDirectory" Margin="3,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
             <Button x:Name="ButtonBrowserStartupDirectory" Content="浏览" HorizontalAlignment="Right" Width="60" Click="ButtonBrowserStartupDirectory_Click"
                     Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </Grid>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="启动参数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=StartupArgument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxStartupArguments" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="驱动程序：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxCommandlineDrivers"
-                  DataContext="{Binding Path=CmdDrivers}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="命令行引擎：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxConsoleEngins" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
     </Grid>
 </UserControl>

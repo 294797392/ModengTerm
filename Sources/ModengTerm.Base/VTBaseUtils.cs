@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -166,6 +167,39 @@ namespace ModengTerm.Base
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static T GetOptions<T>(this Dictionary<string, object> options, string key)
+        {
+            object value = options[key];
+
+            Type type = typeof(T);
+
+            if (type == typeof(string))
+            {
+                return (T)options[key];
+            }
+
+            if (type.IsClass)
+            {
+                string svalue = options[key].ToString();
+                return JsonConvert.DeserializeObject<T>(svalue);
+            }
+
+            return options.GetValue<T>(key);
+        }
+
+        public static string ReplaceVariable(string source)
+        {
+            foreach (KeyValuePair<string, string> kv in VTBaseConsts.VariableName2Value)
+            {
+                if (source.Contains(kv.Key))
+                {
+                    return source.Replace(kv.Key, kv.Value);
+                }
+            }
+
+            return source;
         }
     }
 }
