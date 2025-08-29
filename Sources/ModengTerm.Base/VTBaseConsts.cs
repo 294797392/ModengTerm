@@ -146,7 +146,7 @@ namespace ModengTerm.Base
         /// <summary>
         /// 默认的串口波特率列表
         /// </summary>
-        public static readonly List<string> DefaultSerialPortBaudRates = new List<string>()
+        public static readonly List<string> SerialPortBaudRates = new List<string>()
         {
             "4800",
             "9600",
@@ -158,7 +158,7 @@ namespace ModengTerm.Base
             "921600"
         };
 
-        public static readonly List<int> DefaultSerialPortDataBits = new List<int>()
+        public static readonly List<int> SerialPortDataBits = new List<int>()
         {
             5, 6, 7, 8
         };

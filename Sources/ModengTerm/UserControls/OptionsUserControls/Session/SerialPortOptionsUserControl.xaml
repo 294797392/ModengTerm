@@ -31,12 +31,13 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="端口号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxSerialPortNames" IsEditable="True"
+        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxPortNames" IsEditable="True"
                   ItemsSource="{Binding Path=PortList}" Text="{Binding Path=SelectedPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}" Margin="0,0,65,0"/>
+        <Button Grid.Row="0" Grid.Column="1" Content="刷新" Width="60" HorizontalAlignment="Right" Margin="0,0,3,0" Click="ButtonRefreshPortList_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="波特率：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxSerialPortBaudRate" IsEditable="True"
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxBaudRate" IsEditable="True"
                   ItemsSource="{Binding Path=BaudRateList}" Text="{Binding Path=SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 

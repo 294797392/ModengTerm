@@ -177,12 +177,12 @@ namespace ModengTerm.Base.DataModels
 
         #region 串口 2501 - 2800
 
-        public const string SERIAL_PORT_NAME = " 2501";
-        public const string SERIAL_PORT_BAUD_RATE = " 2502";
-        public const string SERIAL_PORT_DATA_BITS = " 2503";
-        public const string SERIAL_PORT_STOP_BITS = " 2504";
-        public const string SERIAL_PORT_PARITY = " 2505";
-        public const string SERIAL_PORT_HANDSHAKE = " 2506";
+        public const string SERIAL_PORT_NAME = "serial_name";
+        public const string SERIAL_PORT_BAUD_RATE = "serial_baudrate";
+        public const string SERIAL_PORT_DATA_BITS = "serial_databits";
+        public const string SERIAL_PORT_STOP_BITS = " serial_stopbits";
+        public const string SERIAL_PORT_PARITY = "serial_parity";
+        public const string SERIAL_PORT_HANDSHAKE = "serial_handshake";
 
         #endregion
 

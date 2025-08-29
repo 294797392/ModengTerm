@@ -468,43 +468,6 @@ namespace ModengTerm.ViewModel
 
         #endregion
 
-        #region 串口相关
-
-        /// <summary>
-        /// 端口号列表
-        /// </summary>
-        public BindableCollection<string> PortList { get; private set; }
-
-        public string SelectedPort
-        {
-            get { return selectedPort; }
-            set
-            {
-                if (selectedPort != value)
-                {
-                    selectedPort = value;
-                    this.NotifyPropertyChanged("SelectedPort");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 波特率列表
-        /// </summary>
-        public BindableCollection<string> BaudRateList { get; private set; }
-
-        public string SelectedBaudRate { get; set; }
-
-        public BindableCollection<int> DataBitsList { get; private set; }
-
-        public BindableCollection<StopBits> StopBitsList { get; private set; }
-
-        public BindableCollection<Parity> ParityList { get; private set; }
-
-        public BindableCollection<Handshake> HandshakeList { get; private set; }
-
-        #endregion
-
         #region Tcp
 
         public BindableCollection<RawTcpTypeEnum> RawTcpTypes { get; private set; }
@@ -633,34 +596,6 @@ namespace ModengTerm.ViewModel
             SSHAuthTypeList.AddRange(VTBaseUtils.GetEnumValues<SSHAuthTypeEnum>());
             SSHAuthTypeList.SelectedItem = SSHAuthTypeList.FirstOrDefault();
             SSHServerPort = VTBaseConsts.DefaultSSHPort.ToString();
-
-            #endregion
-
-            #region 串口
-
-            PortList = new BindableCollection<string>();
-            PortList.AddRange(SerialPort.GetPortNames());
-            PortList.SelectedItem = PortList.FirstOrDefault();
-
-            BaudRateList = new BindableCollection<string>();
-            BaudRateList.AddRange(VTBaseConsts.DefaultSerialPortBaudRates);
-            BaudRateList.SelectedItem = BaudRateList.FirstOrDefault();
-
-            DataBitsList = new BindableCollection<int>();
-            DataBitsList.AddRange(VTBaseConsts.DefaultSerialPortDataBits);
-            DataBitsList.SelectedItem = DataBitsList.LastOrDefault(); // LastOrDfault是8
-
-            StopBitsList = new BindableCollection<StopBits>();
-            StopBitsList.AddRange(VTBaseUtils.GetEnumValues<StopBits>());
-            StopBitsList.SelectedItem = StopBits.One;
-
-            ParityList = new BindableCollection<Parity>();
-            ParityList.AddRange(VTBaseUtils.GetEnumValues<Parity>());
-            ParityList.SelectedItem = Parity.None;
-
-            HandshakeList = new BindableCollection<Handshake>();
-            HandshakeList.AddRange(VTBaseUtils.GetEnumValues<Handshake>());
-            HandshakeList.SelectedItem = Handshake.None;
 
             #endregion
 
@@ -831,34 +766,6 @@ namespace ModengTerm.ViewModel
             return true;
         }
 
-        private bool GetSerialPortOptions(XTermSession session)
-        {
-            string portName = SelectedPort;
-            if (string.IsNullOrEmpty(portName))
-            {
-                MessageBoxUtils.Info("请输入正确的端口号");
-                return false;
-            }
-
-            int baudRate;
-            string baudRateText = SelectedBaudRate;
-            if (string.IsNullOrEmpty(baudRateText) ||
-                !int.TryParse(baudRateText, out baudRate))
-            {
-                MessageBoxUtils.Info("请输入正确的波特率");
-                return false;
-            }
-
-            //session.SetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME, portName);
-            //session.SetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE, baudRate);
-            //session.SetOption<int>(OptionKeyEnum.SERIAL_PORT_DATA_BITS, DataBitsList.SelectedItem);
-            //session.SetOption<StopBits>(OptionKeyEnum.SERIAL_PORT_STOP_BITS, StopBitsList.SelectedItem);
-            //session.SetOption<Parity>(OptionKeyEnum.SERIAL_PORT_PARITY, ParityList.SelectedItem);
-            //session.SetOption<Handshake>(OptionKeyEnum.SERIAL_PORT_HANDSHAKE, HandshakeList.SelectedItem);
-
-            return true;
-        }
-
         private bool GetTerminalOptions(XTermSession session)
         {
             int row, column;
@@ -1025,15 +932,6 @@ namespace ModengTerm.ViewModel
                 case SessionTypeEnum.LocalConsole:
                     {
                         if (!GetCommandlineOptions(session))
-                        {
-                            return false;
-                        }
-                        break;
-                    }
-
-                case SessionTypeEnum.SerialPort:
-                    {
-                        if (!GetSerialPortOptions(session))
                         {
                             return false;
                         }
