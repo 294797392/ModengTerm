@@ -198,7 +198,7 @@ namespace ModengTerm.ViewModel
         /// 创建一个SidePanel实例并添加到界面
         /// </summary>
         /// <param name="metadata"></param>
-        public void CreateSidePanel(SidePanelMetadata metadata)
+        public SidePanelVM CreateSidePanel(SidePanelMetadata metadata)
         {
             SidePanelVM spvm = VMUtils.CreateSidePanelVM(metadata);
 
@@ -215,7 +215,7 @@ namespace ModengTerm.ViewModel
             catch (Exception ex)
             {
                 logger.Error("加载SidePanel异常", ex);
-                return;
+                return null;
             }
 
             spvm.Panel = sidePanel;
@@ -225,6 +225,8 @@ namespace ModengTerm.ViewModel
             spvm.Initialize();
 
             this.AddSidePanel(spvm);
+
+            return spvm;
         }
 
         public SidePanelVM GetSidePanel(SidePanelMetadata metadata)

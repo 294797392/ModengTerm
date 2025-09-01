@@ -161,7 +161,7 @@ namespace ModengTerm.ViewModel
             OnClose();
         }
 
-        public void CreateSidePanels(List<SidePanelMetadata> metadatas)
+        public void CreateSidePanels(AddonModule addon, List<SidePanelMetadata> metadatas)
         {
             foreach (SidePanelMetadata metadata in metadatas)
             {
@@ -174,12 +174,17 @@ namespace ModengTerm.ViewModel
                 try
                 {
                     sidePanel = ConfigFactory<SidePanel>.CreateInstance(spvm.Metadata.ClassName);
+                    sidePanel.Container = spvm;
                     TabedSidePanel tabSidePanel = sidePanel as TabedSidePanel;
                     if (tabSidePanel != null)
                     {
                         tabSidePanel.Tab = this;
                     }
-                    sidePanel.Container = spvm;
+                    Dictionary<string, object> options;
+                    if (this.session.Options.TryGetValue(addon.ID, out options))
+                    {
+                        sidePanel.Options = options;
+                    }
                     sidePanel.Initialize();
                 }
                 catch (Exception ex)
@@ -198,7 +203,7 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public void CreateOverlayPanels(List<OverlayPanelMetadata> metadatas)
+        public void CreateOverlayPanels(AddonModule addon, List<OverlayPanelMetadata> metadatas)
         {
             foreach (OverlayPanelMetadata metadata in metadatas)
             {
@@ -211,8 +216,13 @@ namespace ModengTerm.ViewModel
                 try
                 {
                     overlayPanel = ConfigFactory<OverlayPanel>.CreateInstance(opvm.Metadata.ClassName);
-                    overlayPanel.Tab = this;
                     overlayPanel.Container = opvm;
+                    overlayPanel.Tab = this;
+                    Dictionary<string, object> options;
+                    if (this.session.Options.TryGetValue(addon.ID, out options))
+                    {
+                        overlayPanel.Options = options;
+                    }
                     overlayPanel.Initialize();
                 }
                 catch (Exception ex)

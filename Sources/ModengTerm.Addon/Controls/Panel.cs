@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Service;
+using ModengTerm.Base;
 using System.Windows.Controls;
 
 namespace ModengTerm.Addon.Controls
@@ -19,12 +20,18 @@ namespace ModengTerm.Addon.Controls
         /// </summary>
         public IClientPanel Container { get; set; }
 
+        /// <summary>
+        /// 获取该插件所有配置项
+        /// </summary>
+        public Dictionary<string, object> Options { get; set; }
+
         public Panel()
         {
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.storage = this.factory.GetStorageService();
             this.client = this.factory.GetClient();
+            this.Options = new Dictionary<string, object>();
         }
 
         #region 抽象方法
@@ -49,16 +56,17 @@ namespace ModengTerm.Addon.Controls
         /// </summary>
         public abstract void Unload();
 
+        /// <summary>
+        /// 获取该插件指定的配置项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public T GetOptions<T>(string key)
+        {
+            return this.Options.GetOptions<T>(key);
+        }
+
         #endregion
-
-        protected void StartTimer(Action<object> action, object userData) 
-        {
-
-        }
-
-        protected void StopTimer(Action<object> action, object userData)
-        {
-
-        }
     }
 }

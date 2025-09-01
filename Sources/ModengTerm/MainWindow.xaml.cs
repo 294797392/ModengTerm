@@ -476,11 +476,11 @@ namespace ModengTerm
 
                 List<SidePanelMetadata> sidePanelMetadatas = ClientUtils.GetScopedPanelMetadatas(metadata.SidePanels, openedSessionVM.Type);
 
-                openedSessionVM.CreateSidePanels(sidePanelMetadatas);
+                openedSessionVM.CreateSidePanels(addon, sidePanelMetadatas);
             }
         }
 
-        private void CreateScopedOverlayPanel(OpenedSessionVM openedSessionVM) 
+        private void CreateScopedOverlayPanel(OpenedSessionVM openedSessionVM)
         {
             foreach (AddonModule addon in this.addons)
             {
@@ -488,7 +488,7 @@ namespace ModengTerm
 
                 List<OverlayPanelMetadata> overlayPanelMetadatas = ClientUtils.GetScopedPanelMetadatas(metadata.OverlayPanels, openedSessionVM.Type);
 
-                openedSessionVM.CreateOverlayPanels(overlayPanelMetadatas);
+                openedSessionVM.CreateOverlayPanels(addon, overlayPanelMetadatas);
             }
         }
 
@@ -501,7 +501,7 @@ namespace ModengTerm
             OverlayPanelMetadata metadata = userData as OverlayPanelMetadata;
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
-            if (overlayPanel != null) 
+            if (overlayPanel != null)
             {
                 overlayPanel.Open();
             }
