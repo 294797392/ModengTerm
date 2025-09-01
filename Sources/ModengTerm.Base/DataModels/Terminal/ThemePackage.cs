@@ -23,7 +23,7 @@ namespace ModengTerm.Base.DataModels.Terminal
         /// ColorName -> r,g,b
         /// </summary>
         [JsonProperty("colorTable")]
-        public VTColorTable ColorTable { get; private set; }
+        public VTColorTable ColorTable { get; set; }
 
         /// <summary>
         /// 背景图片URI
@@ -56,41 +56,21 @@ namespace ModengTerm.Base.DataModels.Terminal
         [JsonProperty("fontSize")]
         public int FontSize { get; set; }
 
-        [JsonProperty("highlightFontColor")]
-        public string HighlightFontColor { get; set; }
-
-        [JsonProperty("highlightBackColor")]
-        public string HighlightBackColor { get; set; }
-
         /// <summary>
         /// 光标颜色
         /// </summary>
         [JsonProperty("cursorColor")]
         public string CursorColor { get; set; }
 
-        [JsonProperty("scrollbarThumbColor")]
-        public string ScrollbarThumbColor { get; set; }
-
-        [JsonProperty("scrollbarButtonColor")]
-        public string ScrollbarButtonColor { get; set; }
-
-        [JsonProperty("scrollbarTrackColor")]
-        public string ScrollbarTrackColor { get; set; }
-
         /// <summary>
-        /// 书签颜色
+        /// 选中区域背景颜色
         /// </summary>
-        [JsonProperty("bookmarkColor")]
-        public string BookmarkColor { get; set; }
-
-        /// <summary>
-        /// 文本选中的颜色
-        /// </summary>
-        [JsonProperty("selectionColor")]
-        public string SelectionColor { get; set; }
+        [JsonProperty("selectionBackColor")]
+        public string SelectionBackColor { get; set; }
 
         public ThemePackage()
         {
+            this.ColorTable = new VTColorTable();
         }
     }
 }

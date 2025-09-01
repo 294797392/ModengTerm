@@ -61,6 +61,11 @@ namespace ModengTerm.Terminal.Engines
                         return new SerialPortChannel();
                     }
 
+                case SessionTypeEnum.Tcp:
+                    {
+                        return new TcpChannel();
+                    }
+
                 default:
                     throw new NotImplementedException();
             }

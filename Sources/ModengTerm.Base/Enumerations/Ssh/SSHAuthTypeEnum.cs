@@ -17,14 +17,13 @@ namespace ModengTerm.Base.Enumerations.Ssh
         Password,
 
         /// <summary>
+        /// 私钥验证
+        /// </summary>
+        PrivateKey,
+
+        /// <summary>
         /// 不需要验证，直接输入IP地址和端口号就可以
         /// </summary>
         None,
-
-        /// <summary>
-        /// 私钥验证
-        /// </summary>
-        PrivateKey
     }
-
 }

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace ModengTerm.Terminal.Engines
 {
-    public class RawTcpChannel : ChannelBase
+    public class TcpChannel : ChannelBase
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("RawTcpChannel");
 
@@ -13,7 +13,7 @@ namespace ModengTerm.Terminal.Engines
         private TcpClient client;
         private NetworkStream stream;
 
-        public RawTcpChannel()
+        public TcpChannel()
         {
         }
 

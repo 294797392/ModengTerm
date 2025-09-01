@@ -13,6 +13,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:Win32ConsoleEngineTextConverter x:Key="Win32ConsoleEngineTextConverter"/>
+
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -49,7 +52,13 @@
         <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxStartupArguments" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="命令行引擎：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxConsoleEngins" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxConsoleEngins" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=Win32ConsoleEngineTextConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
     </Grid>
 </UserControl>

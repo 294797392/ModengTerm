@@ -35,9 +35,9 @@ namespace ModengTerm.Terminal.Renderer
 
         public override void Initialize()
         {
-            string sendColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADVANCE_SEND_COLOR);
+            string sendColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADV_SEND_COLOR);
             this.writeTextAttr = this.CreateForegroundAttribute(sendColor);
-            string recvColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADVANCE_RECV_COLOR);
+            string recvColor = this.session.GetOption<string>(PredefinedOptions.TERM_ADV_RECV_COLOR);
             this.readTextAttr = this.CreateForegroundAttribute(recvColor);
         }
 

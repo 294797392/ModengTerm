@@ -56,9 +56,9 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 选中区域的颜色
+        /// 选中区域的背景颜色
         /// </summary>
-        public string Color { get; set; }
+        public string BackColor { get; set; }
 
         #endregion
 
@@ -408,7 +408,7 @@ namespace ModengTerm.Document
         {
             this.geometries = new List<VTRect>();
 
-            this.backColor = VTColor.CreateFromRgbKey(this.Color);
+            this.backColor = VTColor.CreateFromRgbKey(this.BackColor);
         }
 
         protected override void OnRelease()

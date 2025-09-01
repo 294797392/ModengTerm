@@ -41,7 +41,7 @@ namespace ModengTerm.UserControls
         public void Initialize(XTermSession session)
         {
             string background = session.GetOption<string>(PredefinedOptions.THEME_BACK_COLOR);
-            double padding = session.GetOption<double>(PredefinedOptions.SSH_THEME_DOCUMENT_PADDING);
+            double padding = session.GetOption<double>(PredefinedOptions.THEME_PADDING);
             double width = DocumentControl.ActualWidth - padding * 2;
             double height = DocumentControl.ActualHeight - padding * 2;
 

@@ -29,11 +29,14 @@ namespace ModengTerm.UserControls.OptionsUserControl.Session
         public LocalConsoleOptionsUserControl()
         {
             InitializeComponent();
+
+            this.InitializeUserControl();
         }
 
         private void InitializeUserControl()
         {
             ComboBoxConsoleEngins.ItemsSource = VTBaseUtils.GetEnumValues<Win32ConsoleEngineEnum>();
+            ComboBoxConsoleEngins.SelectedIndex = 0;
         }
 
         #region 事件处理器

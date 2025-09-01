@@ -33,7 +33,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
         #region 实例变量
 
         private ShellSessionVM shellSession;
-        private AutoCompletionVM autoCompleteVM;
         private VideoTerminal videoTerminal;
         private VTKeyboardInput userInput;
         private IClientEventRegistry eventRegistry;
@@ -236,15 +235,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
 
             VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
-
-            // 如果启用了自动完成功能，那么先把按键事件传递给自动完成功能
-            if (this.autoCompleteVM.Enabled)
-            {
-                if (!this.autoCompleteVM.OnKeyDown(vtKey))
-                {
-                    return;
-                }
-            }
 
             this.userInput.CapsLock = Console.CapsLock;
             this.userInput.Key = vtKey;
@@ -519,22 +509,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
         }
 
 
-        private void AutoCompletionUserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            UIElement element = sender as UIElement;
-            if (element.Visibility == Visibility.Collapsed)
-            {
-                // 重新获取焦点，以便于可以接收键盘输入
-                Keyboard.Focus(GridTerminal);
-            }
-        }
-
-        private void AutoCompletionUserControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            // 模拟输入Enter
-            this.autoCompleteVM.OnKeyDown(VTKeys.Enter);
-        }
-
         private void ButtonCloseOverlayPanel_Click(object sender, RoutedEventArgs e)
         {
             FrameworkElement frameworkElement = sender as FrameworkElement;
@@ -548,14 +522,14 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         public int Open(OpenedSessionVM sessionVM)
         {
-            this.scrollDelta = this.Session.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA);
-            this.clickToCursor = this.Session.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_CLICK_TO_CURSOR);
-            this.rightClickActions = this.Session.GetOption<RightClickActions>(PredefinedOptions.BEHAVIOR_RIGHT_CLICK);
+            this.scrollDelta = this.Session.GetOption<int>(PredefinedOptions.CURSOR_SCROLL_DELTA);
+            this.clickToCursor = this.Session.GetOption<bool>(PredefinedOptions.TERM_ADV_CLICK_TO_CURSOR);
+            this.rightClickActions = this.Session.GetOption<RightClickActions>(PredefinedOptions.TERM_RIGHT_CLICK_ACTION);
 
             // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
             string background = this.Session.GetOption<string>(PredefinedOptions.THEME_BACK_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
-            string base64Image = this.Session.GetOption<string>(PredefinedOptions.THEME_BACKGROUND_IMAGE_DATA);
+            string base64Image = this.Session.GetOption<string>(PredefinedOptions.THEME_BACK_IMAGE_DATA);
             if (!string.IsNullOrEmpty(base64Image))
             {
                 try
@@ -569,7 +543,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     logger.Error("加载背景图片异常", ex);
                 }
 
-                ImageBackground.Opacity = this.Session.GetOption<double>(PredefinedOptions.THEME_BACKGROUND_IMAGE_OPACITY);
+                ImageBackground.Opacity = this.Session.GetOption<double>(PredefinedOptions.THEME_BACK_IMAGE_OPACITY);
             }
 
             this.shellSession = sessionVM as ShellSessionVM;
@@ -578,7 +552,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             // DispatcherPriority.Loaded保证DrawArea不为空
             base.Dispatcher.BeginInvoke(new Action(() =>
             {
-                double padding = this.Session.GetOption<double>(PredefinedOptions.SSH_THEME_DOCUMENT_PADDING);
+                double padding = this.Session.GetOption<double>(PredefinedOptions.THEME_PADDING);
                 DocumentAlternate.Visibility = Visibility.Collapsed;
                 DocumentAlternate.Padding = new Thickness(padding);
                 DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;
@@ -590,7 +564,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
                 // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
                 // 手动计算终端宽度和高度，这个高度和宽度可能也不准确。
-                // 解决方法是在每次收到服务端数据之后，重新设置一下终端高度，确保终端高度正确
+                // 解决方法是在每次渲染服务端数据之后，重新设置一下终端高度，确保终端高度正确
                 double width = GridTerminal.ActualWidth;
                 double height = GridTerminal.ActualHeight;
 
@@ -600,15 +574,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 this.shellSession.Height = height;
                 this.shellSession.Open();
 
-                this.autoCompleteVM = this.shellSession.AutoCompletionVM;
-
                 this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
                 this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
                 this.videoTerminal.RequestChangeVisible += this.VideoTerminal_RequestChangeVisible;
-
-                // 自动完成列表和文本行对齐
-                AutoCompletionUserControl.Margin = new Thickness(padding);
-                AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
 
                 base.DataContext = this.shellSession;
 

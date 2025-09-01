@@ -6,12 +6,13 @@ using System;
 
 namespace ModengTerm
 {
-    public static class SessionContentFactory
+    public static class ContentFactory
     {
         public static ISessionContent Create(XTermSession session)
         {
             switch ((SessionTypeEnum)session.Type)
             {
+                case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.LocalConsole:
                 case SessionTypeEnum.Ssh:

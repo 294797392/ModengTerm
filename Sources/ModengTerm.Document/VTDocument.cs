@@ -504,7 +504,7 @@ namespace ModengTerm.Document
             this.cursor.Initialize();
 
             this.Selection = new VTextSelection(this);
-            this.Selection.Color = options.SelectionColor;
+            this.Selection.BackColor = options.SelectionColor;
             this.Selection.StartPointer = this.startPointer;
             this.Selection.EndPointer = this.endPointer;
             this.Selection.Initialize();

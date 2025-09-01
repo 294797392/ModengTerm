@@ -20,11 +20,6 @@ namespace ModengTerm.Document
     public enum VTCursorStyles
     {
         /// <summary>
-        /// 不显示光标
-        /// </summary>
-        None,
-
-        /// <summary>
         /// 光标是一条竖线
         /// </summary>
         Line,
@@ -37,7 +32,12 @@ namespace ModengTerm.Document
         /// <summary>
         /// 光标是半个下划线
         /// </summary>
-        Underscore
+        Underscore,
+
+        /// <summary>
+        /// 不显示光标
+        /// </summary>
+        None,
     }
 
     /// <summary>

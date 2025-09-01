@@ -491,6 +491,7 @@ namespace ModengTerm
                             case SessionTypeEnum.Ssh: return "SSH";
                             case SessionTypeEnum.LocalConsole: return "命令行";
                             case SessionTypeEnum.Sftp: return "SFTP";
+                            case SessionTypeEnum.Tcp: return "Tcp";
 
                             default:
                                 throw new NotImplementedException();
@@ -607,6 +608,47 @@ namespace ModengTerm
                 case OverlayPanelDocks.RightTop: return VerticalAlignment.Top;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TerminalSizeModeTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            TerminalSizeModeEnum sizeMode = (TerminalSizeModeEnum)value;
+
+            switch (sizeMode)
+            {
+                case TerminalSizeModeEnum.Fixed: return "固定大小";
+                case TerminalSizeModeEnum.AutoFit: return "自适应";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Win32ConsoleEngineTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Win32ConsoleEngineEnum consoleEngine = (Win32ConsoleEngineEnum)value;
+
+            switch (consoleEngine)
+            {
+                case Win32ConsoleEngineEnum.Auto: return "自动选择";
+                default:
+                    return consoleEngine.ToString();
             }
         }
 

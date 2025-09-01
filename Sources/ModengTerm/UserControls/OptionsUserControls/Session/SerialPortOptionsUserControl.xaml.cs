@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addon.Controls;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations.Ssh;
 using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
@@ -39,7 +40,7 @@ namespace XTerminal.UserControls.OptionsUserControl
             ComboBoxPortNames.ItemsSource = SerialPort.GetPortNames();
             ComboBoxBaudRate.ItemsSource = VTBaseConsts.SerialPortBaudRates;
             ComboBoxDataBits.ItemsSource = VTBaseConsts.SerialPortDataBits;
-            ComboBoxStopBits.ItemsSource = VTBaseUtils.GetEnumValues<StopBits>();
+            ComboBoxStopBits.ItemsSource = VTBaseUtils.GetEnumValues<StopBits>(StopBits.None);
             ComboBoxParityList.ItemsSource = VTBaseUtils.GetEnumValues<Parity>();
             ComboBoxHandshake.ItemsSource = VTBaseUtils.GetEnumValues<Handshake>();
         }
@@ -63,8 +64,8 @@ namespace XTerminal.UserControls.OptionsUserControl
             Dictionary<string, object> options = new Dictionary<string, object>()
             {
                 { PredefinedOptions.SERIAL_PORT_NAME, ComboBoxPortNames.SelectedItem.ToString() },
-                { PredefinedOptions.SERIAL_PORT_BAUD_RATE, (int)ComboBoxBaudRate.SelectedItem },
-                { PredefinedOptions.SERIAL_PORT_DATA_BITS, (int)ComboBoxDataBits.SelectedItem },
+                { PredefinedOptions.SERIAL_PORT_BAUD_RATE, Convert.ToInt32(ComboBoxBaudRate.SelectedItem) },
+                { PredefinedOptions.SERIAL_PORT_DATA_BITS, Convert.ToInt32(ComboBoxDataBits.SelectedItem) },
                 { PredefinedOptions.SERIAL_PORT_STOP_BITS, (StopBits)ComboBoxStopBits.SelectedItem },
                 { PredefinedOptions.SERIAL_PORT_PARITY, (Parity)ComboBoxParityList.SelectedItem },
                 { PredefinedOptions.SERIAL_PORT_HANDSHAKE, (Handshake)ComboBoxHandshake.SelectedItem }

@@ -1,14 +1,9 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
-using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Parsing;
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 
 namespace ModengTerm.Terminal
@@ -146,14 +141,14 @@ namespace ModengTerm.Terminal
                 ViewportRow = options.Row,
                 ViewportColumn = options.Column,
                 AutoWrapMode = false,
-                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(PredefinedOptions.THEME_CURSOR_STYLE),
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(PredefinedOptions.CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_CURSOR_COLOR),
-                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(PredefinedOptions.THEME_CURSOR_SPEED),
-                ScrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA),
+                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(PredefinedOptions.CURSOR_SPEED),
+                ScrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.CURSOR_SCROLL_DELTA),
                 RollbackMax = sessionInfo.GetOption<int>(PredefinedOptions.TERM_MAX_ROLLBACK),
                 Typeface = options.Typeface,
                 GraphicsInterface = graphicsInterface,
-                SelectionColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_SELECTION_COLOR)
+                SelectionColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_SELECTION_BACK_COLOR)
             };
 
             return documentOptions;

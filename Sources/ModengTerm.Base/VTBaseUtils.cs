@@ -2,16 +2,11 @@
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using XTerminal.Base.Enumerations;
+using System.Net;
 
 namespace ModengTerm.Base
 {
@@ -141,6 +136,33 @@ namespace ModengTerm.Base
             return port > 0 && port < 65535;
         }
 
+        public static bool IsValidNetworkPort(string port)
+        {
+            if (string.IsNullOrEmpty(port))
+            {
+                return false;
+            }
+
+            ushort value;
+            if (!ushort.TryParse(port, out value))
+            {
+                return false;
+            }
+
+            return value > 0 && value < 65535;
+        }
+
+        public static bool IsValidIpAddress(string ipAddress)
+        {
+            if (string.IsNullOrEmpty(ipAddress))
+            {
+                return false;
+            }
+
+            IPAddress ipaddr;
+            return IPAddress.TryParse(ipAddress, out ipaddr);
+        }
+
         public static string TrimInvalidFileNameChars(string srcFileName)
         {
             char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
@@ -169,18 +191,20 @@ namespace ModengTerm.Base
             }
         }
 
+        private static readonly Type StringType = typeof(string);
+
         public static T GetOptions<T>(this Dictionary<string, object> options, string key)
         {
             object value = options[key];
 
-            Type type = typeof(T);
+            Type targetType = typeof(T);
 
-            if (type == typeof(string))
+            if (targetType == StringType)
             {
-                return (T)options[key];
+                return (T)Convert.ChangeType(options[key], typeof(string));
             }
 
-            if (type.IsClass)
+            if (targetType.IsClass)
             {
                 string svalue = options[key].ToString();
                 return JsonConvert.DeserializeObject<T>(svalue);
@@ -200,6 +224,43 @@ namespace ModengTerm.Base
             }
 
             return source;
+        }
+
+        public static string GetDefaultFontFamilyName()
+        {
+            string[] families = new string[] { "新宋体", "宋体", "黑体", "仿宋", "楷书", "隶书", "幼圆", "Consolas" };
+
+            InstalledFontCollection installedFontCollection = new InstalledFontCollection();
+
+            for (int i = 0; i < families.Length; i++)
+            {
+                FontFamily fontFamily = installedFontCollection.Families.FirstOrDefault(v => v.Name == families[i]);
+                if (fontFamily != null)
+                {
+                    return fontFamily.Name;
+                }
+            }
+
+            return installedFontCollection.Families[0].Name;
+        }
+
+        public static FontFamily[] GetAllFontFamilies() 
+        {
+            InstalledFontCollection installedFontCollection = new InstalledFontCollection();
+            return installedFontCollection.Families;
+        }
+
+
+        public static System.Windows.Media.Color RgbKey2Color(string rgbKey) 
+        {
+            VTColor vtClr = VTColor.CreateFromRgbKey(rgbKey);
+            return System.Windows.Media.Color.FromArgb(vtClr.A, vtClr.R, vtClr.G, vtClr.B);
+        }
+
+        public static string Color2RgbKey(System.Windows.Media.Color color) 
+        {
+            // R,G,B,A
+            return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
         }
     }
 }

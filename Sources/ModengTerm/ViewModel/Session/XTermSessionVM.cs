@@ -93,6 +93,14 @@ namespace ModengTerm.ViewModel.Session
                         break;
                     }
 
+                case SessionTypeEnum.Tcp:
+                    {
+                        string ipaddr = session.GetOption<string>(PredefinedOptions.RAW_TCP_ADDRESS);
+                        int port = session.GetOption<int>(PredefinedOptions.RAW_TCP_PORT);
+                        this.URI = string.Format("{0}:{1}", ipaddr, port);
+                        break;
+                    }
+
                 default:
                     throw new NotImplementedException();
             }

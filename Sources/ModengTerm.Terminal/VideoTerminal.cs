@@ -363,14 +363,14 @@ namespace ModengTerm.Terminal
             this.name = sessionInfo.Name;
             this.isRunning = true;
             this.sessionTransport = options.SessionTransport;
-            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_WRITE_ENCODING));
-            this.readEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_READ_ENCODING));
-            this.scrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.MOUSE_SCROLL_DELTA);
+            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_ENCODING));
+            this.readEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(PredefinedOptions.TERM_ENCODING));
+            this.scrollDelta = sessionInfo.GetOption<int>(PredefinedOptions.CURSOR_SCROLL_DELTA);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(PredefinedOptions.TEHEM_COLOR_TABLE);
             this.foregroundColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_FONT_COLOR);
             this.backgroundColor = sessionInfo.GetOption<string>(PredefinedOptions.THEME_BACK_COLOR);
-            this.autoWrapMode = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_AUTO_WRAP_MODE); // DECAWM
-            this.renderWrite = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_RENDER_WRITE);
+            this.autoWrapMode = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADV_AUTO_WRAP_MODE); // DECAWM
+            this.renderWrite = sessionInfo.GetOption<bool>(PredefinedOptions.TERM_ADV_RENDER_SEND);
 
             #region 初始化数据解析器
 
@@ -1236,7 +1236,7 @@ namespace ModengTerm.Terminal
         {
             XTermSession session = this.vtOptions.Session;
 
-            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(PredefinedOptions.TERM_ADVANCE_RENDER_MODE);
+            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(PredefinedOptions.TERM_ADV_RENDER_MODE);
 
             switch (renderMode)
             {

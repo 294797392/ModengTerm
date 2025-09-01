@@ -20,16 +20,12 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <converter:VTCursorStyle2StringConverter x:Key="VTCursorStyle2StringConverter"/>
-            <converter:VTCursorSpeed2StringConverter x:Key="VTCursorSpeed2StringConverter"/>
             <converter:ColorDefinition2BrushConverter x:Key="ColorDefinition2BrushConverter"/>
-            <converter:LivePaperBrushConverter x:Key="LivePaperBrushConverter"/>
-            <converter:EffectType2StringConverter x:Key="EffectType2StringConverter"/>
 
             <Style x:Key="StyleGroupBoxLocal" TargetType="{x:Type GroupBox}">
                 <Setter Property="Margin" Value="2"/>
             </Style>
-            
+
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -47,10 +43,8 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="切换主题：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-           
-            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxThemeList" DataContext="{Binding Path=ThemeList}"
-                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+
+            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxThemeList" SelectionChanged="ComboBoxThemeList_SelectionChanged" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Path=Name}"/>
@@ -73,10 +67,9 @@
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="字体和颜色" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
+            <GroupBox Grid.Row="0" Grid.Column="0" Header="配置" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="35"/>
@@ -90,14 +83,14 @@
                         <RowDefinition Height="35"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="字体：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxFontFamily" DataContext="{Binding Path=FontFamilyList}"
-                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxFontFamily" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path=Name}"/>
@@ -105,114 +98,43 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="大小：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxFontSize" DataContext="{Binding Path=FontSizeList}"
-                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="大小：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="3" x:Name="ComboBoxFontSize" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}"/>
+                                <TextBlock Text="{Binding}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="前景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <xceedtoolkit:ColorPicker Grid.Row="2" Grid.Column="1" x:Name="ColorPickerForeground" SelectedColor="{Binding Path=FontColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="前景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="1" Grid.Column="1" x:Name="ColorPickerForeground" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <xceedtoolkit:ColorPicker Grid.Row="3" Grid.Column="1" x:Name="ColorPickerBackground" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="1" Grid.Column="3" x:Name="ColorPickerBackground" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="背景图：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="TextBoxBackgroundImage" Text="{Binding Path=BackImageName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="{Binding Path=BackImageUri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Margin="3,0,80,0" Height="25" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-                    <Button Grid.Row="4" Grid.Column="1" Content="浏览" Height="25" HorizontalAlignment="Right" Click="ButtonBrowseBackgroundImage_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="背景图：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="99" x:Name="TextBoxBackgroundImage" IsReadOnly="True" Margin="3,0,70,0" Height="25" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+                    <Button Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="99" Content="浏览" Height="25" Width="60" HorizontalAlignment="Right" Click="ButtonBrowseBackgroundImage_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Text="透明度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <Slider Grid.Row="5" Grid.Column="1" x:Name="SliderBackgroundOpacity" Value="{Binding Path=BackImageOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Minimum="0" Maximum="1" TickFrequency="0.1"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="透明度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="99" x:Name="SliderBackgroundOpacity" VerticalAlignment="Center" Minimum="0" Maximum="1" TickFrequency="0.1"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="光标色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" x:Name="ColorPickerCursorColor" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="2" Text="高亮背景：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="3" x:Name="ColorPickerSelectionBackColor" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="内边距：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="TextBoxPadding" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
                     <!--<TextBlock Grid.Row="4" Grid.Column="0" Text="滚动条：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                     <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" x:Name="ColorPickerScrollbar" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>-->
 
                 </Grid>
             </GroupBox>
-
-            <GroupBox Grid.Row="0" Grid.Column="1" Header="光标" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                        <RowDefinition Height="35"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxCursorStyle" DataContext="{Binding Path=CursorStyles}"
-                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource ResourceKey=VTCursorStyle2StringConverter}}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <xceedtoolkit:ColorPicker Grid.Row="1" Grid.Column="1" SelectedColor="{Binding Path=CursorColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
-
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="速度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxCursorSpeed" DataContext="{Binding Path=CursorSpeeds}"
-                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource ResourceKey=VTCursorSpeed2StringConverter}}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-
-                </Grid>
-            </GroupBox>
-        </Grid>
-
-        <Grid Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="0"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="35"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="背景特效：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <ComboBox Grid.Row="5" Grid.Column="1" DataContext="{Binding Path=EffectTypeEnumList}"
-                          ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                          Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource ResourceKey=EffectType2StringConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <TextBlock Grid.Row="9" Grid.Column="0" Text="高亮字体色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <xceedtoolkit:ColorPicker Grid.Row="9" Grid.Column="1" Height="30" SelectedColor="{Binding Path=HighlightFontColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-
-            <TextBlock Grid.Row="10" Grid.Column="0" Text="高亮背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <xceedtoolkit:ColorPicker Grid.Row="10" Grid.Column="1" Height="30" SelectedColor="{Binding Path=HighlightBackgroundColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-
+            
         </Grid>
 
     </Grid>

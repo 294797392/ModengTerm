@@ -61,6 +61,8 @@ namespace ModengTerm.Addon
 
                 while (current != null)
                 {
+                    LinkedListNode<EventData> next = current.Next;
+
                     EventData evd = current.Value;
 
                     if (evd.Delegate == @delegate)
@@ -68,6 +70,8 @@ namespace ModengTerm.Addon
                         evds.Remove(current);
                         break;
                     }
+
+                    current = next;
                 }
             }
 

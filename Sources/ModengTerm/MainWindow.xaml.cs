@@ -127,10 +127,6 @@ namespace ModengTerm
         private void CloseSession(OpenedSessionVM session)
         {
             ISessionContent content = session.Content as ISessionContent;
-            if (VTBaseUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
-            {
-                UserControl userControl = content as UserControl;
-            }
             content.Close();
 
             session.TabEvent -= this.OpenedSessionVM_TabEvent;
@@ -896,7 +892,7 @@ namespace ModengTerm
         /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
         public void OpenSession(XTermSession session, bool addToRecent = true)
         {
-            ISessionContent content = SessionContentFactory.Create(session);
+            ISessionContent content = ContentFactory.Create(session);
             ContentControlSession.Content = content;
 
             OpenedSessionVM openedSessionVM = OpenedSessionVMFactory.Create(session);

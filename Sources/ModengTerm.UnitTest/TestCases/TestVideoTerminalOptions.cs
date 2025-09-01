@@ -21,7 +21,7 @@ namespace ModengTerm.UnitTest.TestCases
              */
 
             XTermSession session = UnitTestHelper.CreateSession(9, 9);
-            session.SetOption<bool>(PredefinedOptions.TERM_ADVANCE_CLICK_TO_CURSOR, true);
+            session.SetOption<bool>(PredefinedOptions.TERM_ADV_CLICK_TO_CURSOR, true);
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal3(session);
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
@@ -62,7 +62,7 @@ namespace ModengTerm.UnitTest.TestCases
              */
 
             XTermSession session = UnitTestHelper.CreateSession(9, 9);
-            session.SetOption<bool>(PredefinedOptions.TERM_ADVANCE_CLICK_TO_CURSOR, true);
+            session.SetOption<bool>(PredefinedOptions.TERM_ADV_CLICK_TO_CURSOR, true);
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal3(session);
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
@@ -153,7 +153,7 @@ namespace ModengTerm.UnitTest.TestCases
         public bool Terminal_Advance_AutoWrapMode()
         {
             XTermSession session = UnitTestHelper.CreateSession(9, 9);
-            session.SetOption<bool>(PredefinedOptions.TERM_ADVANCE_AUTO_WRAP_MODE, true);
+            session.SetOption<bool>(PredefinedOptions.TERM_ADV_AUTO_WRAP_MODE, true);
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal3(session);
             VTDocument document = terminal.MainDocument;
 

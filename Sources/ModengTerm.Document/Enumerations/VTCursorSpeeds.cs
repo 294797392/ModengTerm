@@ -13,14 +13,14 @@ namespace ModengTerm.Document.Enumerations
     public enum VTCursorSpeeds
     {
         /// <summary>
-        /// 高速闪烁
-        /// </summary>
-        High = 300,
-
-        /// <summary>
         /// 中速
         /// </summary>
         Normal = 600,
+
+        /// <summary>
+        /// 高速闪烁
+        /// </summary>
+        High = 300,
 
         /// <summary>
         /// 低速

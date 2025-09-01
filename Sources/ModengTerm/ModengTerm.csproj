@@ -70,6 +70,7 @@
     <Compile Remove="OfficialAddons\Explorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\OptionsUserControls\Session\LoginScriptOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml.cs" />
+    <Compile Remove="UserControls\OptionsUserControls\Terminal\BehaviorOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModel\CreateSession\OptionContentVM.cs" />
@@ -117,6 +118,7 @@
     <Page Remove="Themes\Themes.XShell.xaml" />
     <Page Remove="UserControls\OptionsUserControls\Session\LoginScriptOptionsUserControl.xaml" />
     <Page Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml" />
+    <Page Remove="UserControls\OptionsUserControls\Terminal\BehaviorOptionsUserControl.xaml" />
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
     <Page Remove="UserControls\TerminalUserControls\Graphics\Template.xaml" />
     <Page Remove="UserControls\ViewportUserControl.xaml" />

@@ -64,11 +64,6 @@ namespace ModengTerm.ViewModel.Terminal
         /// </summary>
         private bool isRunning;
 
-        /// <summary>
-        /// 提供剪贴板功能
-        /// </summary>
-        private VTClipboard clipboard;
-
         private string uri;
 
         private int totalRows;
@@ -202,22 +197,6 @@ namespace ModengTerm.ViewModel.Terminal
         public BindableCollection<string> HistoryCommands { get; private set; }
 
         /// <summary>
-        /// 自动完成功能ViewModel
-        /// </summary>
-        public AutoCompletionVM AutoCompletionVM
-        {
-            get { return autoCompletionVM; }
-            private set
-            {
-                if (autoCompletionVM != value)
-                {
-                    autoCompletionVM = value;
-                    NotifyPropertyChanged("AutoCompletionVM");
-                }
-            }
-        }
-
-        /// <summary>
         /// 是否显示输入栏
         /// </summary>
         public bool InputPanelVisible
@@ -262,19 +241,15 @@ namespace ModengTerm.ViewModel.Terminal
             //scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             HistoryCommands = new BindableCollection<string>();
 
-            writeEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_WRITE_ENCODING));
-            readEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_READ_ENCODING));
-            clipboard = new VTClipboard()
-            {
-                MaximumHistory = Session.GetOption<int>(PredefinedOptions.TERM_MAX_CLIPBOARD_HISTORY)
-            };
+            writeEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
+            readEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
 
             #region 初始化上下文菜单
 
             ContextMenus = new BindableCollection<ContextMenuVM>();
             ContextMenus.AddRange(VMUtils.CreateContextMenuVMs(false));
 
-            RightClickActions brc = Session.GetOption<RightClickActions>(PredefinedOptions.BEHAVIOR_RIGHT_CLICK);
+            RightClickActions brc = Session.GetOption<RightClickActions>(PredefinedOptions.TERM_RIGHT_CLICK_ACTION);
             if (brc == RightClickActions.ContextMenu)
             {
                 ContextMenuVisibility = Visibility.Visible;
@@ -295,9 +270,9 @@ namespace ModengTerm.ViewModel.Terminal
             VTypeface typeface = this.MainDocument.GetTypeface(fontSize, fontFamily);
             typeface.ForegroundColor = this.session.GetOption<string>(PredefinedOptions.THEME_FONT_COLOR);
             VTSize displaySize = new VTSize(this.Width, this.Height);
-            TerminalSizeModeEnum sizeMode = this.session.GetOption<TerminalSizeModeEnum>(PredefinedOptions.SSH_TERM_SIZE_MODE);
-            int rows = this.session.GetOption<int>(PredefinedOptions.SSH_TERM_ROW);
-            int cols = this.session.GetOption<int>(PredefinedOptions.SSH_TERM_COL);
+            TerminalSizeModeEnum sizeMode = this.session.GetOption<TerminalSizeModeEnum>(PredefinedOptions.TERM_SIZE_MODE);
+            int rows = this.session.GetOption<int>(PredefinedOptions.TERM_ROW);
+            int cols = this.session.GetOption<int>(PredefinedOptions.TERM_COL);
             if (sizeMode == TerminalSizeModeEnum.AutoFit)
             {
                 /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
@@ -323,14 +298,6 @@ namespace ModengTerm.ViewModel.Terminal
             videoTerminal.DisableBell = Session.GetOption<bool>(PredefinedOptions.TERM_DISABLE_BELL);
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
-
-            #endregion
-
-            #region 加载自动完成列表功能
-
-            AutoCompletionVM = new AutoCompletionVM();
-            AutoCompletionVM.Initialize(this);
-            AutoCompletionVM.Enabled = Session.GetOption<bool>(PredefinedOptions.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
 
             #endregion
 
@@ -363,8 +330,6 @@ namespace ModengTerm.ViewModel.Terminal
                 return;
             }
 
-            AutoCompletionVM.Release();
-
             channelTransport.StatusChanged -= SessionTransport_StatusChanged;
             channelTransport.DataReceived -= SessionTransport_DataReceived;
             channelTransport.Close();
@@ -372,9 +337,6 @@ namespace ModengTerm.ViewModel.Terminal
 
             videoTerminal.OnViewportChanged -= VideoTerminal_ViewportChanged;
             videoTerminal.Release();
-
-            // 释放剪贴板
-            clipboard.Release();
 
             isRunning = false;
         }
@@ -385,7 +347,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         private ChannelOptions CreateChannelOptions(int rows, int cols)
         {
-            int recvBufferSize = this.session.GetOption<int>(PredefinedOptions.SSH_READ_BUFFER_SIZE);
+            int recvBufferSize = this.session.GetOption<int>(PredefinedOptions.TERM_READ_BUFFER_SIZE);
 
             switch ((SessionTypeEnum)this.session.Type)
             {
@@ -413,11 +375,11 @@ namespace ModengTerm.ViewModel.Terminal
                             Column = cols,
                             Row = rows,
                             AuthenticationType = this.session.GetOption<SSHAuthTypeEnum>(PredefinedOptions.SSH_AUTH_TYPE),
-                            UserName = this.session.GetOption<string>(PredefinedOptions.SFTP_USER_NAME),
-                            Password = this.session.GetOption<string>(PredefinedOptions.SFTP_USER_PASSWORD),
-                            PrivateKeyId = this.session.GetOption<string>(PredefinedOptions.SSH_PRIVATE_KEY_FILE),
+                            UserName = this.session.GetOption<string>(PredefinedOptions.SSH_USER_NAME),
+                            Password = this.session.GetOption<string>(PredefinedOptions.SSH_PASSWORD),
+                            PrivateKeyId = this.session.GetOption<string>(PredefinedOptions.SSH_PRIVATE_KEY_ID),
                             Passphrase = this.session.GetOption<string>(PredefinedOptions.SSH_Passphrase),
-                            ServerPort = this.session.GetOption<int>(PredefinedOptions.SFTP_SERVER_PORT),
+                            ServerPort = this.session.GetOption<int>(PredefinedOptions.SSH_SERVER_PORT),
                             ServerAddress = this.session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR),
                             TerminalType = this.session.GetOption<string>(PredefinedOptions.SSH_TERM_TYPE),
                             PortForwards = this.session.GetOption<List<PortForward>>(PredefinedOptions.SSH_PORT_FORWARDS)
@@ -932,11 +894,6 @@ namespace ModengTerm.ViewModel.Terminal
             });
         }
 
-        private void SelectAll()
-        {
-            videoTerminal.SelectAll();
-        }
-
         #endregion
 
         #region IClientShellTab
@@ -997,8 +954,6 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 return;
             }
-
-            clipboard.SetData(paragraph);
 
             // 把数据设置到Windows剪贴板里
             System.Windows.Clipboard.SetText(paragraph.Content);

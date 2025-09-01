@@ -234,9 +234,9 @@ namespace ModengTerm.UnitTest
             // 重写测试使用的Session参数
             XTermSession session = manifest.DefaultSession;
             session.SetOption<int>(PredefinedOptions.TERM_MAX_ROLLBACK, 1000);
-            session.SetOption<TerminalSizeModeEnum>(PredefinedOptions.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.Fixed);
-            session.SetOption<int>(PredefinedOptions.SSH_TERM_ROW, row);
-            session.SetOption<int>(PredefinedOptions.SSH_TERM_COL, col);
+            session.SetOption<TerminalSizeModeEnum>(PredefinedOptions.TERM_SIZE_MODE, TerminalSizeModeEnum.Fixed);
+            session.SetOption<int>(PredefinedOptions.TERM_ROW, row);
+            session.SetOption<int>(PredefinedOptions.TERM_COL, col);
 
             return session;
         }

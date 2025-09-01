@@ -22,6 +22,7 @@ namespace ModengTerm.ViewModel
         {
             switch ((SessionTypeEnum)session.Type)
             {
+                case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.Ssh:
                 case SessionTypeEnum.LocalConsole:

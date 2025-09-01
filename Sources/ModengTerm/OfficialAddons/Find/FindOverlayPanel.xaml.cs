@@ -118,7 +118,7 @@ namespace ModengTerm.OfficialAddons.Find
         {
             this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.Tab);
 
-            string backColorRgbKey = this.Tab.GetOption<string>(PredefinedOptions.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            string backColorRgbKey = this.Tab.GetOption<string>(PredefinedOptions.THEME_SELECTION_BACK_COLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
             IClientShellTab shellTab = this.Tab as IClientShellTab;
             this.drawingContext = shellTab.DrawingContext;

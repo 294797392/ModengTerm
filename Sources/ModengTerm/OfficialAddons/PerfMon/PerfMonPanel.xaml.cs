@@ -786,6 +786,11 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 this.cpuUsagePerf.Dispose();
                 this.cpuUsagePerf = null;
             }
+
+            if (this.timerHandle != null)
+            {
+                TimerUtils.Context.DeleteTimer(this.timerHandle);
+            }
         }
 
         public override void Load()

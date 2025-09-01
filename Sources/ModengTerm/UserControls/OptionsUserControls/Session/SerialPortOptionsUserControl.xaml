@@ -31,35 +31,22 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="端口号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxPortNames" IsEditable="True"
-                  ItemsSource="{Binding Path=PortList}" Text="{Binding Path=SelectedPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}" Margin="0,0,65,0"/>
-        <Button Grid.Row="0" Grid.Column="1" Content="刷新" Width="60" HorizontalAlignment="Right" Margin="0,0,3,0" Click="ButtonRefreshPortList_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxPortNames" IsEditable="True" Style="{StaticResource ResourceKey=StyleComboBoxValue}" Margin="3,0,65,0"/>
+        <Button Grid.Row="0" Grid.Column="1" Content="刷新" Width="60" HorizontalAlignment="Right" Margin="0,0,3,0" Click="ButtonRefreshPortList_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="波特率：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxBaudRate" IsEditable="True"
-                  ItemsSource="{Binding Path=BaudRateList}" Text="{Binding Path=SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxBaudRate" IsEditable="True" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="数据位：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxDataBits"
-                  DataContext="{Binding Path=DataBitsList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
-
+        <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxDataBits" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="停止位：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxStopBits"
-                  DataContext="{Binding Path=StopBitsList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxStopBits" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0" Text="校验位：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ComboBoxParityList"
-                  DataContext="{Binding Path=ParityList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ComboBoxParityList" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="5" Grid.Column="0" Text="流控制：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="5" Grid.Column="1" x:Name="ComboBoxHandshake"
-                  DataContext="{Binding Path=HandshakeList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+        <ComboBox Grid.Row="5" Grid.Column="1" x:Name="ComboBoxHandshake" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
     </Grid>
 </UserControl>

@@ -24,24 +24,6 @@ namespace ModengTerm.Base
         public List<AppTheme> AppThemes { get; private set; }
 
         /// <summary>
-        /// XTerminal支持的文字大小列表
-        /// </summary>
-        [JsonProperty("fontSize")]
-        public List<FontSizeDefinition> FontSizeList { get; private set; }
-
-        /// <summary>
-        /// 支持的文字样式列表
-        /// </summary>
-        [JsonProperty("fontFamily")]
-        public List<FontFamilyDefinition> FontFamilyList { get; private set; }
-
-        /// <summary>
-        /// 主题列表
-        /// </summary>
-        [JsonProperty("defaultThemes")]
-        public List<ThemePackage> DefaultThemes { get; private set; }
-
-        /// <summary>
         /// 插件列表
         /// </summary>
         [JsonProperty("addons")]
@@ -51,9 +33,6 @@ namespace ModengTerm.Base
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.AppThemes = new List<AppTheme>();
-            this.FontSizeList = new List<FontSizeDefinition>();
-            this.FontFamilyList = new List<FontFamilyDefinition>();
-            this.DefaultThemes = new List<ThemePackage>();
             this.Addons = new List<AddonMetadata>();
         }
     }

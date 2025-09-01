@@ -393,6 +393,17 @@
                             "name": "SSH",
                             "className": "ModengTerm.UserControls.OptionsUserControl.SSH.SSHOptionsUserControl, ModengTerm",
                             "scopes": [ "ssh" ],
+                            "defaultOptions": {
+                                "ssh_server_addr": "192.168.1.1",
+                                "ssh_server_port": 22,
+                                "ssh_user_name": "",
+                                "ssh_password": "",
+                                "ssh_private_key_id": "",
+                                "ssh_passphrase": "",
+                                "ssh_auth_type": "password",
+                                "ssh_port_forwards": [],
+                                "ssh_term_type": "xterm-256color"
+                            },
                             "child": [
                                 {
                                     "id": "5919A665-EB86-437F-A227-124783A410F6",
@@ -406,13 +417,26 @@
                             "id": "9CCE099F-DBC2-4193-B557-239CA48F3F4C",
                             "name": "串口",
                             "className": "XTerminal.UserControls.OptionsUserControl.SerialPortOptionsUserControl, ModengTerm",
-                            "scopes": [ "serialPort" ]
+                            "scopes": [ "serialPort" ],
+                            "defaultOptions": {
+                                "serial_name": "COM1",
+                                "serial_baudrate": 115200,
+                                "serial_databits": 8,
+                                "serial_stopbits": "one",
+                                "serial_parity": "none",
+                                "serial_handshake": "none"
+                            }
                         },
                         {
                             "id": "B940611E-C437-4E3B-A490-15F3E4C7E197",
                             "name": "Tcp",
                             "className": "ModengTerm.UserControls.OptionsUserControl.RawTcp.RawTcpOptionsUserControl, ModengTerm",
-                            "scopes": [ "tcp" ]
+                            "scopes": [ "tcp" ],
+                            "defaultOptions": {
+                                "tcp_type": "client",
+                                "tcp_addr": "127.0.0.1",
+                                "tcp_port": 2025
+                            }
                         }
                     ]
                 },
@@ -420,170 +444,85 @@
                     "id": "24AFB18B-79BB-435A-B4F1-A62006F1A026",
                     "name": "终端",
                     "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.TerminalOptionsUserControl, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ],
+                    "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                    "defaultOptions": {
+                        "term_row": 80,
+                        "term_col": 24,
+                        "term_max_scrollback": 20000,
+                        "term_disable_bell": false,
+                        "term_size_mode": "autoFit",
+                        "term_encoding": "utf-8",
+                        "term_right_click_action": "contextMenu",
+                        "term_read_buffer_size": 16384
+                    },
                     "child": [
                         {
                             "id": "0FA6848B-5FC8-4B4A-B387-544EEF845498",
                             "name": "外观",
                             "className": "ModengTerm.UserControls.OptionsUserControls.Terminal.ThemeOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ]
+                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "defaultOptions": {
+                                "theme_font_family": "%SYS_FONT%",
+                                "theme_font_size": 14,
+                                "theme_font_color": "242,242,242,255",
+                                "theme_back_color": "36,36,36,255",
+                                "theme_cursor_color": "255,255,255,255",
+                                "theme_back_image_name": "",
+                                "theme_back_image_data": "",
+                                "theme_back_image_opacity": 0.7,
+                                "theme_color_table": {
+                                    "rgbKeys": [
+                                        "54,52,46,255",
+                                        "165,100,52,255",
+                                        "0,128,0,255",
+                                        "153,150,6,255",
+                                        "70,70,255,255",
+                                        "123,81,117,255",
+                                        "0,162,196,255",
+                                        "207,216,211,255",
+                                        "83,87,85,255",
+                                        "207,158,114,255",
+                                        "28,196,112,255",
+                                        "226,226,52,255",
+                                        "111,111,244,255",
+                                        "169,126,173,255",
+                                        "80,235,252,255",
+                                        "236,238,238,255"
+                                    ]
+                                },
+                                "theme_id": "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
+                                "theme_padding": 5,
+                                "theme_selection_back_color": "255,255,255,100"
+                            }
                         },
                         {
-                            "id": "5ABD09D0-3F88-45DC-A2DA-1E528914DF00",
-                            "name": "行为",
-                            "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.BehaviorOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ]
+                            "id": "07003B7C-4E63-8213-777A-E37D52BAC31B",
+                            "name": "鼠标",
+                            "className": "ModengTerm.UserControls.OptionsUserControls.Terminal.MouseOptionsUserControl, ModengTerm",
+                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "defaultOptions": {
+                                "cursor_speed": "normal",
+                                "cursor_style": "line",
+                                "cursor_scroll_delta": 1
+                            }
                         },
                         {
                             "id": "39C7B12B-479D-40DF-803F-FDDEC7B4CF61",
                             "name": "高级",
                             "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ]
+                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "defaultOptions": {
+                                "term_adv_render_mode": "default",
+                                "term_adv_click_to_cursor": false,
+                                "term_adv_auto_wrap_mode": false,
+                                "term_adv_send_color": "255,255,255,255",
+                                "term_adv_recv_color": "255,255,255,255",
+                                "term_adv_render_send": false
+                            }
                         }
                     ]
                 }
             ]
-        }
-    ],
-
-
-
-    "fontSize": [
-        {
-            "id": "12",
-            "name": "12号",
-            "value": 12
-        },
-
-        {
-            "id": "14",
-            "name": "14号",
-            "value": 14
-        },
-
-        {
-            "id": "16",
-            "name": "16号",
-            "value": 16
-        },
-
-        {
-            "id": "18",
-            "name": "18号",
-            "value": 18
-        },
-
-        {
-            "id": "20",
-            "name": "20号",
-            "value": 20
-        }
-    ],
-
-    "fontFamily": [
-        {
-            "name": "新宋体",
-            "value": "新宋体"
-        },
-        {
-            "name": "黑体",
-            "value": "黑体"
-        },
-        {
-            "name": "仿宋",
-            "value": "仿宋"
-        },
-        {
-            "name": "楷书",
-            "value": "楷书"
-        },
-        {
-            "name": "隶书",
-            "value": "隶书"
-        },
-        {
-            "name": "幼圆",
-            "value": "幼圆"
-        },
-        {
-            "name": "Consolas",
-            "value": "Consolas"
-        }
-    ],
-
-    "defaultThemes": [
-        {
-            "id": "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
-            "name": "Xshell - NewBlack",
-            "colorTable": {
-                "rgbKeys": [
-                    "54,52,46,255",
-                    "165,100,52,255",
-                    "0,128,0,255",
-                    "153,150,6,255",
-                    "70,70,255,255",
-                    "123,81,117,255",
-                    "0,162,196,255",
-                    "207,216,211,255",
-
-                    "83,87,85,255",
-                    "207,158,114,255",
-                    "28,196,112,255",
-                    "226,226,52,255",
-                    "111,111,244,255",
-                    "169,126,173,255",
-                    "80,235,252,255",
-                    "236,238,238,255"
-                ]
-            },
-            "backgroundType": 0,
-            "backgroundUri": "54,52,46",
-            "backColor": "36,36,36,255",
-            "fontColor": "242,242,242,255",
-            "fontSize": 14,
-            "cursorColor": "255,255,255,255",
-            "bookmarkColor": "236,238,238,255",
-            "highlightFontColor": "54,52,46,255",
-            "highlightBackColor": "236,238,238,100",
-            "selectionColor": "255,255,255,100",
-            "backImageOpacity": 1
-        },
-
-        {
-            "id": "AC439E26-0768-4131-8F86-1D79778846DB",
-            "name": "Xshell - XTerm",
-            "colorTable": {
-                "rgbKeys": [
-                    "0,0,0,255",
-                    "187,0,0,255",
-                    "0,100,0,255",
-                    "200,175,0,255",
-                    "30,144,245,255",
-                    "187,0,187,255",
-                    "0,205,205,255",
-                    "235,235,235,255",
-
-                    "85,85,85,255",
-                    "255,85,85,255",
-                    "85,255,85,255",
-                    "255,245,85,255",
-                    "80,190,255,255",
-                    "255,85,255,255",
-                    "85,255,255,255",
-                    "255,255,255,255"
-                ]
-            },
-            "backgroundType": 0,
-            "backgroundUri": "0,0,0,255",
-            "backColor": "0,0,0,255",
-            "fontColor": "255,255,255,255",
-            "fontSize": 14,
-            "cursorColor": "255,255,255,255",
-            "bookmarkColor": "255,255,255,255",
-            "highlightFontColor": "0,0,0,255,255",
-            "highlightBackColor": "255,255,255,100",
-            "selectionColor": "255,255,255,100",
-            "backImageOpacity": 1
         }
     ]
 }

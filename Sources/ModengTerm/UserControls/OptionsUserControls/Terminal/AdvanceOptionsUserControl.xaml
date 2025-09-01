@@ -35,9 +35,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="显示方式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=RenderModes}" ItemsSource="{Binding}" 
-                          SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxRenderModes" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource ResourceKey=RenderModeTextConverter}}"/>
@@ -46,25 +44,22 @@
                 </ComboBox>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="输入颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <xceedtoolkit:ColorPicker Grid.Row="1" Grid.Column="1" x:Name="ColorPickerSendColor" SelectedColor="{Binding Path=SendColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+                <xceedtoolkit:ColorPicker Grid.Row="1" Grid.Column="1" x:Name="ColorPickerSendColor" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="接收颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <xceedtoolkit:ColorPicker Grid.Row="2" Grid.Column="1" x:Name="ColorPickerRecvColor" SelectedColor="{Binding Path=RecvColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+                <xceedtoolkit:ColorPicker Grid.Row="2" Grid.Column="1" x:Name="ColorPickerRecvColor" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
-                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,0,5,0" IsChecked="{Binding Path=RenderWrite,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="显示输入的数据" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="CheckBoxDisplaySend" HorizontalAlignment="Right" Margin="0,0,5,0" Content="显示输入的数据" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
 
             </Grid>
         </GroupBox>
 
         <StackPanel Margin="210,10,0,0" Orientation="Vertical">
-            <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="0,0,0,0"
-                  Content="自由移动光标" IsChecked="{Binding Path=ClickToCursor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+            <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="CheckBoxClickToCursor" VerticalAlignment="Center" Margin="0,0,0,0"
+                  Content="自由移动光标" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
 
-            <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="0,10,0,0"
-                  Content="启用自动完成列表" IsChecked="{Binding Path=AutoCompletionList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
-
-            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="0,10,0,0"
-                  Content="自动换行（DECAWM）" IsChecked="{Binding Path=AutoWrapMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="CheckBoxAutoWrapMode" VerticalAlignment="Center" Margin="0,10,0,0"
+                  Content="自动换行（DECAWM）" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
 
         </StackPanel>
         

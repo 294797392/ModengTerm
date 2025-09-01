@@ -132,7 +132,7 @@ namespace ModengTerm.ViewModel
                 opvm.Release();
             }
 
-            this.OverlayPanels.Clear();
+            this.overlayPanels.Clear();
 
             #endregion
 
@@ -142,6 +142,8 @@ namespace ModengTerm.ViewModel
             {
                 spvm.Release();
             }
+
+            this.sidePanels.Clear();
 
             #endregion
 
