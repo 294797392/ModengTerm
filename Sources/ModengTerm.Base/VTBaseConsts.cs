@@ -69,7 +69,7 @@ namespace ModengTerm.Base
                         { PredefinedOptions.CURSOR_SPEED, "normal" },
                         { PredefinedOptions.TERM_ROW, 24 },
                         { PredefinedOptions.TERM_COL, 80 },
-                        { PredefinedOptions.SSH_TERM_TYPE, "xterm-256color" },
+                        { PredefinedOptions.TERM_TYPE, "xterm-256color" },
                         { PredefinedOptions.TERM_SIZE_MODE, "autoFit" },
                         { PredefinedOptions.TERM_ENCODING, "UTF-8" },
                         { PredefinedOptions.TERM_READ_BUFFER_SIZE, 8192 },
@@ -115,6 +115,13 @@ namespace ModengTerm.Base
                 ID = "3",
                 Name = "Tcp",
                 Type = SessionTypeEnum.Tcp
+            },
+
+            new SessionMetadata()
+            {
+                ID = "4",
+                Name = "Sftp",
+                Type = SessionTypeEnum.Sftp
             }
         };
 

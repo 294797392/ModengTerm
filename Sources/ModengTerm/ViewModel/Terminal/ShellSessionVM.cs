@@ -19,6 +19,7 @@ using ModengTerm.Terminal.Modem;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -351,7 +352,7 @@ namespace ModengTerm.ViewModel.Terminal
 
             switch ((SessionTypeEnum)this.session.Type)
             {
-                case SessionTypeEnum.SerialPort: 
+                case SessionTypeEnum.SerialPort:
                     {
                         return new SerialPortChannelOptions()
                         {
@@ -381,14 +382,14 @@ namespace ModengTerm.ViewModel.Terminal
                             Passphrase = this.session.GetOption<string>(PredefinedOptions.SSH_Passphrase),
                             ServerPort = this.session.GetOption<int>(PredefinedOptions.SSH_SERVER_PORT),
                             ServerAddress = this.session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR),
-                            TerminalType = this.session.GetOption<string>(PredefinedOptions.SSH_TERM_TYPE),
+                            TerminalType = this.session.GetOption<string>(PredefinedOptions.TERM_TYPE),
                             PortForwards = this.session.GetOption<List<PortForward>>(PredefinedOptions.SSH_PORT_FORWARDS)
                         };
                     }
 
                 case SessionTypeEnum.LocalConsole:
                     {
-                        return new LocalConsoleChannelOptions() 
+                        return new LocalConsoleChannelOptions()
                         {
                             ReceiveBufferSize = recvBufferSize,
                             Column = cols,
@@ -402,7 +403,7 @@ namespace ModengTerm.ViewModel.Terminal
 
                 case SessionTypeEnum.Tcp:
                     {
-                        return new TcpChannelOptions() 
+                        return new TcpChannelOptions()
                         {
                             ReceiveBufferSize = recvBufferSize,
                             Column = cols,
@@ -833,12 +834,11 @@ namespace ModengTerm.ViewModel.Terminal
                 {
                     logger.Error("Render异常", ex);
                 }
-            });
+
+            }, System.Windows.Threading.DispatcherPriority.Background);
 
             VTDocument mainDocument = this.videoTerminal.MainDocument;
             this.TotalRows = mainDocument.History.Lines;
-
-            HandleScript();
         }
 
         private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Base.Enumerations;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using XTerminal;
 using ModengTerm.ViewModel.Terminal;
+using ModengTerm.ViewModel.FileTrans;
 
 namespace ModengTerm.ViewModel
 {
@@ -28,6 +28,11 @@ namespace ModengTerm.ViewModel
                 case SessionTypeEnum.LocalConsole:
                     {
                         return new ShellSessionVM(session);
+                    }
+
+                case SessionTypeEnum.Sftp:
+                    {
+                        return new FsSessionVM(session);
                     }
 
                 default:

@@ -893,6 +893,7 @@ namespace ModengTerm
         public void OpenSession(XTermSession session, bool addToRecent = true)
         {
             ISessionContent content = ContentFactory.Create(session);
+            content.Session = session;
             ContentControlSession.Content = content;
 
             OpenedSessionVM openedSessionVM = OpenedSessionVMFactory.Create(session);

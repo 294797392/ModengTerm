@@ -69,11 +69,14 @@
     <Compile Remove="OfficialAddons\Snippet\QuickInputVM.cs" />
     <Compile Remove="OfficialAddons\Explorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\OptionsUserControls\Session\LoginScriptOptionsUserControl.xaml.cs" />
+    <Compile Remove="UserControls\OptionsUserControls\Session\SftpOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\OptionsUserControls\Terminal\BehaviorOptionsUserControl.xaml.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModel\CreateSession\OptionContentVM.cs" />
+    <Compile Remove="ViewModel\FileTrans\FsDirVM.cs" />
+    <Compile Remove="ViewModel\FileTrans\FsFileVM.cs" />
     <Compile Remove="ViewModel\Terminal\BookmarksVM.cs" />
     <Compile Remove="ViewModel\Terminal\ClipboardVM.cs" />
     <Compile Remove="ViewModel\Terminal\FavoritesVM.cs" />
@@ -106,6 +109,7 @@
     <None Remove="Images\QQGroup.png" />
     <None Remove="Images\resource_mgr.png" />
     <None Remove="Images\serialport.png" />
+    <None Remove="Images\sftp.png" />
     <None Remove="Images\ssh.png" />
     <None Remove="Images\tcp.png" />
   </ItemGroup>
@@ -117,6 +121,7 @@
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
     <Page Remove="Themes\Themes.XShell.xaml" />
     <Page Remove="UserControls\OptionsUserControls\Session\LoginScriptOptionsUserControl.xaml" />
+    <Page Remove="UserControls\OptionsUserControls\Session\SftpOptionsUserControl.xaml" />
     <Page Remove="UserControls\OptionsUserControls\Session\SystemWatchOptionsUserControl.xaml" />
     <Page Remove="UserControls\OptionsUserControls\Terminal\BehaviorOptionsUserControl.xaml" />
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
@@ -146,6 +151,7 @@
     <ProjectReference Include="..\ModengTerm.Addon\ModengTerm.Addon.csproj" />
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
+    <ProjectReference Include="..\ModengTerm.FileTrans\ModengTerm.FileTrans.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
 
@@ -188,6 +194,7 @@
     <Resource Include="Images\portForward.png" />
     <Resource Include="Images\QQGroup.png" />
     <Resource Include="Images\serialport.png" />
+    <Resource Include="Images\sftp.png" />
     <Resource Include="Images\ssh.png" />
     <Resource Include="Images\tcp.png" />
   </ItemGroup>

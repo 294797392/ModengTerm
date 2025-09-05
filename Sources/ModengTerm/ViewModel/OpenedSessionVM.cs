@@ -38,7 +38,6 @@ namespace ModengTerm.ViewModel
         private SessionStatusEnum status;
         private DependencyObject content;
 
-        private Dictionary<AddonModule, Dictionary<string, object>> dataMap;
         private List<SidePanelVM> sidePanels;
         private BindableCollection<OverlayPanelVM> overlayPanels;
 
@@ -99,7 +98,6 @@ namespace ModengTerm.ViewModel
         public OpenedSessionVM(XTermSession session)
         {
             this.session = session;
-            this.dataMap = new Dictionary<AddonModule, Dictionary<string, object>>();
             this.sidePanels = new List<SidePanelVM>();
             this.overlayPanels = new BindableCollection<OverlayPanelVM>();
         }
@@ -146,8 +144,6 @@ namespace ModengTerm.ViewModel
             this.sidePanels.Clear();
 
             #endregion
-
-            this.dataMap.Clear();
         }
 
         public int Open()
@@ -249,42 +245,6 @@ namespace ModengTerm.ViewModel
         public T GetOption<T>(string key)
         {
             return this.Session.GetOption<T>(key);
-        }
-
-        public void SetData(AddonModule addon, string key, object value)
-        {
-            Dictionary<string, object> map;
-
-            if (!this.dataMap.TryGetValue(addon, out map))
-            {
-                map = new Dictionary<string, object>();
-                this.dataMap[addon] = map;
-            }
-
-            map[key] = value;
-        }
-
-        public TValue GetData<TValue>(AddonModule addon, string key)
-        {
-            Dictionary<string, object> map;
-
-            if (!this.dataMap.TryGetValue(addon, out map))
-            {
-                return default(TValue);
-            }
-
-            object value;
-            if (!map.TryGetValue(key, out value))
-            {
-                return default(TValue);
-            }
-
-            if (value == null)
-            {
-                return default(TValue);
-            }
-
-            return (TValue)value;
         }
 
         #endregion

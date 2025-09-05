@@ -8,6 +8,7 @@ using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls.TerminalUserControls;
@@ -20,7 +21,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm
 {
@@ -649,6 +649,46 @@ namespace ModengTerm
                 case Win32ConsoleEngineEnum.Auto: return "自动选择";
                 default:
                     return consoleEngine.ToString();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FileItemDisplaySizeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            long size = (long)value;
+
+            double toValue;
+            SizeUnitEnum toUnit;
+            VTBaseUtils.AutoFitSize(size, SizeUnitEnum.bytes, out toValue, out toUnit);
+
+            return string.Format("{0}{1}", toValue, VTBaseUtils.GetSizeUnitName(toUnit));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FsItemTypeNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FsItemTypeEnum type = (FsItemTypeEnum)value;
+
+            switch (type)
+            {
+                case FsItemTypeEnum.File: return "文件";
+                case FsItemTypeEnum.Directory: return "文件夹";
+                default:
+                    throw new NotImplementedException();
             }
         }
 

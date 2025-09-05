@@ -4,23 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base.Enumerations
+namespace ModengTerm.FileTrans.Enumerations
 {
-    public enum SFTPAuthTypeEnum
+    public enum FileTaskTypeEnum
     {
         /// <summary>
-        /// 不需要验证，直接输入IP地址和端口号就可以
+        /// 上传文件任务
         /// </summary>
-        None,
+        UploadFile,
 
         /// <summary>
-        /// 密码验证
+        /// 下载文件任务
         /// </summary>
-        Password,
+        DownloadFile,
 
         /// <summary>
-        /// 私钥验证
+        /// 创建目录任务
         /// </summary>
-        PrivateKey
+        CreateDirectory
     }
 }

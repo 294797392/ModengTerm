@@ -53,6 +53,7 @@ namespace ModengTerm.Base.DataModels
         [EnumDataType(typeof(RightClickActions))]
         public const string TERM_RIGHT_CLICK_ACTION = "term_right_click_action";
         public const string TERM_READ_BUFFER_SIZE = "term_read_buffer_size";
+        public const string TERM_TYPE = "term_type";
 
 
 
@@ -103,7 +104,6 @@ namespace ModengTerm.Base.DataModels
         public const string SSH_Passphrase = "ssh_passphrase";
         public const string SSH_AUTH_TYPE = "ssh_auth_type";
         public const string SSH_PORT_FORWARDS = "ssh_port_forwards";
-        public const string SSH_TERM_TYPE = "ssh_term_type";
 
         #endregion
 
@@ -226,15 +226,10 @@ namespace ModengTerm.Base.DataModels
 
         #endregion
 
-        #region SFTP 10000 - 11000
+        #region SFTP - 常规设置
 
-        //public const string SFTP_SERVER_ADDRESS = " 10000";
-        //public const string SFTP_SERVER_PORT = " 10001";
-        //public const string SFTP_USER_NAME = " 10002";
-        //public const string SFTP_USER_PASSWORD = " 10003";
-        ////SFTP_AUTH_TYPE =" 10004";
-        //public const string SFTP_SERVER_INITIAL_DIRECTORY = " 10005";
-        //public const string SFTP_CLIENT_INITIAL_DIRECTORY = " 10006";
+        public const string FS_GENERAL_SERVER_INITIAL_DIR = "fs_general_server_initial_dir";
+        public const string FS_GENERAL_CLIENT_INITIAL_DIR = "fs_general_client_initial_dir";
 
         #endregion
     }

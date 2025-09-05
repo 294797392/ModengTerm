@@ -400,9 +400,7 @@
                                 "ssh_password": "",
                                 "ssh_private_key_id": "",
                                 "ssh_passphrase": "",
-                                "ssh_auth_type": "password",
-                                "ssh_port_forwards": [],
-                                "ssh_term_type": "xterm-256color"
+                                "ssh_auth_type": "password"
                             },
                             "child": [
                                 {
@@ -437,8 +435,33 @@
                                 "tcp_addr": "127.0.0.1",
                                 "tcp_port": 2025
                             }
+                        },
+                        {
+                            "id": "D4685D16-0273-79C5-FB6E-236F699D1C0C",
+                            "name": "连接配置",
+                            "className": "ModengTerm.UserControls.OptionsUserControl.SSH.SSHOptionsUserControl, ModengTerm",
+                            "scopes": [ "sftp" ],
+                            "defaultOptions": {
+                                "ssh_server_addr": "192.168.1.1",
+                                "ssh_server_port": 22,
+                                "ssh_user_name": "",
+                                "ssh_password": "",
+                                "ssh_private_key_id": "",
+                                "ssh_passphrase": "",
+                                "ssh_auth_type": "password"
+                            }
                         }
                     ]
+                },
+                {
+                    "id": "B8EC88D3-EA30-A2B3-9A1B-01B43952AE08",
+                    "name": "常规设置",
+                    "className": "ModengTerm.UserControls.OptionsUserControls.FileTrans.GenericOptionsUserControl, ModengTerm",
+                    "scopes": [ "sftp" ],
+                    "defaultOptions": {
+                        "fs_general_server_initial_dir": "/root",
+                        "fs_general_client_initial_dir": "%CLI_DIR%"
+                    }
                 },
                 {
                     "id": "24AFB18B-79BB-435A-B4F1-A62006F1A026",
@@ -453,7 +476,8 @@
                         "term_size_mode": "autoFit",
                         "term_encoding": "utf-8",
                         "term_right_click_action": "contextMenu",
-                        "term_read_buffer_size": 16384
+                        "term_read_buffer_size": 16384,
+                        "term_type": "xterm-256color"
                     },
                     "child": [
                         {

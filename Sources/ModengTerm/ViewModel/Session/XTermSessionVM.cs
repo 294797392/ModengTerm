@@ -77,19 +77,19 @@ namespace ModengTerm.ViewModel.Session
             {
                 case SessionTypeEnum.SerialPort:
                     {
-                        URI = session.GetOption<string>(PredefinedOptions.SERIAL_PORT_NAME);
+                        this.URI = session.GetOption<string>(PredefinedOptions.SERIAL_PORT_NAME);
                         break;
                     }
 
                 case SessionTypeEnum.Ssh:
                     {
-                        URI = session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR);
+                        this.URI = session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR);
                         break;
                     }
 
                 case SessionTypeEnum.LocalConsole:
                     {
-                        URI = session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH);
+                        this.URI = session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH);
                         break;
                     }
 
@@ -98,6 +98,12 @@ namespace ModengTerm.ViewModel.Session
                         string ipaddr = session.GetOption<string>(PredefinedOptions.RAW_TCP_ADDRESS);
                         int port = session.GetOption<int>(PredefinedOptions.RAW_TCP_PORT);
                         this.URI = string.Format("{0}:{1}", ipaddr, port);
+                        break;
+                    }
+
+                case SessionTypeEnum.Sftp:
+                    {
+                        this.URI = session.GetOption<string>(PredefinedOptions.SSH_SERVER_ADDR);
                         break;
                     }
 

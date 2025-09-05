@@ -18,7 +18,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal.Base.Enumerations;
 using ModengTerm.ViewModel.CreateSession;
 using ModengTerm.Base;
 using ModengTerm.Addon.Controls;

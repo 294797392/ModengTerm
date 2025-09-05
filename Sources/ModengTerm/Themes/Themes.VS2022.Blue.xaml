@@ -14,6 +14,7 @@
     <BitmapImage x:Key="504" UriSource="pack://application:,,,/ModengTerm;component/Images/tcp.png"/>
     <BitmapImage x:Key="505" UriSource="pack://application:,,,/ModengTerm;component/Images/goback.png"/>
     <BitmapImage x:Key="RES506E" UriSource="pack://application:,,,/ModengTerm;component/Images/adb.png"/>
+    <BitmapImage x:Key="RES507E" UriSource="pack://application:,,,/ModengTerm;component/Images/sftp.png"/>
 
 
 

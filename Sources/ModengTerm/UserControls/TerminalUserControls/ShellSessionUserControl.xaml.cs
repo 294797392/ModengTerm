@@ -572,6 +572,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 this.shellSession.AlternateDocument = DocumentAlternate;
                 this.shellSession.Width = width;
                 this.shellSession.Height = height;
+                // TODO：Open应该由上层统一调用
                 this.shellSession.Open();
 
                 this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
@@ -596,6 +597,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.videoTerminal.RequestChangeVisible -= this.VideoTerminal_RequestChangeVisible;
             this.videoTerminal = null;
 
+            // TODO：Close和Release应该由上层统一调用
             this.shellSession.Close();
             this.shellSession.Release();
         }

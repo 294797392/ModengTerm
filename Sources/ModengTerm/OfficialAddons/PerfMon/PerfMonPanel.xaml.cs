@@ -36,18 +36,6 @@ namespace ModengTerm.OfficialAddons.PerfMon
     /// </summary>
     public partial class PerfMonPanel : TabedSidePanel
     {
-        /// <summary>
-        /// 定义内存大小的单位
-        /// </summary>
-        private enum UnitType
-        {
-            bytes,
-            KB,
-            MB,
-            GB,
-            TB
-        }
-
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("PerfMonPanel");
@@ -144,9 +132,9 @@ namespace ModengTerm.OfficialAddons.PerfMon
             ulong usageMem = totalMem - availableMem;
 
             double total, usage;
-            UnitType totalUnit, usageUnit;
-            this.AutoFitSize(totalMem, UnitType.KB, out total, out totalUnit);
-            this.AutoFitSize(usageMem, UnitType.KB, out usage, out usageUnit);
+            SizeUnitEnum totalUnit, usageUnit;
+            VTBaseUtils.AutoFitSize(totalMem, SizeUnitEnum.KB, out total, out totalUnit);
+            VTBaseUtils.AutoFitSize(usageMem, SizeUnitEnum.KB, out usage, out usageUnit);
             this.cpuMem.DisplayMemoryUsage = string.Format("{0}{1}/{2}{3}", usage, usageUnit, total, totalUnit);
             this.cpuMem.MemoryPercent = Math.Round((double)usageMem / totalMem * 100, 2);
         }
@@ -224,12 +212,12 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 }
 
                 double totalSize = 0, availableFreeSpace = 0;
-                UnitType totalSizeUnit = UnitType.bytes, availableFreeSpaceUnit = UnitType.bytes;
+                SizeUnitEnum totalSizeUnit = SizeUnitEnum.bytes, availableFreeSpaceUnit = SizeUnitEnum.bytes;
 
                 ulong available;
                 if (ulong.TryParse(strs[3], out available))
                 {
-                    this.AutoFitSize(available, UnitType.KB, out availableFreeSpace, out availableFreeSpaceUnit);
+                    VTBaseUtils.AutoFitSize(available, SizeUnitEnum.KB, out availableFreeSpace, out availableFreeSpaceUnit);
                 }
                 else
                 {
@@ -240,7 +228,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 ulong size;
                 if (ulong.TryParse(strs[1], out size))
                 {
-                    this.AutoFitSize(size, UnitType.KB, out totalSize, out totalSizeUnit);
+                    VTBaseUtils.AutoFitSize(size, SizeUnitEnum.KB, out totalSize, out totalSizeUnit);
                 }
                 else
                 {
@@ -364,8 +352,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     if (ulong.TryParse(items[2], out rss))
                     {
                         double memory;
-                        UnitType memoryUnit;
-                        this.AutoFitSize(rss, UnitType.KB, out memory, out memoryUnit);
+                        SizeUnitEnum memoryUnit;
+                        VTBaseUtils.AutoFitSize(rss, SizeUnitEnum.KB, out memory, out memoryUnit);
                         procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
                     }
 
@@ -424,8 +412,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     if (ulong.TryParse(items[2], out rss))
                     {
                         double memory;
-                        UnitType memoryUnit;
-                        this.AutoFitSize(rss, UnitType.KB, out memory, out memoryUnit);
+                        SizeUnitEnum memoryUnit;
+                        VTBaseUtils.AutoFitSize(rss, SizeUnitEnum.KB, out memory, out memoryUnit);
                         procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
                     }
 
@@ -470,9 +458,9 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 }
 
                 double totalSize, availableFreeSpace;
-                UnitType totalSizeUnit, availableFreeSpaceUnit;
-                this.AutoFitSize(drive.TotalSize, UnitType.bytes, out totalSize, out totalSizeUnit);
-                this.AutoFitSize(drive.AvailableFreeSpace, UnitType.bytes, out availableFreeSpace, out availableFreeSpaceUnit);
+                SizeUnitEnum totalSizeUnit, availableFreeSpaceUnit;
+                VTBaseUtils.AutoFitSize(drive.TotalSize, SizeUnitEnum.bytes, out totalSize, out totalSizeUnit);
+                VTBaseUtils.AutoFitSize(drive.AvailableFreeSpace, SizeUnitEnum.bytes, out availableFreeSpace, out availableFreeSpaceUnit);
 
                 disk.FreeRatio = string.Format("{0}{1}/{2}{3}", availableFreeSpace, availableFreeSpaceUnit, totalSize, totalSizeUnit);
             }
@@ -500,8 +488,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     procVM.Name = win32Proc.ProcessName;
 
                     double memory;
-                    UnitType memoryUnit;
-                    this.AutoFitSize(win32Proc.WorkingSet64, UnitType.bytes, out memory, out memoryUnit);
+                    SizeUnitEnum memoryUnit;
+                    VTBaseUtils.AutoFitSize(win32Proc.WorkingSet64, SizeUnitEnum.bytes, out memory, out memoryUnit);
                     procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
 
                     procVMs.Add(procVM);
@@ -531,8 +519,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     procVM.Name = win32Proc.ProcessName;
 
                     double memory;
-                    UnitType memoryUnit;
-                    this.AutoFitSize(win32Proc.WorkingSet64, UnitType.bytes, out memory, out memoryUnit);
+                    SizeUnitEnum memoryUnit;
+                    VTBaseUtils.AutoFitSize(win32Proc.WorkingSet64, SizeUnitEnum.bytes, out memory, out memoryUnit);
                     procVM.DisplayMemory = string.Format("{0}{1}", memory, memoryUnit);
                 }
 
@@ -622,9 +610,9 @@ namespace ModengTerm.OfficialAddons.PerfMon
                 this.cpuMem.MemoryPercent = memstat.dwMemoryLoad;
                 ulong dwUsagePhys = memstat.dwTotalPhys - memstat.dwAvailPhys;
                 double total, usage;
-                UnitType totalUnit, usageUnit;
-                this.AutoFitSize(memstat.dwTotalPhys, UnitType.bytes, out total, out totalUnit);
-                this.AutoFitSize(dwUsagePhys, UnitType.bytes, out usage, out usageUnit);
+                SizeUnitEnum totalUnit, usageUnit;
+                VTBaseUtils.AutoFitSize(memstat.dwTotalPhys, SizeUnitEnum.bytes, out total, out totalUnit);
+                VTBaseUtils.AutoFitSize(dwUsagePhys, SizeUnitEnum.bytes, out usage, out usageUnit);
                 this.cpuMem.DisplayMemoryUsage = string.Format("{0}{1}/{2}{3}", usage, usageUnit, total, totalUnit);
             }
             else
@@ -633,79 +621,6 @@ namespace ModengTerm.OfficialAddons.PerfMon
             }
 
             #endregion
-        }
-
-        /// <summary>
-        /// 根据输入的大小获取一个自适应的大小
-        /// </summary>
-        private void AutoFitSize(double fromValue, UnitType fromUnit, out double toValue, out UnitType toUnit)
-        {
-            toValue = fromValue;
-            toUnit = fromUnit;
-
-            int decimals = 2;
-
-            // 小于1024，如果再转换那就小于1了，显示不友好
-            // 所以直接返回
-            if (fromValue < 1024)
-            {
-                return;
-            }
-
-            toValue = fromValue / 1024;
-
-            switch (fromUnit)
-            {
-                case UnitType.bytes: goto FromBytes;
-                case UnitType.KB: goto FromKB;
-                case UnitType.MB: goto FromMB;
-                case UnitType.GB: goto FromGB;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            FromBytes:
-            if (toValue < 1024)
-            {
-                toValue = Math.Round(toValue, decimals);
-                toUnit = UnitType.KB;
-                return;
-            }
-
-            toValue = toValue / 1024;
-
-            FromKB:
-            if (toValue < 1024)
-            {
-                toValue = Math.Round(toValue, decimals);
-                toUnit = UnitType.MB;
-                return;
-            }
-
-            toValue = toValue / 1024;
-
-            FromMB:
-            if (toValue < 1024)
-            {
-                toValue = Math.Round(toValue, decimals);
-                toUnit = UnitType.GB;
-                return;
-            }
-
-            toValue = toValue / 1024;
-
-            FromGB:
-            if (toValue < 1024)
-            {
-                toValue = Math.Round(toValue, decimals);
-                toUnit = UnitType.TB;
-            }
-            else
-            {
-                // 大于1024TB
-                toValue = Math.Round(toValue, decimals);
-                toUnit = UnitType.TB;
-            }
         }
 
         /// <summary>
@@ -848,8 +763,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     if (bytesReceived > 0)
                     {
                         double value;
-                        UnitType valueUnit;
-                        this.AutoFitSize(bytesReceived, UnitType.bytes, out value, out valueUnit);
+                        SizeUnitEnum valueUnit;
+                        VTBaseUtils.AutoFitSize(bytesReceived, SizeUnitEnum.bytes, out value, out valueUnit);
                         netDevice.DownloadSpeed = string.Format("{0}{1}/s", value, valueUnit);
                     }
                     else
@@ -861,8 +776,8 @@ namespace ModengTerm.OfficialAddons.PerfMon
                     if (bytesSent > 0)
                     {
                         double value;
-                        UnitType valueUnit;
-                        this.AutoFitSize(bytesSent, UnitType.bytes, out value, out valueUnit);
+                        SizeUnitEnum valueUnit;
+                        VTBaseUtils.AutoFitSize(bytesSent, SizeUnitEnum.bytes, out value, out valueUnit);
                         netDevice.UploadSpeed = string.Format("{0}{1}/s", value, valueUnit);
                     }
                     else

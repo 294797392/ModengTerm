@@ -20,7 +20,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFToolkit.Utility;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.UserControls.OptionsUserControl.SSH
 {

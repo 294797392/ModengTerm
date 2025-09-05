@@ -21,7 +21,7 @@ namespace ModengTerm.Themes
                 resourceMap[resourceKey] = resource;
 
                 Freezable freezable = resource as Freezable;
-                if (freezable != null) 
+                if (freezable != null)
                 {
                     //使用Freeze可以提高性能
                     freezable.Freeze();
@@ -44,6 +44,7 @@ namespace ModengTerm.Themes
                 case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("503");
                 case SessionTypeEnum.Ssh: return ThemeManager.GetResource<ImageSource>("502");
                 case SessionTypeEnum.Tcp: return ThemeManager.GetResource<ImageSource>("504");
+                case SessionTypeEnum.Sftp: return ThemeManager.GetResource<ImageSource>("RES507E");
                 default:
                     throw new NotImplementedException();
             }
@@ -73,7 +74,7 @@ namespace ModengTerm.Themes
                 return;
             }
 
-            if (currentTheme != null) 
+            if (currentTheme != null)
             {
                 Application.Current.Resources.MergedDictionaries.Remove(currentTheme);
             }

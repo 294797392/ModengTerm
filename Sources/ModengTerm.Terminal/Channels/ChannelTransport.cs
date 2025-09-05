@@ -106,7 +106,7 @@ namespace ModengTerm.Terminal.Engines
                 return;
             }
 
-            this.CloseDriver();
+            this.CloseChannel();
             this.backgroundTask.Wait();
         }
 
@@ -182,7 +182,7 @@ namespace ModengTerm.Terminal.Engines
 
         #region 实例方法
 
-        private void CloseDriver()
+        private void CloseChannel()
         {
             this.channel.Close();
             this.isRunning = false;
@@ -346,7 +346,7 @@ namespace ModengTerm.Terminal.Engines
         {
             logger.Error("SshNet Stream_ErrorOccurred", e.Exception);
             this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
-            this.CloseDriver();
+            this.CloseChannel();
         }
 
         private void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)

@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
+using ModengTerm.UserControls.FileTransUserControls;
 using ModengTerm.UserControls.TerminalUserControls;
 using System;
 
@@ -17,7 +18,12 @@ namespace ModengTerm
                 case SessionTypeEnum.LocalConsole:
                 case SessionTypeEnum.Ssh:
                     {
-                        return new ShellSessionUserControl() { Session = session };
+                        return new ShellSessionUserControl();
+                    }
+
+                case SessionTypeEnum.Sftp:
+                    {
+                        return new WorkbenchUserControl();
                     }
 
                 default:

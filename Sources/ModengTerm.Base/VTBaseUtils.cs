@@ -244,23 +244,110 @@ namespace ModengTerm.Base
             return installedFontCollection.Families[0].Name;
         }
 
-        public static FontFamily[] GetAllFontFamilies() 
+        public static FontFamily[] GetAllFontFamilies()
         {
             InstalledFontCollection installedFontCollection = new InstalledFontCollection();
             return installedFontCollection.Families;
         }
 
 
-        public static System.Windows.Media.Color RgbKey2Color(string rgbKey) 
+        public static System.Windows.Media.Color RgbKey2Color(string rgbKey)
         {
             VTColor vtClr = VTColor.CreateFromRgbKey(rgbKey);
             return System.Windows.Media.Color.FromArgb(vtClr.A, vtClr.R, vtClr.G, vtClr.B);
         }
 
-        public static string Color2RgbKey(System.Windows.Media.Color color) 
+        public static string Color2RgbKey(System.Windows.Media.Color color)
         {
             // R,G,B,A
             return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
+        }
+
+        public static string GetSizeUnitName(SizeUnitEnum sizeUnit)
+        {
+            switch (sizeUnit)
+            {
+                case SizeUnitEnum.TB: return "TB";
+                case SizeUnitEnum.GB: return "GB";
+                case SizeUnitEnum.bytes: return "字节";
+                case SizeUnitEnum.KB: return "KB";
+                case SizeUnitEnum.MB: return "MB";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 根据输入的大小获取一个自适应的大小
+        /// </summary>
+        public static void AutoFitSize(double fromValue, SizeUnitEnum fromUnit, out double toValue, out SizeUnitEnum toUnit)
+        {
+            toValue = fromValue;
+            toUnit = fromUnit;
+
+            int decimals = 2;
+
+            // 小于1024，如果再转换那就小于1了，显示不友好
+            // 所以直接返回
+            if (fromValue < 1024)
+            {
+                return;
+            }
+
+            toValue = fromValue / 1024;
+
+            switch (fromUnit)
+            {
+                case SizeUnitEnum.bytes: goto FromBytes;
+                case SizeUnitEnum.KB: goto FromKB;
+                case SizeUnitEnum.MB: goto FromMB;
+                case SizeUnitEnum.GB: goto FromGB;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            FromBytes:
+            if (toValue < 1024)
+            {
+                toValue = Math.Round(toValue, decimals);
+                toUnit = SizeUnitEnum.KB;
+                return;
+            }
+
+            toValue = toValue / 1024;
+
+            FromKB:
+            if (toValue < 1024)
+            {
+                toValue = Math.Round(toValue, decimals);
+                toUnit = SizeUnitEnum.MB;
+                return;
+            }
+
+            toValue = toValue / 1024;
+
+            FromMB:
+            if (toValue < 1024)
+            {
+                toValue = Math.Round(toValue, decimals);
+                toUnit = SizeUnitEnum.GB;
+                return;
+            }
+
+            toValue = toValue / 1024;
+
+            FromGB:
+            if (toValue < 1024)
+            {
+                toValue = Math.Round(toValue, decimals);
+                toUnit = SizeUnitEnum.TB;
+            }
+            else
+            {
+                // 大于1024TB
+                toValue = Math.Round(toValue, decimals);
+                toUnit = SizeUnitEnum.TB;
+            }
         }
     }
 }
