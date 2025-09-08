@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.FileTrans.Clients.Channels;
 using ModengTerm.FileTrans.DataModels;
 using ModengTerm.FileTrans.Enumerations;
 using System;
@@ -40,7 +39,8 @@ namespace ModengTerm.FileTrans.Clients
                     FullPath = dirInfo.FullName,
                     LastUpdateTime = dirInfo.LastWriteTime,
                     Name = dirInfo.Name,
-                    Type = FsItemTypeEnum.Directory
+                    Type = FsItemTypeEnum.Directory,
+                    IsHidden = dirInfo.Attributes.HasFlag(FileAttributes.Hidden)
                 };
                 fsItems.Add(fsItem);
             }
@@ -55,7 +55,8 @@ namespace ModengTerm.FileTrans.Clients
                     FullPath = fileInfo.FullName,
                     LastUpdateTime = fileInfo.LastWriteTime,
                     Name = fileInfo.Name,
-                    Type = FsItemTypeEnum.File
+                    Type = FsItemTypeEnum.File,
+                    IsHidden = fileInfo.Attributes.HasFlag(FileAttributes.Hidden)
                 };
                 fsItems.Add(fsItem);
             }
@@ -68,14 +69,19 @@ namespace ModengTerm.FileTrans.Clients
             this.currentDirectory = directory;
         }
 
-        public override bool CreateDirectory(string directory)
+        public override void CreateDirectory(string directory)
         {
             throw new NotImplementedException();
         }
 
-        public override FsUploadChannel CreateUploadChannel()
+        public override void BeginUpload(string targetFilePath, int bufferSize)
         {
-            throw new NotImplementedException();
         }
+
+        public override void Upload(byte[] buffer, int offset, int length)
+        { }
+
+        public override void EndUpload()
+        { }
     }
 }

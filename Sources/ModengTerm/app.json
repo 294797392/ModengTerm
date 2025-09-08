@@ -438,7 +438,7 @@
                         },
                         {
                             "id": "D4685D16-0273-79C5-FB6E-236F699D1C0C",
-                            "name": "连接配置",
+                            "name": "SFTP",
                             "className": "ModengTerm.UserControls.OptionsUserControl.SSH.SSHOptionsUserControl, ModengTerm",
                             "scopes": [ "sftp" ],
                             "defaultOptions": {
@@ -461,6 +461,16 @@
                     "defaultOptions": {
                         "fs_general_server_initial_dir": "/root",
                         "fs_general_client_initial_dir": "%CLI_DIR%"
+                    }
+                },
+                {
+                    "id": "B8EC88D3-EA30-A2B3-9A1B-01B43952AE08",
+                    "name": "传输设置",
+                    "className": "ModengTerm.UserControls.OptionsUserControls.FileTrans.TransmissionOptionsUserControl, ModengTerm",
+                    "scopes": [ "sftp" ],
+                    "defaultOptions": {
+                        "fs_trans_upload_buffer_size": "32",
+                        "fs_trans_download_buffer_size": "32"
                     }
                 },
                 {

@@ -232,5 +232,18 @@ namespace ModengTerm.Base.DataModels
         public const string FS_GENERAL_CLIENT_INITIAL_DIR = "fs_general_client_initial_dir";
 
         #endregion
+
+        #region SFTP - 传输设置
+
+        /// <summary>
+        /// 上传缓冲区大小
+        /// </summary>
+        public const string FS_TRANS_UPLOAD_BUFFER_SIZE = "fs_trans_upload_buffer_size";
+        /// <summary>
+        /// 下载缓冲区大小
+        /// </summary>
+        public const string FS_TRANS_DOWNLOAD_BUFFER_SIZE = "fs_trans_download_buffer_size";
+
+        #endregion
     }
 }

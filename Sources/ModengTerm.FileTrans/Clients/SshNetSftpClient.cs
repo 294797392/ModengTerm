@@ -1,18 +1,13 @@
-﻿using log4net.Repository.Hierarchy;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Base;
-using Renci.SshNet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ModengTerm.FileTrans.DataModels;
-using Renci.SshNet.Sftp;
 using ModengTerm.FileTrans.Enumerations;
-using ModengTerm.FileTrans.Clients.Channels;
+using Renci.SshNet;
+using Renci.SshNet.Sftp;
+using System.Text;
+using System.Windows.Media.Animation;
 
 namespace ModengTerm.FileTrans.Clients
 {
@@ -27,6 +22,7 @@ namespace ModengTerm.FileTrans.Clients
         #region 实例变量
 
         private SftpClient client;
+        private SftpFileStream stream;
 
         #endregion
 
@@ -105,11 +101,18 @@ namespace ModengTerm.FileTrans.Clients
 
             foreach (ISftpFile file in fileList)
             {
+                // 会多出来一个名字是.的目录，不知道是做什么的
+                if (file.Name == ".")
+                {
+                    continue;
+                }
+
                 FsItemInfo fsItem = new FsItemInfo();
                 fsItem.Name = file.Name;
                 fsItem.FullPath = file.FullName;
                 fsItem.Size = file.Length;
                 fsItem.LastUpdateTime = file.LastWriteTime;
+                fsItem.IsHidden = VTBaseUtils.IsUnixHiddenFile(file.Name);
 
                 if (file.IsDirectory)
                 {
@@ -131,14 +134,31 @@ namespace ModengTerm.FileTrans.Clients
             this.client.ChangeDirectory(directory);
         }
 
-        public override bool CreateDirectory(string directory)
+        public override void CreateDirectory(string directory)
         {
-            throw new NotImplementedException();
+            this.client.CreateDirectory(directory);
         }
 
-        public override FsUploadChannel CreateUploadChannel()
+        public override void BeginUpload(string targetFilePath, int bufferSize)
         {
-            throw new NotImplementedException();
+            this.client.BufferSize = (uint)bufferSize;
+            this.stream = this.client.OpenWrite(targetFilePath);
+        }
+
+        public override void Upload(byte[] buffer, int offset, int length)
+        {
+            this.stream.Write(buffer, offset, length);
+        }
+
+        public override void EndUpload()
+        {
+            if (this.stream == null)
+            {
+                return;
+            }
+
+            this.stream.Dispose();
+            this.stream = null;
         }
 
         #endregion

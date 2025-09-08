@@ -12,6 +12,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Border Grid.Row="0" Grid.RowSpan="999" Grid.Column="0" Grid.ColumnSpan="999" Background="#F0F0F0"/>
+
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>

@@ -19,6 +19,7 @@ namespace ModengTerm.ViewModel.FileTrans
     public class FsTreeVM : TreeViewModel<FsTreeContext>
     {
         private string currentDirectory;
+        private int totalHiddens;
 
         public string CurrentDirectory
         {
@@ -29,6 +30,22 @@ namespace ModengTerm.ViewModel.FileTrans
                 {
                     this.currentDirectory = value;
                     this.NotifyPropertyChanged("CurrentDirectory");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 一共有多少个隐藏文件
+        /// </summary>
+        public int TotalHiddens
+        {
+            get { return this.totalHiddens; }
+            set
+            {
+                if (this.totalHiddens != value)
+                {
+                    this.totalHiddens = value;
+                    this.NotifyPropertyChanged("TotalHiddens");
                 }
             }
         }

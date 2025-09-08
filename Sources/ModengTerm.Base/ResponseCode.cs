@@ -7,6 +7,10 @@ namespace ModengTerm.Base
 {
     public class ResponseCode
     {
+        public const int CONNECT_SERVER_ERROR = -3;
+        public const int FILE_NOT_FOUND = -2;
+
+
         public const int FAILED = -1;
         public const int SUCCESS = 0;
         public const int TIMEOUT = 1;

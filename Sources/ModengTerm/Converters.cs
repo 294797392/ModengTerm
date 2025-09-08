@@ -697,4 +697,24 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class FsItemType2SizeVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FsItemTypeEnum type = (FsItemTypeEnum)value;
+
+            switch (type)
+            {
+                case FsItemTypeEnum.Directory: return Visibility.Collapsed;
+                default:
+                    return Visibility.Visible;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

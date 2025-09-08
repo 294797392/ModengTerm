@@ -1,11 +1,15 @@
-﻿using ModengTerm.Base;
+﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Base;
+using ModengTerm.Document;
 using ModengTerm.FileTrans.Clients;
-using ModengTerm.FileTrans.Clients.Channels;
 using ModengTerm.FileTrans.Enumerations;
+using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans
@@ -20,7 +24,13 @@ namespace ModengTerm.FileTrans
         /// <summary>
         /// 上传或者下载进度发生改变的时候触发
         /// </summary>
-        public event Action<FileAgent, string, double> ProgressChanged;
+        public event Action<FileAgent, string, double, string> ProgressChanged;
+
+        #endregion
+
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileAgent");
 
         #endregion
 
@@ -34,31 +44,34 @@ namespace ModengTerm.FileTrans
         private ManualResetEvent taskEvent;
         private List<FileTask> taskList;
 
-        private Queue<FsUploadChannel> uploadChannelQueue;
+        private Queue<FsClientBase> clientQueue;
+        private bool initOnce;
 
         #endregion
 
         #region 属性
 
         /// <summary>
-        /// 客户端传输通道
+        /// 客户端传输通道配置项
         /// </summary>
-        public FsClientTransport Transport
-        {
-            get { return this.clientTransport; }
-            set
-            {
-                if (this.clientTransport != value)
-                {
-                    this.clientTransport = value;
-                }
-            }
-        }
+        public FsClientOptions ClientOptions { get; set; }
 
         /// <summary>
         /// 上传线程数量
         /// </summary>
         public int Threads { get; set; }
+
+        /// <summary>
+        /// 一次上传多大的数据
+        /// 单位是字节
+        /// </summary>
+        public int UploadBufferSize { get; set; }
+
+        /// <summary>
+        /// 一次下载多大的数据
+        /// 单位是字节
+        /// </summary>
+        public int DownloadBufferSize { get; set; }
 
         #endregion
 
@@ -74,7 +87,10 @@ namespace ModengTerm.FileTrans
 
         public void Initialize()
         {
-            this.uploadChannelQueue = new Queue<FsUploadChannel>();
+            this.taskList = new List<FileTask>();
+            this.clientQueue = new Queue<FsClientBase>();
+            this.taskEvent = new ManualResetEvent(false);
+            this.threadList = new List<Thread>();
         }
 
         /// <summary>
@@ -82,15 +98,14 @@ namespace ModengTerm.FileTrans
         /// </summary>
         public void Release()
         {
-
+            this.clientTransport.Close();
         }
 
         public void EnqueueTask(List<FileTask> tasks)
         {
-            if (this.threadList == null)
+            if (!this.initOnce)
             {
-                this.taskEvent = new ManualResetEvent(false);
-                this.threadList = new List<Thread>();
+                this.initOnce = true;
                 for (int i = 0; i < this.Threads; i++)
                 {
                     Thread thread = new Thread(this.WorkerThreadProc);
@@ -110,6 +125,10 @@ namespace ModengTerm.FileTrans
 
         #region 实例方法
 
+        /// <summary>
+        /// 从任务队列中选择一个要上传的任务
+        /// </summary>
+        /// <returns></returns>
         private FileTask SelectTask()
         {
             FileTask task = null;
@@ -130,36 +149,122 @@ namespace ModengTerm.FileTrans
             return task;
         }
 
-        private void NotifyProgressChanged(string taskId, double progress)
+        private void NotifyProgressChanged(string taskId, double progress, string message)
         {
-            this.ProgressChanged?.Invoke(this, taskId, progress);
+            this.ProgressChanged?.Invoke(this, taskId, progress, message);
         }
 
-        private FsUploadChannel GetFreeUploadChannel() 
+        private FsClientBase GetFreeFsClient()
         {
-            FsUploadChannel channel = null;
+            FsClientBase client = null;
 
-            lock (this.uploadChannelQueue)
+            lock (this.clientQueue)
             {
-                if (this.uploadChannelQueue.Count > 0) 
+                if (this.clientQueue.Count > 0)
                 {
-                    channel = this.uploadChannelQueue.Dequeue();
+                    client = this.clientQueue.Dequeue();
                 }
             }
 
-            if (channel == null) 
+            if (client == null)
             {
-                channel = this.clientTransport.CreateUploadChannel();
+                client = FsClientFactory.Create(this.ClientOptions);
+                client.Options = this.ClientOptions;
+                if (client.Open() != ResponseCode.SUCCESS)
+                {
+                    return null;
+                }
             }
 
-            return channel;
+            return client;
         }
 
-        private void ReuseUploadChannel(FsUploadChannel channel) 
+        private void ReuseFsClient(FsClientBase client)
         {
-            lock (this.uploadChannelQueue)
+            lock (this.clientQueue)
             {
-                this.uploadChannelQueue.Enqueue(channel);
+                this.clientQueue.Enqueue(client);
+            }
+        }
+
+        private int UploadFile(FileTask task, FsClientBase fsClient)
+        {
+            FileStream stream = null;
+            try
+            {
+                stream = new FileStream(task.SourceFilePath, FileMode.Open, FileAccess.Read);
+            }
+            catch (FileNotFoundException ex)
+            {
+                this.NotifyProgressChanged(task.SourceFilePath, ResponseCode.FILE_NOT_FOUND, "要上传的文件不存在");
+                logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", task.SourceFilePath);
+                return ResponseCode.FILE_NOT_FOUND;
+            }
+            catch (Exception ex)
+            {
+                this.NotifyProgressChanged(task.Id, ResponseCode.FAILED, ex.Message);
+                logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, task.SourceFilePath);
+                return ResponseCode.FAILED;
+            }
+
+            fsClient.BeginUpload(task.TargetFilePath, this.UploadBufferSize);
+
+            byte[] buffer = new byte[this.UploadBufferSize];
+
+            while (stream.Position != stream.Length)
+            {
+                try
+                {
+                    int len = stream.Read(buffer, 0, buffer.Length);
+                    fsClient.Upload(buffer, 0, len);
+
+                    double percent = Math.Round(((double)stream.Position / stream.Length), 2);
+                    this.NotifyProgressChanged(task.Id, percent, string.Empty);
+                    logger.InfoFormat("上传百分比:{0}", percent);
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        stream.Close();
+                    }
+                    finally
+                    { }
+
+                    fsClient.EndUpload();
+
+                    logger.Error("上传数据段异常", ex);
+                    return ResponseCode.FAILED;
+                }
+            }
+
+            logger.InfoFormat("上传完成");
+
+            try
+            {
+                stream.Close();
+            }
+            finally
+            { }
+
+            fsClient.EndUpload();
+
+            return ResponseCode.SUCCESS;
+        }
+
+        private int CreateDirectory(FileTask task, FsClientBase fsClient)
+        {
+            try
+            {
+                fsClient.CreateDirectory(task.TargetFilePath);
+                this.NotifyProgressChanged(task.Id, 100, string.Empty);
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("创建目录异常", ex);
+                this.NotifyProgressChanged(task.Id, ResponseCode.FAILED, ex.Message);
+                return ResponseCode.FAILED;
             }
         }
 
@@ -179,30 +284,32 @@ namespace ModengTerm.FileTrans
                     continue;
                 }
 
+                FsClientBase fsClient = this.GetFreeFsClient();
+                if (fsClient == null)
+                {
+                    this.NotifyProgressChanged(task.Id, ResponseCode.CONNECT_SERVER_ERROR, "连接服务器失败");
+                    continue;
+                }
+
                 switch (task.Type)
                 {
                     case FileTaskTypeEnum.CreateDirectory:
                         {
-                            if (!this.clientTransport.CreateDirectory(task.TargetFilePath))
-                            {
-                                this.NotifyProgressChanged(task.Id, ResponseCode.FAILED);
-                            }
-                            else
-                            {
-                                this.NotifyProgressChanged(task.Id, 100);
-                            }
+                            this.CreateDirectory(task, fsClient);
                             break;
                         }
 
                     case FileTaskTypeEnum.UploadFile:
                         {
-                            FsUploadChannel uploadChannel = this.GetFreeUploadChannel();
+                            this.UploadFile(task, fsClient);
                             break;
                         }
 
                     default:
                         throw new NotImplementedException();
                 }
+
+                this.ReuseFsClient(fsClient);
             }
         }
 

@@ -103,8 +103,10 @@ namespace ModengTerm.ViewModel.FileTrans
             this.serverFsTransport = transport;
             this.clientFsTransport = this.CreateClientFsTransport();
             this.fileAgent = new FileAgent();
-            this.fileAgent.Transport = this.serverFsTransport;
-            this.fileAgent.Threads = 3;
+            this.fileAgent.ClientOptions = options;
+            this.fileAgent.Threads = 1;
+            this.fileAgent.UploadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_UPLOAD_BUFFER_SIZE) * 1024;
+            this.fileAgent.DownloadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_DOWNLOAD_BUFFER_SIZE) * 1024;
             this.fileAgent.ProgressChanged += this.FileAgent_ProgressChanged;
             this.fileAgent.Initialize();
 
@@ -223,7 +225,7 @@ namespace ModengTerm.ViewModel.FileTrans
 
                 if (fstat.Type == FsItemTypeEnum.Directory)
                 {
-                    fileStatus.AddRange(this.CreateFileStatusRecursively(localDir, fstat.TargetFullPath));
+                    fileStatus.AddRange(this.CreateFileStatusRecursively(fsInfo.FullName, fstat.TargetFullPath));
                 }
             }
 
@@ -323,61 +325,70 @@ namespace ModengTerm.ViewModel.FileTrans
 
                 fsTree.CurrentDirectory = directory;
 
+                List<FsItemVM> fsItemVms = new List<FsItemVM>();
+
+                // 如果加载的是本地文件列表，那么把返回上级节点加进去
+                if (clientFs)
+                {
+                    // 如果路径后有反斜杠，Directory.GetParent会直接把反斜杠去掉之后就返回，相当于是返回了同一个目录
+                    // 如果路径是磁盘根目录（比如C:\），那么就不去掉最后的反斜杠，如果去掉了Directory.GetParent会继续返回软件当前目录
+                    if (!directory.EndsWith(":\\"))
+                    {
+                        if (directory.EndsWith('\\'))
+                        {
+                            directory = directory.TrimEnd('\\');
+                        }
+                    }
+
+                    DirectoryInfo directoryInfo = Directory.GetParent(directory);
+                    if (directoryInfo == null)
+                    {
+                        // 说明没有上级目录了
+                    }
+                    else
+                    {
+                        FsItemVM fsItemVM = new FsItemVM(fsTree.Context);
+                        fsItemVM.ID = directoryInfo.FullName;
+                        fsItemVM.Name = "..";
+                        fsItemVM.Type = FsItemTypeEnum.Directory;
+                        fsItemVM.FullPath = directoryInfo.FullName;
+                        fsItemVM.Icon = IconUtils.GetFolderIcon();
+                        fsItemVms.Add(fsItemVM);
+                    }
+                }
+
+                foreach (FsItemInfo fsItem in fsItems)
+                {
+                    FsItemVM fsItemVm = new FsItemVM(fsTree.Context);
+                    fsItemVm.ID = fsItem.FullPath;
+                    fsItemVm.Name = fsItem.Name;
+                    fsItemVm.FullPath = fsItem.FullPath;
+                    fsItemVm.Size = fsItem.Size;
+                    fsItemVm.LastUpdateTime = fsItem.LastUpdateTime;
+                    fsItemVm.Type = fsItem.Type;
+                    fsItemVm.IsHidden = fsItem.IsHidden;
+                    fsItemVm.IsVisible = !fsItemVm.IsHidden;
+
+                    if (fsItem.Type == FsItemTypeEnum.Directory)
+                    {
+                        fsItemVm.Icon = IconUtils.GetFolderIcon();
+                    }
+                    else
+                    {
+                        fsItemVm.Icon = IconUtils.GetIcon(fsItem.FullPath);
+                    }
+
+                    fsItemVms.Add(fsItemVm);
+                }
+
                 App.Current.Dispatcher.Invoke(() =>
                 {
                     try
                     {
                         fsTree.ClearNodes();
 
-                        // 如果加载的是本地文件列表，那么把返回上级节点加进去
-                        if (clientFs)
+                        foreach (FsItemVM fsItemVm in fsItemVms)
                         {
-                            // 如果路径后有反斜杠，Directory.GetParent会直接把反斜杠去掉之后就返回，相当于是返回了同一个目录
-                            // 如果路径是磁盘根目录（比如C:\），那么就不去掉最后的反斜杠，如果去掉了Directory.GetParent会继续返回软件当前目录
-                            if (!directory.EndsWith(":\\"))
-                            {
-                                if (directory.EndsWith('\\'))
-                                {
-                                    directory = directory.TrimEnd('\\');
-                                }
-                            }
-
-                            DirectoryInfo directoryInfo = Directory.GetParent(directory);
-                            if (directoryInfo == null)
-                            {
-                                // 说明没有上级目录了
-                            }
-                            else
-                            {
-                                FsItemVM fsItemVM = new FsItemVM(fsTree.Context);
-                                fsItemVM.ID = directoryInfo.FullName;
-                                fsItemVM.Name = "..";
-                                fsItemVM.Type = FsItemTypeEnum.Directory;
-                                fsItemVM.FullPath = directoryInfo.FullName;
-                                fsItemVM.Icon = IconUtils.GetFolderIcon();
-                                fsTree.AddRootNode(fsItemVM);
-                            }
-                        }
-
-                        foreach (FsItemInfo fsItem in fsItems)
-                        {
-                            FsItemVM fsItemVm = new FsItemVM(fsTree.Context);
-                            fsItemVm.ID = fsItem.FullPath;
-                            fsItemVm.Name = fsItem.Name;
-                            fsItemVm.FullPath = fsItem.FullPath;
-                            fsItemVm.Size = fsItem.Size;
-                            fsItemVm.LastUpdateTime = fsItem.LastUpdateTime;
-                            fsItemVm.Type = fsItem.Type;
-
-                            if (fsItem.Type == FsItemTypeEnum.Directory)
-                            {
-                                fsItemVm.Icon = IconUtils.GetFolderIcon();
-                            }
-                            else
-                            {
-                                fsItemVm.Icon = IconUtils.GetIcon(fsItem.FullPath);
-                            }
-
                             fsTree.AddRootNode(fsItemVm);
                         }
                     }
@@ -463,7 +474,7 @@ namespace ModengTerm.ViewModel.FileTrans
             }
         }
 
-        private void FileAgent_ProgressChanged(FileAgent fileAgent, string id, double progress)
+        private void FileAgent_ProgressChanged(FileAgent fileAgent, string id, double progress, string message)
         {
         }
 

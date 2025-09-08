@@ -17,6 +17,7 @@ namespace ModengTerm.ViewModel.FileTrans
         private DateTime lastUpdateTime;
         private long size;
         private BitmapSource icon;
+        private bool isHidden;
 
         /// <summary>
         /// 完整路径
@@ -93,6 +94,22 @@ namespace ModengTerm.ViewModel.FileTrans
                 {
                     this.icon = value;
                     this.NotifyPropertyChanged("Icon");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 是否是隐藏文件或目录
+        /// </summary>
+        public bool IsHidden
+        {
+            get { return this.isHidden; }
+            set
+            {
+                if (this.isHidden != value)
+                {
+                    this.isHidden = true;
+                    this.NotifyPropertyChanged("IsHidden");
                 }
             }
         }

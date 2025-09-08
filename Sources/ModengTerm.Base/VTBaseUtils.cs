@@ -349,5 +349,20 @@ namespace ModengTerm.Base
                 toUnit = SizeUnitEnum.TB;
             }
         }
+
+        /// <summary>
+        /// 判断unix系统上的文件或目录是否是隐藏的
+        /// </summary>
+        /// <param name="fileName">要判断的文件名或目录名</param>
+        /// <returns></returns>
+        public static bool IsUnixHiddenFile(string fileName)
+        {
+            if (fileName == "." || fileName == "..")
+            {
+                return false;
+            }
+
+            return fileName.StartsWith(".");
+        }
     }
 }

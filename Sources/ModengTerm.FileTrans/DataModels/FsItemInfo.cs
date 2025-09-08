@@ -33,5 +33,10 @@ namespace ModengTerm.FileTrans.DataModels
         /// 最后一个更新时间
         /// </summary>
         public DateTime LastUpdateTime { get; set; }
+
+        /// <summary>
+        /// 是否是隐藏文件
+        /// </summary>
+        public bool IsHidden { get; set; }
     }
 }

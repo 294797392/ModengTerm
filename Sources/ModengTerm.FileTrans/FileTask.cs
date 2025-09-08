@@ -31,5 +31,25 @@ namespace ModengTerm.FileTrans
         /// 任务类型
         /// </summary>
         public FileTaskTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 要上传的文件流
+        /// </summary>
+        public FileStream Stream { get; set; }
+
+        /// <summary>
+        /// 要写入的文件的总长度
+        /// </summary>
+        public ulong TotalLength { get; set; }
+
+        /// <summary>
+        /// 当前已经写入了多少字节的数据
+        /// </summary>
+        public ulong Offset { get; set; }
+
+        /// <summary>
+        /// 还剩余多少字节数据要写入
+        /// </summary>
+        public ulong Remain { get; set; }
     }
 }

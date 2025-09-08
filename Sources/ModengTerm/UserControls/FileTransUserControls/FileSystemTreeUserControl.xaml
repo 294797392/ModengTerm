@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.FileTransUserControls"
              xmlns:dd="clr-namespace:WPFToolkit.DragDrop;assembly=WPFToolkit"
+             xmlns:toolkitconverters="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              xmlns:converters="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -14,6 +15,8 @@
 
         <converters:FileItemDisplaySizeConverter x:Key="FileItemDisplaySizeConverter"/>
         <converters:FsItemTypeNameConverter x:Key="FsItemTypeNameConverter"/>
+        <converters:FsItemType2SizeVisibleConverter x:Key="FsItemType2SizeVisibleConverter"/>
+        <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
         <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -22,26 +25,44 @@
     </UserControl.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
 
         <DataGrid x:Name="DataGridFsList" ItemsSource="{Binding Path=Roots}" MouseDoubleClick="DataGridFsList_MouseDoubleClick" 
                   dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" 
                   dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
                   Style="{StaticResource ResourceKey=StyleDataGrid}">
 
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
+                    <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+                    <Setter Property="Height" Value="30"/>
+                </Style>
+            </DataGrid.RowStyle>
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
+                    <Setter Property="Height" Value="30"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="名字" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Path=Icon}" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Path=Name}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
+                                <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0"
+                                           Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="类型" Width="100">
+                <DataGridTemplateColumn Header="类型" Width="70" CanUserSort="True" SortMemberPath="Type">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -52,12 +73,13 @@
                 <DataGridTemplateColumn Header="大小" Width="100" CanUserSort="True" SortMemberPath="Size">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=Size, Converter={StaticResource ResourceKey=FileItemDisplaySizeConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                            <TextBlock Text="{Binding Path=Size, Converter={StaticResource ResourceKey=FileItemDisplaySizeConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"
+                                       Visibility="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemType2SizeVisibleConverter}}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="最后修改日期" Width="150">
+                <DataGridTemplateColumn Header="最后修改日期" Width="150" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=LastUpdateTime, StringFormat='yyyy/MM/dd hh:mm:ss'}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -68,6 +90,20 @@
             </DataGrid.Columns>
             
         </DataGrid>
+
+        <Grid Grid.Row="1" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="110"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="1" Text="{Binding Path=TotalHiddens, StringFormat='一共有{0}个隐藏项目'}" Margin="0,0,10,0"/>
+            <CheckBox Grid.Column="2" Content="显示隐藏的项目"/>
+
+        </Grid>
+        
+        
         
         
         <!--<TreeView Style="{StaticResource ResourceKey=StyleTreeView}" ItemsSource="{Binding Path=Roots}">

@@ -131,8 +131,8 @@ namespace ModengTerm.UserControls.FileTransUserControls
                 // 拖到了目录上，说明要传输到dropItem目录里
             }
 
-            FsTreeVM sourceFsTree = DataGridFsList.DataContext as FsTreeVM;
-            FsTreeVM targetFsTree = (dropInfo.VisualTarget as DataGrid).DataContext as FsTreeVM;
+            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
+            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
             this.TransferFile?.Invoke(sourceFsTree, targetFsTree, dragItems, dropItem);
         }
 

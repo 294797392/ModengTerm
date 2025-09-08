@@ -1,5 +1,5 @@
-﻿using ModengTerm.FileTrans.Clients.Channels;
-using ModengTerm.FileTrans.DataModels;
+﻿using ModengTerm.FileTrans.DataModels;
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,13 +54,11 @@ namespace ModengTerm.FileTrans.Clients
         /// <summary>
         /// 创建目录
         /// </summary>
-        /// <returns></returns>
-        public abstract bool CreateDirectory(string directory);
+        /// <remarks>操作失败直接扔异常，不扔异常就说明操作成功</remarks>
+        public abstract void CreateDirectory(string directory);
 
-        /// <summary>
-        /// 创建上传文件通道
-        /// </summary>
-        /// <returns></returns>
-        public abstract FsUploadChannel CreateUploadChannel();
+        public abstract void BeginUpload(string targetFilePath, int bufferSize);
+        public abstract void Upload(byte[] buffer, int offset, int length);
+        public abstract void EndUpload();
     }
 }

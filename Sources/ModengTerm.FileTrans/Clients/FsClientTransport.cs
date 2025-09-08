@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base.Enumerations;
-using ModengTerm.FileTrans.Clients.Channels;
 using ModengTerm.FileTrans.DataModels;
 using System;
 using System.Collections.Generic;
@@ -129,35 +128,14 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                return this.client.CreateDirectory(dir);
+                this.client.CreateDirectory(dir);
+                return true;
             }
             catch (Exception ex)
             {
                 logger.Error("CreateDirectory异常", ex);
                 this.Close();
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// 创建一个上传通道
-        /// </summary>
-        /// <returns></returns>
-        public FsUploadChannel CreateUploadChannel()
-        {
-            if (!this.CheckStatus())
-            {
-                return null;
-            }
-
-            try
-            {
-                return this.client.CreateUploadChannel();
-            }
-            catch (Exception ex)
-            {
-                logger.Error("创建上传通道异常", ex);
-                return null;
             }
         }
 
