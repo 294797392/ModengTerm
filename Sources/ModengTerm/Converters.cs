@@ -8,10 +8,12 @@ using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.FileTrans;
 using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls.TerminalUserControls;
+using ModengTerm.ViewModel.FileTrans;
 using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
@@ -716,5 +718,80 @@ namespace ModengTerm
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class FsOperationTypeNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FsOperationTypeEnum type = (FsOperationTypeEnum)value;
+
+            switch (type)
+            {
+                case FsOperationTypeEnum.Upload: return "上传";
+                case FsOperationTypeEnum.Download: return "下载";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ProcessStatesNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            ProcessStates processStates = (ProcessStates)value;
+
+            switch (processStates)
+            {
+                case ProcessStates.StartTransfer:
+                case ProcessStates.BytesTransfered: return "传输中";
+                case ProcessStates.Failure: return "传输失败";
+                case ProcessStates.Completed: return "传输完成";
+                case ProcessStates.Queued: return "已入队, 等待传输";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FsItemIsHidden2ForegroundConverter : IValueConverter
+    {
+        private static readonly Brush HiddenItemForeground = new SolidColorBrush(Color.FromArgb(150, 0, 0, 0));
+
+        static FsItemIsHidden2ForegroundConverter() 
+        {
+            HiddenItemForeground.Freeze();
+        }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool isHidden = (bool)value;
+
+            if (isHidden)
+            {
+                return HiddenItemForeground;
+            }
+            else
+            {
+                return Brushes.Black;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

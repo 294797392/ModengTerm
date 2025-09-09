@@ -16,6 +16,7 @@
         <converters:FileItemDisplaySizeConverter x:Key="FileItemDisplaySizeConverter"/>
         <converters:FsItemTypeNameConverter x:Key="FsItemTypeNameConverter"/>
         <converters:FsItemType2SizeVisibleConverter x:Key="FsItemType2SizeVisibleConverter"/>
+        <converters:FsItemIsHidden2ForegroundConverter x:Key="FsItemIsHidden2ForegroundConverter"/>
         <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
         <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
@@ -39,6 +40,7 @@
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
                     <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
                     <Setter Property="Height" Value="30"/>
+                    <Setter Property="Foreground" Value="{Binding Path=IsHidden, Converter={StaticResource ResourceKey=FsItemIsHidden2ForegroundConverter}}"/>
                 </Style>
             </DataGrid.RowStyle>
 
@@ -47,7 +49,7 @@
                     <Setter Property="Height" Value="30"/>
                 </Style>
             </DataGrid.ColumnHeaderStyle>
-            
+
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="名字" Width="*">
@@ -70,7 +72,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="大小" Width="100" CanUserSort="True" SortMemberPath="Size">
+                <DataGridTemplateColumn Header="大小" Width="80" CanUserSort="True" SortMemberPath="Size">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Size, Converter={StaticResource ResourceKey=FileItemDisplaySizeConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"
@@ -99,7 +101,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="1" Text="{Binding Path=TotalHiddens, StringFormat='一共有{0}个隐藏项目'}" Margin="0,0,10,0"/>
-            <CheckBox Grid.Column="2" Content="显示隐藏的项目"/>
+            <CheckBox Grid.Column="2" x:Name="CheckBoxToggleHiddenItem" Content="显示隐藏的项目" Checked="CheckBoxShowHiddenItems_CheckedChanged" Unchecked="CheckBoxShowHiddenItems_CheckedChanged"/>
 
         </Grid>
         

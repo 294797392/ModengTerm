@@ -66,6 +66,15 @@ namespace ModengTerm.UserControls.FileTransUserControls
             }
         }
 
+        private void CheckBoxShowHiddenItems_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            FsTreeVM fsTree = DataGridFsList.DataContext as FsTreeVM;
+
+            bool showHidden = CheckBoxToggleHiddenItem.IsChecked.Value;
+
+            fsTree.ToggleHiddenItems(showHidden);
+        }
+
         #endregion
 
         #region 实例方法

@@ -18,6 +18,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <GroupBox Grid.Row="0" Header="缓冲区大小设置">
@@ -41,6 +42,22 @@
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="下载：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                 <TextBox Grid.Row="0" Grid.Column="4" x:Name="TextBoxDownloadBufferSize" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
                 <TextBlock Grid.Row="0" Grid.Column="5" Text="kb" HorizontalAlignment="Left" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="多线程设置">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="同时工作的线程数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxWorkingThreads" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
             </Grid>
         </GroupBox>

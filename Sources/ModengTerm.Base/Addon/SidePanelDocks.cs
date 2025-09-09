@@ -14,11 +14,16 @@ namespace ModengTerm.Base.Addon
         /// <summary>
         /// 显示在左边
         /// </summary>
-        Left,
+        Left = 0,
 
         /// <summary>
         /// 显示在右边
         /// </summary>
-        Right
+        Right = 1,
+
+        /// <summary>
+        /// 显示在底边
+        /// </summary>
+        Bottom = 2
     }
 }

@@ -347,7 +347,7 @@
             <Grid Grid.Column="2">
                 <termuc2:PanelContainerUserControl Dock="Right" DataContext="{Binding Path=PanelContainers[1]}"/>
             </Grid>
-
+            
         </Grid>
 
         <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=RES50001E}" IsHitTestVisible="False"/>

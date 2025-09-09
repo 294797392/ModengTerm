@@ -41,7 +41,7 @@ namespace ModengTerm.ViewModel.FileTrans
         private FsClientTransport serverFsTransport;
         private FsClientTransport clientFsTransport;
 
-        private ObservableCollection<FileStatusVM> fileStatus;
+        private BindableCollection<FileStatusVM> fileStatus;
 
         private FileAgent fileAgent;
 
@@ -62,7 +62,7 @@ namespace ModengTerm.ViewModel.FileTrans
         /// <summary>
         /// 当前所有在队列里的文件状态
         /// </summary>
-        public ObservableCollection<FileStatusVM> FileStatus { get { return this.fileStatus; } }
+        public BindableCollection<FileStatusVM> FileStatus { get { return this.fileStatus; } }
 
         #endregion
 
@@ -83,7 +83,7 @@ namespace ModengTerm.ViewModel.FileTrans
             this.clientFsTree.Context.Type = FsTreeTypeEnum.ClientTree;
             this.serverFsTree = new FsTreeVM();
             this.serverFsTree.Context.Type = FsTreeTypeEnum.ServerTree;
-            this.fileStatus = new ObservableCollection<FileStatusVM>();
+            this.fileStatus = new BindableCollection<FileStatusVM>();
         }
 
         protected override void OnRelease()
@@ -104,7 +104,7 @@ namespace ModengTerm.ViewModel.FileTrans
             this.clientFsTransport = this.CreateClientFsTransport();
             this.fileAgent = new FileAgent();
             this.fileAgent.ClientOptions = options;
-            this.fileAgent.Threads = 1;
+            this.fileAgent.Threads = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_THREADS);
             this.fileAgent.UploadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_UPLOAD_BUFFER_SIZE) * 1024;
             this.fileAgent.DownloadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_DOWNLOAD_BUFFER_SIZE) * 1024;
             this.fileAgent.ProgressChanged += this.FileAgent_ProgressChanged;
@@ -193,9 +193,10 @@ namespace ModengTerm.ViewModel.FileTrans
 
         private void UploadFiles(List<FsItemVM> localFsItems, string serverDir)
         {
-            List<FileStatusVM> fileStatusVM = this.CreateFileStatus(localFsItems, serverDir);
+            List<FileStatusVM> fileStatusVM = this.CreateFileStatus(localFsItems, serverDir, FsOperationTypeEnum.Upload);
             List<FileTask> uploadItems = this.CreateUploadTasks(fileStatusVM);
 
+            this.fileStatus.AddRange(fileStatusVM);
             this.fileAgent.EnqueueTask(uploadItems);
         }
 
@@ -205,7 +206,7 @@ namespace ModengTerm.ViewModel.FileTrans
         /// <param name="localDir"></param>
         /// <param name="serverDir">要上传到哪个目录里</param>
         /// <returns></returns>
-        private List<FileStatusVM> CreateFileStatusRecursively(string localDir, string serverDir)
+        private List<FileStatusVM> CreateFileStatusRecursively(string localDir, string serverDir, FsOperationTypeEnum opType)
         {
             List<FileStatusVM> fileStatus = new List<FileStatusVM>();
             DirectoryInfo directoryInfo = new DirectoryInfo(localDir);
@@ -217,22 +218,23 @@ namespace ModengTerm.ViewModel.FileTrans
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = fsInfo.FullName,
-                    LocalFullPath = fsInfo.FullName,
+                    SourceFullPath = fsInfo.FullName,
                     TargetFullPath = string.Format("{0}/{1}", serverDir, fsInfo.Name),
-                    Type = fsInfo is DirectoryInfo ? FsItemTypeEnum.Directory : FsItemTypeEnum.File
+                    Type = fsInfo is DirectoryInfo ? FsItemTypeEnum.Directory : FsItemTypeEnum.File,
+                    OpType = opType
                 };
                 fileStatus.Add(fstat);
 
                 if (fstat.Type == FsItemTypeEnum.Directory)
                 {
-                    fileStatus.AddRange(this.CreateFileStatusRecursively(fsInfo.FullName, fstat.TargetFullPath));
+                    fileStatus.AddRange(this.CreateFileStatusRecursively(fsInfo.FullName, fstat.TargetFullPath, opType));
                 }
             }
 
             return fileStatus;
         }
 
-        private List<FileStatusVM> CreateFileStatus(List<FsItemVM> localFsItems, string serverDir)
+        private List<FileStatusVM> CreateFileStatus(List<FsItemVM> localFsItems, string serverDir, FsOperationTypeEnum opType)
         {
             List<FileStatusVM> fileStatusVMs = new List<FileStatusVM>();
 
@@ -242,23 +244,24 @@ namespace ModengTerm.ViewModel.FileTrans
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = fsItem.FullPath,
-                    LocalFullPath = fsItem.FullPath,
+                    SourceFullPath = fsItem.FullPath,
                     TargetFullPath = string.Format("{0}/{1}", serverDir, fsItem.Name),
-                    Type = fsItem.Type
+                    Type = fsItem.Type,
+                    OpType = opType
                 };
 
                 fileStatusVMs.Add(fstat);
 
                 if (fsItem.Type == FsItemTypeEnum.Directory)
                 {
-                    fileStatusVMs.AddRange(this.CreateFileStatusRecursively(fsItem.FullPath, fstat.TargetFullPath));
+                    fileStatusVMs.AddRange(this.CreateFileStatusRecursively(fsItem.FullPath, fstat.TargetFullPath, opType));
                 }
             }
 
             return fileStatusVMs;
         }
 
-        private List<FileTask> CreateUploadTasks(List<FileStatusVM> fileStatusVM) 
+        private List<FileTask> CreateUploadTasks(List<FileStatusVM> fileStatusVM)
         {
             List<FileTask> uploadTasks = new List<FileTask>();
 
@@ -267,7 +270,7 @@ namespace ModengTerm.ViewModel.FileTrans
                 FileTask uploadTask = new FileTask()
                 {
                     Id = fileStatus.ID.ToString(),
-                    SourceFilePath = fileStatus.LocalFullPath,
+                    SourceFilePath = fileStatus.SourceFullPath,
                     TargetFilePath = fileStatus.TargetFullPath,
                 };
 
@@ -275,7 +278,7 @@ namespace ModengTerm.ViewModel.FileTrans
                 {
                     uploadTask.Type = FileTaskTypeEnum.CreateDirectory;
                 }
-                else 
+                else
                 {
                     uploadTask.Type = FileTaskTypeEnum.UploadFile;
                 }
@@ -381,6 +384,8 @@ namespace ModengTerm.ViewModel.FileTrans
                     fsItemVms.Add(fsItemVm);
                 }
 
+                fsTree.TotalHiddens = fsItemVms.Count(v => v.IsHidden);
+
                 App.Current.Dispatcher.Invoke(() =>
                 {
                     try
@@ -474,8 +479,53 @@ namespace ModengTerm.ViewModel.FileTrans
             }
         }
 
-        private void FileAgent_ProgressChanged(FileAgent fileAgent, string id, double progress, string message)
+        private void FileAgent_ProgressChanged(FileAgent fileAgent, string taskId, double progress, string serverMessage, int bytesTransfer, ProcessStates processStates)
         {
+            FileStatusVM fileStatus = this.fileStatus.FirstOrDefault(v => v.ID == taskId);
+            if (fileStatus == null)
+            {
+                logger.ErrorFormat("查找文件状态失败, {0}, {1}, {2}", taskId, progress, serverMessage);
+                return;
+            }
+
+            fileStatus.State = processStates;
+            fileStatus.Message = serverMessage;
+
+            switch (processStates)
+            {
+                case ProcessStates.BytesTransfered:
+                    {
+                        TimeSpan ts = DateTime.Now - fileStatus.PrevTransferTime;
+                        double speed = bytesTransfer / ts.TotalSeconds;
+                        double toValue;
+                        SizeUnitEnum toUnit;
+                        VTBaseUtils.AutoFitSize(speed, SizeUnitEnum.bytes, out toValue, out toUnit);
+                        fileStatus.Speed = string.Format("{0} {1}/s", toValue, toUnit);
+                        fileStatus.Progress = progress;
+                        fileStatus.PrevTransferTime = DateTime.Now;
+                        break;
+                    }
+
+                case ProcessStates.Failure:
+                    {
+                        break;
+                    }
+
+                case ProcessStates.Completed:
+                    {
+                        fileStatus.Progress = progress;
+                        break;
+                    }
+
+                case ProcessStates.StartTransfer:
+                    {
+                        fileStatus.PrevTransferTime = DateTime.Now;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion

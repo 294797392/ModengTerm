@@ -243,6 +243,10 @@ namespace ModengTerm.Base.DataModels
         /// 下载缓冲区大小
         /// </summary>
         public const string FS_TRANS_DOWNLOAD_BUFFER_SIZE = "fs_trans_download_buffer_size";
+        /// <summary>
+        /// 同时工作的线程数
+        /// </summary>
+        public const string FS_TRANS_THREADS = "fs_trans_threads";
 
         #endregion
     }

@@ -54,6 +54,11 @@ namespace ModengTerm.UserControls
                                 break;
                             }
 
+                        case Dock.Bottom:
+                            {
+                                break;
+                            }
+
                         default:
                             throw new System.NotImplementedException();
                     }

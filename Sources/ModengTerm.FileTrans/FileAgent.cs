@@ -23,8 +23,13 @@ namespace ModengTerm.FileTrans
 
         /// <summary>
         /// 上传或者下载进度发生改变的时候触发
+        /// string：taskId
+        /// double：progress
+        /// string：serverMessage
+        /// int：bytesTransferd，本次传输字节数
+        /// ProcessStates：ProcessStates
         /// </summary>
-        public event Action<FileAgent, string, double, string> ProgressChanged;
+        public event Action<FileAgent, string, double, string, int, ProcessStates> ProgressChanged;
 
         #endregion
 
@@ -149,9 +154,9 @@ namespace ModengTerm.FileTrans
             return task;
         }
 
-        private void NotifyProgressChanged(string taskId, double progress, string message)
+        private void NotifyProgressChanged(string taskId, double progress, string serverMessage, int bytesTransfer, ProcessStates processStates)
         {
-            this.ProgressChanged?.Invoke(this, taskId, progress, message);
+            this.ProgressChanged?.Invoke(this, taskId, progress, serverMessage, bytesTransfer, processStates);
         }
 
         private FsClientBase GetFreeFsClient()
@@ -187,7 +192,7 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private int UploadFile(FileTask task, FsClientBase fsClient)
+        private bool UploadFile(FileTask task, FsClientBase fsClient)
         {
             FileStream stream = null;
             try
@@ -196,20 +201,24 @@ namespace ModengTerm.FileTrans
             }
             catch (FileNotFoundException ex)
             {
-                this.NotifyProgressChanged(task.SourceFilePath, ResponseCode.FILE_NOT_FOUND, "要上传的文件不存在");
+                this.NotifyProgressChanged(task.SourceFilePath, 0, "要上传的文件不存在", 0, ProcessStates.Failure);
                 logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", task.SourceFilePath);
-                return ResponseCode.FILE_NOT_FOUND;
+                return false;
             }
             catch (Exception ex)
             {
-                this.NotifyProgressChanged(task.Id, ResponseCode.FAILED, ex.Message);
+                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
                 logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, task.SourceFilePath);
-                return ResponseCode.FAILED;
+                return false;
             }
+
+            bool success = true;
 
             fsClient.BeginUpload(task.TargetFilePath, this.UploadBufferSize);
 
             byte[] buffer = new byte[this.UploadBufferSize];
+
+            this.NotifyProgressChanged(task.Id, 0, string.Empty, 0, ProcessStates.StartTransfer);
 
             while (stream.Position != stream.Length)
             {
@@ -218,23 +227,23 @@ namespace ModengTerm.FileTrans
                     int len = stream.Read(buffer, 0, buffer.Length);
                     fsClient.Upload(buffer, 0, len);
 
-                    double percent = Math.Round(((double)stream.Position / stream.Length), 2);
-                    this.NotifyProgressChanged(task.Id, percent, string.Empty);
-                    logger.InfoFormat("上传百分比:{0}", percent);
+                    double percent = Math.Round(((double)stream.Position / stream.Length) * 100, 2);
+                    this.NotifyProgressChanged(task.Id, percent, string.Empty, len, ProcessStates.BytesTransfered);
+                    //logger.InfoFormat("上传百分比:{0}", percent);
+                }
+                catch (SshException ex)
+                {
+                    success = false;
+                    this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                    logger.Error("上传数据段异常", ex);
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    try
-                    {
-                        stream.Close();
-                    }
-                    finally
-                    { }
-
-                    fsClient.EndUpload();
-
+                    success = false;
+                    this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
                     logger.Error("上传数据段异常", ex);
-                    return ResponseCode.FAILED;
+                    break;
                 }
             }
 
@@ -249,22 +258,28 @@ namespace ModengTerm.FileTrans
 
             fsClient.EndUpload();
 
-            return ResponseCode.SUCCESS;
+            // 如果出现异常导致传输失败，那么在catch里触发事件
+            if (success) 
+            {
+                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+            }
+
+            return success;
         }
 
-        private int CreateDirectory(FileTask task, FsClientBase fsClient)
+        private bool CreateDirectory(FileTask task, FsClientBase fsClient)
         {
             try
             {
                 fsClient.CreateDirectory(task.TargetFilePath);
-                this.NotifyProgressChanged(task.Id, 100, string.Empty);
-                return ResponseCode.SUCCESS;
+                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                return true;
             }
             catch (Exception ex)
             {
                 logger.Error("创建目录异常", ex);
-                this.NotifyProgressChanged(task.Id, ResponseCode.FAILED, ex.Message);
-                return ResponseCode.FAILED;
+                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                return false;
             }
         }
 
@@ -287,7 +302,7 @@ namespace ModengTerm.FileTrans
                 FsClientBase fsClient = this.GetFreeFsClient();
                 if (fsClient == null)
                 {
-                    this.NotifyProgressChanged(task.Id, ResponseCode.CONNECT_SERVER_ERROR, "连接服务器失败");
+                    this.NotifyProgressChanged(task.Id, 0, "连接服务器失败", 0, ProcessStates.Failure);
                     continue;
                 }
 

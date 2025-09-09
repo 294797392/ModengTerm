@@ -49,5 +49,15 @@ namespace ModengTerm.ViewModel.FileTrans
                 }
             }
         }
+
+        public void ToggleHiddenItems(bool isShow) 
+        {
+            IEnumerable<FsItemVM> hiddenItems = this.Context.NodeList.Cast<FsItemVM>().Where(v => v.IsHidden);
+
+            foreach (FsItemVM hiddenItem in hiddenItems)
+            {
+                hiddenItem.IsVisible = isShow;
+            }
+        }
     }
 }
