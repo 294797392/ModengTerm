@@ -410,11 +410,10 @@ namespace ModengTerm.ViewModel.FileTrans
         /// </summary>
         /// <param name="srcFsItems">要传输的原始文件列表</param>
         /// <param name="dstFsItem">要传输到的目标文件夹，如果为空，则表示当前目录</param>
-        public void TransferFile(FsTreeVM srcFsTree, FsTreeVM dstFsTree, List<FsItemVM> srcFsItems, FsItemVM dstFsItem)
+        public void TransferFile(FsTreeVM srcFsTree, FsTreeVM dstFsTree, List<FsItemVM> srcFsItems, string dstDir)
         {
             FsTreeTypeEnum srcTreeType = srcFsTree.Context.Type;
             FsTreeTypeEnum dstTreeType = dstFsTree.Context.Type;
-            string dstDir = dstFsItem == null ? dstFsTree.CurrentDirectory : dstFsItem.FullPath;
 
             if (srcTreeType == FsTreeTypeEnum.ClientTree)
             {

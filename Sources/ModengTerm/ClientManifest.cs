@@ -15,7 +15,7 @@ namespace ModengTerm.Base
         /// 默认顶部根菜单
         /// </summary>
         [JsonProperty("toolbarMenus")]
-        public List<AddonMenuDefinition> ToolbarMenus { get; private set; }
+        public List<MenuMetadata> ToolbarMenus { get; private set; }
 
         /// <summary>
         /// 窗口主题列表
@@ -31,7 +31,7 @@ namespace ModengTerm.Base
 
         public ClientManifest()
         {
-            this.ToolbarMenus = new List<AddonMenuDefinition>();
+            this.ToolbarMenus = new List<MenuMetadata>();
             this.AppThemes = new List<AppTheme>();
             this.Addons = new List<AddonMetadata>();
         }

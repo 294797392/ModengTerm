@@ -71,8 +71,6 @@ namespace ModengTerm.ViewModel.Terminal
 
         private Visibility contextMenuVisibility;
 
-        private AutoCompletionVM autoCompletionVM;
-
         private bool inputPanelVisible;
 
         private bool modemRunning;
@@ -120,11 +118,6 @@ namespace ModengTerm.ViewModel.Terminal
         }
 
         /// <summary>
-        /// 向外部公开终端模拟器的控制接口
-        /// </summary>
-        public IVideoTerminal VideoTerminal { get { return videoTerminal; } }
-
-        /// <summary>
         /// SSH主机的Uri
         /// </summary>
         public string Uri
@@ -144,6 +137,8 @@ namespace ModengTerm.ViewModel.Terminal
         public GraphicsFactory AlternateDocument { get; set; }
 
         public IDrawingContext DrawingContext { get; set; }
+
+        public IVideoTerminal VideoTerminal { get { return this.videoTerminal; } }
 
         /// <summary>
         /// 获取或设置终端宽度，单位是像素
@@ -961,7 +956,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         public void ClearScreen()
         {
-            VTDocument document = VideoTerminal.ActiveDocument;
+            VTDocument document = this.videoTerminal.ActiveDocument;
             document.DeleteViewoprt();
             document.SetCursorLogical(0, 0);
             document.RequestInvalidate();

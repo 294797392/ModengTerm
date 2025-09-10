@@ -23,7 +23,7 @@ namespace ModengTerm.ViewModel
 
         #region 属性
 
-        public AddonMenuDefinition Definition { get; private set; }
+        public MenuMetadata Definition { get; private set; }
 
         /// <summary>
         /// 子菜单列表
@@ -54,7 +54,7 @@ namespace ModengTerm.ViewModel
 
         #region 构造方法
 
-        public ContextMenuVM(AddonMenuDefinition definition)
+        public ContextMenuVM(MenuMetadata definition)
         {
             this.ID = definition.ID;
             this.Name = definition.Name;

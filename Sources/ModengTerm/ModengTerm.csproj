@@ -75,8 +75,10 @@
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModel\CreateSession\OptionContentVM.cs" />
-    <Compile Remove="ViewModel\FileTrans\FsDirVM.cs" />
-    <Compile Remove="ViewModel\FileTrans\FsFileVM.cs" />
+    <Compile Remove="ViewModel\FileTransfer\FsDirVM.cs" />
+    <Compile Remove="ViewModel\FileTransfer\FsFileVM.cs" />
+    <Compile Remove="ViewModel\Terminal\AutoCompletionSource.cs" />
+    <Compile Remove="ViewModel\Terminal\AutoCompletionVM.cs" />
     <Compile Remove="ViewModel\Terminal\BookmarksVM.cs" />
     <Compile Remove="ViewModel\Terminal\ClipboardVM.cs" />
     <Compile Remove="ViewModel\Terminal\FavoritesVM.cs" />
@@ -151,7 +153,7 @@
     <ProjectReference Include="..\ModengTerm.Addon\ModengTerm.Addon.csproj" />
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
-    <ProjectReference Include="..\ModengTerm.FileTrans\ModengTerm.FileTrans.csproj" />
+    <ProjectReference Include="..\ModengTerm.FileTrans\ModengTerm.FileTransfer.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
 

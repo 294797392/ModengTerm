@@ -100,10 +100,10 @@ namespace ModengTerm.UserControls.FileTransUserControls
         /// <param name="srcFsTree">从哪颗树上开始拖动</param>
         /// <param name="dstFsTree">要拖动到哪颗树上</param>
         /// <param name="srcFsItems">拖拽的文件列表</param>
-        /// <param name="dstFsItem">要拖到哪个目录里，如果是空，则表示当前目录</param>
-        private void FileSystemTreeUserControl_StartTransfer(FsTreeVM srcFsTree, FsTreeVM dstFsTree, List<FsItemVM> srcFsItems, FsItemVM dstFsItem)
+        /// <param name="dstDir">要传输到的目录</param>
+        private void FileSystemTreeUserControl_StartTransfer(FsTreeVM srcFsTree, FsTreeVM dstFsTree, List<FsItemVM> srcFsItems, string dstDir)
         {
-            this.fsSession.TransferFile(srcFsTree, dstFsTree, srcFsItems, dstFsItem);
+            this.fsSession.TransferFile(srcFsTree, dstFsTree, srcFsItems, dstDir);
         }
 
         #endregion

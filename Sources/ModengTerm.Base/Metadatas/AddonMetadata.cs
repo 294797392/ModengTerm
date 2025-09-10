@@ -35,13 +35,13 @@ namespace ModengTerm.Base.Metadatas
         /// 顶部菜单
         /// </summary>
         [JsonProperty("toolbarMenus")]
-        public List<AddonMenuDefinition> ToolbarMenus { get; private set; }
+        public List<MenuMetadata> ToolbarMenus { get; private set; }
 
         /// <summary>
         /// 右键菜单
         /// </summary>
         [JsonProperty("contextMenus")]
-        public List<AddonMenuDefinition> ContextMenus { get; private set; }
+        public List<MenuMetadata> ContextMenus { get; private set; }
 
         /// <summary>
         /// 侧边栏面板
@@ -63,8 +63,8 @@ namespace ModengTerm.Base.Metadatas
 
         public AddonMetadata()
         {
-            this.ToolbarMenus = new List<AddonMenuDefinition>();
-            this.ContextMenus = new List<AddonMenuDefinition>();
+            this.ToolbarMenus = new List<MenuMetadata>();
+            this.ContextMenus = new List<MenuMetadata>();
             this.SidePanels = new List<SidePanelMetadata>();
             this.OverlayPanels = new List<OverlayPanelMetadata>();
             this.Preferences = new List<PreferenceMetadata>();

@@ -6,7 +6,7 @@ namespace ModengTerm.Base.Metadatas
     /// <summary>
     /// 定义一个插件菜单
     /// </summary>
-    public class AddonMenuDefinition
+    public class MenuMetadata
     {
         /// <summary>
         /// 菜单ID
@@ -27,16 +27,10 @@ namespace ModengTerm.Base.Metadatas
         public string Command { get; set; }
 
         /// <summary>
-        /// 该菜单所支持的会话类型
-        /// </summary>
-        [JsonProperty("sessionTypes")]
-        public List<int> SessionTypes { get; private set; }
-
-        /// <summary>
         /// 子菜单
         /// </summary>
         [JsonProperty("child")]
-        public List<AddonMenuDefinition> Children { get; private set; }
+        public List<MenuMetadata> Children { get; private set; }
 
         /// <summary>
         /// 根菜单的Id
@@ -51,10 +45,9 @@ namespace ModengTerm.Base.Metadatas
         [JsonIgnore]
         public string AddonId { get; set; }
 
-        public AddonMenuDefinition()
+        public MenuMetadata()
         {
-            this.SessionTypes = new List<int>();
-            this.Children = new List<AddonMenuDefinition>();
+            this.Children = new List<MenuMetadata>();
         }
     }
 }

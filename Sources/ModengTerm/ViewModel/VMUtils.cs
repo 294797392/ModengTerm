@@ -92,7 +92,7 @@ namespace ModengTerm.ViewModel
 
         public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)
         {
-            List<AddonMenuDefinition> menuItems = new List<AddonMenuDefinition>();
+            List<MenuMetadata> menuItems = new List<MenuMetadata>();
 
             if (toolbarMenu)
             {
@@ -103,9 +103,9 @@ namespace ModengTerm.ViewModel
             // 再加载所有的插件菜单
             foreach (AddonMetadata addon in ClientContext.Context.Manifest.Addons)
             {
-                List<AddonMenuDefinition> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
+                List<MenuMetadata> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
 
-                foreach (AddonMenuDefinition menuItem in menus)
+                foreach (MenuMetadata menuItem in menus)
                 {
                     menuItem.AddonId = addon.ID;
                 }
@@ -115,7 +115,7 @@ namespace ModengTerm.ViewModel
 
             List<ContextMenuVM> result = new List<ContextMenuVM>();
 
-            foreach (AddonMenuDefinition menuItem in menuItems)
+            foreach (MenuMetadata menuItem in menuItems)
             {
                 ContextMenuVM cmvm = new ContextMenuVM(menuItem);
 
@@ -175,9 +175,9 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        private static void LoadChildMenuItems(ContextMenuVM parentVM, List<AddonMenuDefinition> children)
+        private static void LoadChildMenuItems(ContextMenuVM parentVM, List<MenuMetadata> children)
         {
-            foreach (AddonMenuDefinition menuItem in children)
+            foreach (MenuMetadata menuItem in children)
             {
                 menuItem.AddonId = parentVM.AddonId;
 

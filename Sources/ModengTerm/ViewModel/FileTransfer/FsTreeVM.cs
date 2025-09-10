@@ -18,8 +18,14 @@ namespace ModengTerm.ViewModel.FileTrans
 
     public class FsTreeVM : TreeViewModel<FsTreeContext>
     {
+        #region 实例变量
+
         private string currentDirectory;
         private int totalHiddens;
+
+        #endregion
+
+        #region 属性
 
         public string CurrentDirectory
         {
@@ -50,6 +56,14 @@ namespace ModengTerm.ViewModel.FileTrans
             }
         }
 
+        #endregion
+
+        #region 公开接口
+
+        /// <summary>
+        /// 切换隐藏目录的显示状态
+        /// </summary>
+        /// <param name="isShow">是否显示隐藏目录</param>
         public void ToggleHiddenItems(bool isShow) 
         {
             IEnumerable<FsItemVM> hiddenItems = this.Context.NodeList.Cast<FsItemVM>().Where(v => v.IsHidden);
@@ -59,5 +73,7 @@ namespace ModengTerm.ViewModel.FileTrans
                 hiddenItem.IsVisible = isShow;
             }
         }
+
+        #endregion
     }
 }

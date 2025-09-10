@@ -29,7 +29,7 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         #region 公开事件
 
-        public event Action<FsTreeVM, FsTreeVM, List<FsItemVM>, FsItemVM> TransferFile;
+        public event Action<FsTreeVM, FsTreeVM, List<FsItemVM>, string> TransferFile;
         public event Action<FsTreeVM, FsItemVM> EnterDirectory;
 
         #endregion
@@ -85,23 +85,33 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         public void OnDragOver(DropInfo dropInfo)
         {
-            FsItemVM targetItem = dropInfo.TargetItem as FsItemVM;
-            if (targetItem == null)
+            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
+            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
+
+            // 拖放到哪个节点
+            FsItemVM dropItem = dropInfo.TargetItem as FsItemVM;
+            if (dropItem == null)
             {
                 dropInfo.Effects = DragDropEffects.Copy;
                 return;
             }
 
-            if (targetItem.Type != FsItemTypeEnum.Directory)
+            if (sourceFsTree == targetFsTree)
             {
-                dropInfo.Effects = DragDropEffects.None;
-                return;
+                if (dropItem.Type != FsItemTypeEnum.Directory)
+                {
+                    dropInfo.Effects = DragDropEffects.None;
+                    return;
+                }
+            }
+            else
+            {
             }
 
             if (dropInfo.Data is List<FsItemVM>)
             {
                 List<FsItemVM> dragItems = dropInfo.Data as List<FsItemVM>;
-                if (dropInfo == null || dragItems.Contains(targetItem))
+                if (dropInfo == null || dragItems.Contains(dropItem))
                 {
                     dropInfo.Effects = DragDropEffects.None;
                     return;
@@ -109,7 +119,7 @@ namespace ModengTerm.UserControls.FileTransUserControls
             }
             else if (dropInfo.Data is FsItemVM)
             {
-                if (targetItem == dropInfo.Data)
+                if (dropItem == dropInfo.Data)
                 {
                     dropInfo.Effects = DragDropEffects.None;
                     return;
@@ -121,6 +131,9 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         public void OnDrop(DropInfo dropInfo)
         {
+            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
+            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
+
             List<FsItemVM> dragItems = dropInfo.Data as List<FsItemVM>;
             if (dragItems == null)
             {
@@ -129,20 +142,27 @@ namespace ModengTerm.UserControls.FileTransUserControls
                 dragItems.Add(fsItemVm);
             }
 
+            string dstDir = string.Empty;
+
             FsItemVM dropItem = dropInfo.TargetItem as FsItemVM;
             if (dropItem == null)
             {
                 // 拖到了DataGrid的空白处，说明是要传输到当前显示的目录里
                 // 判断要拖到服务器还是客户端
+                if (sourceFsTree == targetFsTree)
+                {
+                    return;
+                }
+
+                dstDir = targetFsTree.CurrentDirectory;
             }
             else
             {
                 // 拖到了目录上，说明要传输到dropItem目录里
+                dstDir = dropItem.FullPath;
             }
 
-            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
-            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
-            this.TransferFile?.Invoke(sourceFsTree, targetFsTree, dragItems, dropItem);
+            this.TransferFile?.Invoke(sourceFsTree, targetFsTree, dragItems, dstDir);
         }
 
         #endregion

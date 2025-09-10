@@ -185,22 +185,10 @@ namespace ModengTerm.Base
             12, 14, 16, 18, 20
         };
 
-
-
         /// <summary>
         /// 最多保存10个最近打开的会话
         /// </summary>
         public const int MaxRecentSessions = 10;
-
-        public const int MIN_PORT = 1;
-        public const int MAX_PORT = 65535;
-
-        public const int TerminalColumns = 80;
-        public const int TerminalRows = 24;
-        public const TerminalTypeEnum DefaultTerminalType = TerminalTypeEnum.XTerm256Color;
-
-        public const int DefaultTerminalScrollback = 99999;
-        public const int DefaultMaxClipboardHistory = 50;
 
         /// <summary>
         /// 默认的串口波特率列表
@@ -221,20 +209,6 @@ namespace ModengTerm.Base
         {
             5, 6, 7, 8
         };
-
-        /// <summary>
-        /// 默认的SSH服务端口号
-        /// </summary>
-        public const int DefaultSSHPort = 22;
-
-        #region SFTP
-
-        /// <summary>
-        /// 最多记录100个历史目录
-        /// </summary>
-        public const int MaxHistoryDirectory = 100;
-
-        #endregion
 
         /// <summary>
         /// TreeViewItem的缩进

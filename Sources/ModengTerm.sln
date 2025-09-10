@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Addon", "ModengT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Controls", "ModengTerm.Controls\ModengTerm.Controls.csproj", "{17471BEE-F0A3-414E-AE88-C9580CAF8369}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.FileTrans", "ModengTerm.FileTrans\ModengTerm.FileTrans.csproj", "{0960E1D5-5B4B-4492-BC62-EF5CC79115C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.FileTransfer", "ModengTerm.FileTrans\ModengTerm.FileTransfer.csproj", "{0960E1D5-5B4B-4492-BC62-EF5CC79115C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
