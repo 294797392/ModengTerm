@@ -26,7 +26,10 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.FileTrans
 {
-    public class FsSessionVM : OpenedSessionVM, IClientFileTransTab
+    /// <summary>
+    /// 文件传输会话ViewModel
+    /// </summary>
+    public class FtpSessionVM : OpenedSessionVM, IClientFtpTab
     {
         #region 类变量
 
@@ -68,7 +71,7 @@ namespace ModengTerm.ViewModel.FileTrans
 
         #region 构造方法
 
-        public FsSessionVM(XTermSession session) :
+        public FtpSessionVM(XTermSession session) :
             base(session)
         {
         }
@@ -94,6 +97,11 @@ namespace ModengTerm.ViewModel.FileTrans
         {
             this.serverFsTree.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_SERVER_INITIAL_DIR);
             this.clientFsTree.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
+
+            // 加载树形列表右键菜单
+
+            //this.serverFsTree.MenuItems.AddRange(VMUtils.CreateMenuItems(false, MenuScopeEnum.FtpRemoteFileList));
+            //this.clientFsTree.MenuItems.AddRange(VMUtils.CreateMenuItems(false, MenuScopeEnum.FtpLocalFileList));
 
             FsClientOptions options = this.CreateOptions();
             FsClientTransport transport = new FsClientTransport();

@@ -36,6 +36,20 @@
                   dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
                   Style="{StaticResource ResourceKey=StyleDataGrid}">
 
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.Resources>
+                        <CollectionViewSource x:Key="CollectionViewSource1" Source="{Binding Path=ContextMenus}"/>
+                    </ContextMenu.Resources>
+
+                    <ContextMenu.ItemsSource>
+                        <CompositeCollection>
+                            <CollectionContainer Collection="{Binding Source={StaticResource CollectionViewSource1}}"/>
+                        </CompositeCollection>
+                    </ContextMenu.ItemsSource>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
                     <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
@@ -104,10 +118,7 @@
             <CheckBox Grid.Column="2" x:Name="CheckBoxToggleHiddenItem" Content="显示隐藏的项目" Checked="CheckBoxShowHiddenItems_CheckedChanged" Unchecked="CheckBoxShowHiddenItems_CheckedChanged"/>
 
         </Grid>
-        
-        
-        
-        
+
         <!--<TreeView Style="{StaticResource ResourceKey=StyleTreeView}" ItemsSource="{Binding Path=Roots}">
 
             <TreeView.ItemTemplate>

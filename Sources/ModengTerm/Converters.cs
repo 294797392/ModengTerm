@@ -491,7 +491,7 @@ namespace ModengTerm
                         {
                             case SessionTypeEnum.SerialPort: return "串口";
                             case SessionTypeEnum.Ssh: return "SSH";
-                            case SessionTypeEnum.LocalConsole: return "命令行";
+                            case SessionTypeEnum.Console: return "命令行";
                             case SessionTypeEnum.Sftp: return "SFTP";
                             case SessionTypeEnum.Tcp: return "Tcp";
 

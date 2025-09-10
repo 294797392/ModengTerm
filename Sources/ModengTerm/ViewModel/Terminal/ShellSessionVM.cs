@@ -167,9 +167,9 @@ namespace ModengTerm.ViewModel.Terminal
         }
 
         /// <summary>
-        /// 会话的右键菜单
+        /// 右键菜单
         /// </summary>
-        public BindableCollection<ContextMenuVM> ContextMenus { get; private set; }
+        public BindableCollection<MenuItemVM> ContextMenus { get; private set; }
 
         /// <summary>
         /// 控制右键菜单的显示和隐藏
@@ -234,16 +234,15 @@ namespace ModengTerm.ViewModel.Terminal
 
         protected override int OnOpen()
         {
-            //scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
-            HistoryCommands = new BindableCollection<string>();
+            this.HistoryCommands = new BindableCollection<string>();
 
-            writeEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
-            readEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
+            this.writeEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
+            this.readEncoding = Encoding.GetEncoding(this.session.GetOption<string>(PredefinedOptions.TERM_ENCODING));
 
             #region 初始化上下文菜单
 
-            ContextMenus = new BindableCollection<ContextMenuVM>();
-            ContextMenus.AddRange(VMUtils.CreateContextMenuVMs(false));
+            this.ContextMenus = new BindableCollection<MenuItemVM>();
+            this.ContextMenus.AddRange(VMUtils.CreateAddonMenuItems(false));
 
             RightClickActions brc = Session.GetOption<RightClickActions>(PredefinedOptions.TERM_RIGHT_CLICK_ACTION);
             if (brc == RightClickActions.ContextMenu)
@@ -312,7 +311,7 @@ namespace ModengTerm.ViewModel.Terminal
 
             #endregion
 
-            Uri = InitializeURI();
+            this.Uri = this.InitializeURI();
 
             this.isRunning = true;
 
@@ -382,7 +381,7 @@ namespace ModengTerm.ViewModel.Terminal
                         };
                     }
 
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         return new LocalConsoleChannelOptions()
                         {
@@ -430,7 +429,7 @@ namespace ModengTerm.ViewModel.Terminal
                         break;
                     }
 
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         string cmdPath = Session.GetOption<string>(PredefinedOptions.CONSOLE_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);

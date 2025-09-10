@@ -15,7 +15,7 @@ namespace ModengTerm
             {
                 case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                 case SessionTypeEnum.Ssh:
                     {
                         return new ShellSessionUserControl();

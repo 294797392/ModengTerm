@@ -1,31 +1,4 @@
 ﻿{
-    "toolbarMenus": [
-        {
-            "id": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A",
-            "name": "会话"
-        },
-        {
-            "id": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
-            "name": "视图"
-        },
-        {
-            "id": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "name": "编辑"
-        },
-        {
-            "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "name": "配置"
-        },
-        {
-            "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "name": "工具"
-        },
-        {
-            "id": "A592C670-3B36-495D-89CE-364691D9DFDA",
-            "name": "帮助"
-        }
-    ],
-
     "themes": [
         {
             "id": "1",
@@ -106,7 +79,7 @@
                     "name": "查找",
                     "icon": "M850.304 375.04v-45.248c0-47.488-38.4-100.544-89.216-100.544H536.192l-6.72-12.48a62.976 62.976 0 0 0-56.32-33.92H226.688A84.672 84.672 0 0 0 143.04 268.8v467.776a84.608 84.608 0 0 0 83.648 85.824h578.56a84.608 84.608 0 0 0 83.584-85.824V449.6c0-27.136-14.72-54.208-38.4-74.56h-0.128z m-64.384-22.656H601.6l-30.72-58.752h190.976c10.24 0 24.896 19.2 24.896 36.16v22.592h-0.832z m38.4 96v286.976a21.12 21.12 0 0 1-19.2 21.504H226.56a20.48 20.48 0 0 1-19.2-21.504V267.648a21.12 21.12 0 0 1 19.2-21.44h245.248l81.344 153.6c5.76 10.24 16.512 16.64 28.288 16.96h209.92c12.48 0 32.96 20.352 32.96 31.616z",
                     "className": "ModengTerm.OfficialAddons.Find.FindOverlayPanel, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialport", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialport", "tcp" ],
                     "openHotkeys": [ "Ctrl+F" ],
                     "closeHotkeys": [ "Esc" ],
                     "commands": [ "OpenFindPanel" ],
@@ -217,7 +190,7 @@
                     "name": "快速输入",
                     "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
                     "className": "ModengTerm.OfficialAddons.Snippet.SnippetPanel, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialport", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialport", "tcp" ],
                     "commands": [ "OpenSnippetPanel" ],
                     "dock": "Right"
                 }
@@ -242,7 +215,7 @@
                     "owner": 1,
                     "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
                     "className": "ModengTerm.OfficialAddons.PerfMon.PerfMonPanel, ModengTerm",
-                    "scopes": [ "localConsole", "ssh" ],
+                    "scopes": [ "console", "ssh" ],
                     "commands": [ "OpenPerfMonPanel" ],
                     "dock": "right"
                 }
@@ -266,7 +239,7 @@
                     "name": "广播",
                     "icon": "M164.4544 728.5248a30.72 30.72 0 0 0 43.4176-43.4688l-43.4176 43.4688zM207.872 76.8a30.72 30.72 0 1 0-43.4176-43.4688l43.4176 43.4688zM859.5456 33.3824a30.72 30.72 0 0 0-43.4176 43.4688l43.4176-43.4688zM816.128 685.056a30.72 30.72 0 0 0 43.4176 43.4688l-43.4176-43.4688zM724.736 168.2432a30.72 30.72 0 0 0-43.4688 43.4176l43.52-43.4176z m-43.4688 381.952a30.72 30.72 0 1 0 43.52 43.52l-43.52-43.52z m-382.0032 43.52a30.72 30.72 0 0 0 43.4176-43.52l-43.4176 43.52z m43.4176-382.0544a30.72 30.72 0 0 0-43.4176-43.4176l43.4176 43.4176z m200.0384 407.6544a30.72 30.72 0 0 0-61.44 0h61.44z m-61.44 349.5424a30.72 30.72 0 1 0 61.44 0H481.28zM207.872 685.056a430.08 430.08 0 0 1 0-608.256L164.4544 33.4336a491.52 491.52 0 0 0 0 695.1424l43.4176-43.4688zM816.128 76.8a430.08 430.08 0 0 1 0 608.256l43.4176 43.4688a491.52 491.52 0 0 0 0-695.1424l-43.4176 43.4688z m-134.8608 134.8608a239.4112 239.4112 0 0 1 0 338.5856l43.52 43.4176a300.8512 300.8512 0 0 0 0-425.472l-43.52 43.52z m-338.5856 338.5856a239.4112 239.4112 0 0 1 0-338.5856l-43.4176-43.4176a300.8512 300.8512 0 0 0 0 425.472l43.4176-43.52z m170.3936-169.2672a0.9728 0.9728 0 0 1-0.3072 0.7168 0.9728 0.9728 0 0 1-0.768 0.3072v61.44a62.464 62.464 0 0 0 62.5152-62.464h-61.44z m-1.024 1.024a0.9728 0.9728 0 0 1-0.768-0.3072 0.9728 0.9728 0 0 1-0.3072-0.768h-61.44c0 34.56 27.9552 62.5152 62.464 62.5152v-61.44z m-1.0752-1.024a0.9728 0.9728 0 0 1 0.3072-0.768A0.9728 0.9728 0 0 1 512 379.904v-61.44A62.464 62.464 0 0 0 449.536 380.928h61.44zM512 379.904a0.9728 0.9728 0 0 1 0.768 0.3072 0.9728 0.9728 0 0 1 0.3072 0.768h61.44a62.464 62.464 0 0 0-62.464-62.5152v61.44z m-30.72 239.4112v349.5424h61.44v-349.5424H481.28z",
                     "className": "ModengTerm.OfficialAddons.Broadcast.BroadcastPanel, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialport", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialport", "tcp" ],
                     "openHotkeys": [ "Ctrl+Q" ],
                     "commands": [ "OpenBroadcastPanel" ],
                     "dock": "Right"
@@ -291,7 +264,7 @@
                     "name": "记录日志",
                     "icon": "M208.736 566.336H64.384v59.328h144.352v-59.328z m0-336.096H165.44V74.592c0-7.968 4.896-14.848 10.464-14.848h502.016V0.448H175.936c-38.72 1.248-69.248 34.368-68.192 74.144v155.648H64.384V289.6h144.352V230.24z m0 168.096H64.384v59.328h144.352v-59.328z m714.656 76.576h-57.76v474.496c0 7.936-4.896 14.848-10.464 14.848H175.936c-5.568 0-10.464-6.912-10.464-14.848v-155.68h43.296v-59.296H64.384v59.296h43.328v155.68c-1.024 39.776 29.472 72.896 68.192 74.144h679.232c38.72-1.184 69.248-34.368 68.256-74.144V474.912z m14.944-290.336l-83.072-85.312a71.264 71.264 0 0 0-52.544-21.728 71.52 71.52 0 0 0-51.616 23.872L386.528 507.264a30.496 30.496 0 0 0-6.176 10.72L308.16 740.512a30.016 30.016 0 0 0 6.976 30.24c7.712 7.968 19.2 10.752 29.568 7.2l216.544-74.112a28.736 28.736 0 0 0 12.128-7.936L940.448 287.456a75.552 75.552 0 0 0-2.112-102.88z m-557.12 518.272l39.104-120.64 78.336 80.416-117.44 40.224z m170.048-70.016l-103.552-106.016 200.16-222.4 103.52 106.304-200.128 222.112zM897.952 247.072l-0.256 0.224-107.136 119.168-103.52-106.528 106.432-118.624a14.144 14.144 0 0 1 10.304-4.736 13.44 13.44 0 0 1 10.464 4.288l83.264 85.696c5.472 5.6 5.664 14.72 0.448 20.512z",
                     "className": "ModengTerm.OfficialAddons.Logger.LoggerOptionsPanel, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialport", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialport", "tcp" ],
                     "openHotkeys": [ "Ctrl+W" ],
                     "commands": [ "OpenLoggerPanel" ],
                     "dock": "Right"
@@ -374,13 +347,13 @@
                     "id": "20C693D5-0186-4CCF-A019-D95E6A05BDDD",
                     "name": "会话",
                     "className": "",
-                    "scopes": [ "localConsole", "ssh", "serialPort", "sftp", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialPort", "sftp", "tcp" ],
                     "child": [
                         {
                             "id": "91A9E520-E632-471B-B238-E070AFE742DB",
                             "name": "命令行",
                             "className": "ModengTerm.UserControls.OptionsUserControl.Session.LocalConsoleOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole" ],
+                            "scopes": [ "console" ],
                             "defaultOptions": {
                                 "console_startup_path": "%SYS_DIR%/cmd.exe",
                                 "console_startup_directory": "%CLI_DIR%",
@@ -478,7 +451,7 @@
                     "id": "24AFB18B-79BB-435A-B4F1-A62006F1A026",
                     "name": "终端",
                     "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.TerminalOptionsUserControl, ModengTerm",
-                    "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                    "scopes": [ "console", "ssh", "serialPort", "tcp" ],
                     "defaultOptions": {
                         "term_row": 80,
                         "term_col": 24,
@@ -495,7 +468,7 @@
                             "id": "0FA6848B-5FC8-4B4A-B387-544EEF845498",
                             "name": "外观",
                             "className": "ModengTerm.UserControls.OptionsUserControls.Terminal.ThemeOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "scopes": [ "console", "ssh", "serialPort", "tcp" ],
                             "defaultOptions": {
                                 "theme_font_family": "%SYS_FONT%",
                                 "theme_font_size": 14,
@@ -534,7 +507,7 @@
                             "id": "07003B7C-4E63-8213-777A-E37D52BAC31B",
                             "name": "鼠标",
                             "className": "ModengTerm.UserControls.OptionsUserControls.Terminal.MouseOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "scopes": [ "console", "ssh", "serialPort", "tcp" ],
                             "defaultOptions": {
                                 "cursor_speed": "normal",
                                 "cursor_style": "line",
@@ -545,7 +518,7 @@
                             "id": "39C7B12B-479D-40DF-803F-FDDEC7B4CF61",
                             "name": "高级",
                             "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm",
-                            "scopes": [ "localConsole", "ssh", "serialPort", "tcp" ],
+                            "scopes": [ "console", "ssh", "serialPort", "tcp" ],
                             "defaultOptions": {
                                 "term_adv_render_mode": "default",
                                 "term_adv_click_to_cursor": false,

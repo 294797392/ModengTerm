@@ -10,7 +10,9 @@ using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using WPFToolkit.MVVM;
+using Xceed.Wpf.Toolkit.Core.Converters;
 
 namespace ModengTerm.ViewModel
 {
@@ -71,7 +73,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 窗口顶部的所有菜单列表
         /// </summary>
-        public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
+        public BindableCollection<MenuItemVM> TitleMenus { get; private set; }
 
         /// <summary>
         /// 所有主题列表
@@ -112,8 +114,8 @@ namespace ModengTerm.ViewModel
                 this.RecentlyOpenedSession.Add(recentlySessionVM);
             }
 
-            this.TitleMenus = new BindableCollection<ContextMenuVM>();
-            this.TitleMenus.AddRange(VMUtils.CreateContextMenuVMs(true));
+            this.TitleMenus = new BindableCollection<MenuItemVM>();
+            this.LoadTitleMenus();
 
             this.Themes = new BindableCollection<AppThemeVM>();
             this.Themes.AddRange(ClientContext.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
@@ -238,6 +240,43 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 实例方法
+
+        /// <summary>
+        /// 加载标题栏菜单
+        /// 插件菜单加载逻辑是：
+        /// 软件启动之后，加载所有的插件菜单，并加到ViewModel里，在AvtiveSession改变的时候，动态显示或隐藏对应会话的插件菜单
+        /// </summary>
+        private void LoadTitleMenus()
+        {
+            foreach (MenuMetadata titleMenu in VTBaseConsts.TitleMenus)
+            {
+                MenuItemVM mivm = new MenuItemVM(titleMenu);
+                this.TitleMenus.Add(mivm);
+            }
+
+            List<MenuItemVM> menuItems = VMUtils.CreateAddonMenuItems(true);
+
+            foreach (MenuItemVM mivm in menuItems)
+            {
+                string pid = mivm.Metadata.ParentId;
+
+                if (string.IsNullOrEmpty(pid))
+                {
+                    this.TitleMenus.Add(mivm);
+                }
+                else
+                {
+                    MenuItemVM parentVm = this.TitleMenus.FirstOrDefault(v => v.Metadata.ID == pid);
+                    if (parentVm == null) 
+                    {
+                        logger.ErrorFormat("加载标题栏插件菜单失败, 没有找到对应的父节点:{0}, {1}", pid, mivm.Name);
+                        continue;
+                    }
+
+                    parentVm.Children.Add(mivm);
+                }
+            }
+        }
 
         #endregion
 

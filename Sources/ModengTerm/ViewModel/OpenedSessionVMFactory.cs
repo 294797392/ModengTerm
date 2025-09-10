@@ -25,14 +25,14 @@ namespace ModengTerm.ViewModel
                 case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.Ssh:
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         return new ShellSessionVM(session);
                     }
 
                 case SessionTypeEnum.Sftp:
                     {
-                        return new FsSessionVM(session);
+                        return new FtpSessionVM(session);
                     }
 
                 default:

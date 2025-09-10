@@ -10,12 +10,6 @@ using System.Collections.Generic;
 namespace ModengTerm.Addon
 {
     /// <summary>
-    /// 点击顶部菜单栏或者右键菜单所执行的事件处理器
-    /// </summary>
-    /// <param name="e"></param>
-    public delegate void AddonCommandDelegate(CommandArgs e);
-
-    /// <summary>
     /// 插件生命周期管理
     /// 插件事件管理
     /// </summary>
@@ -35,8 +29,6 @@ namespace ModengTerm.Addon
 
         private AddonMetadata metadata;
 
-        private Dictionary<string, Command> registerCommands;
-
         private List<IOverlayPanel> overlayPanels;
 
         protected ClientFactory factory;
@@ -48,14 +40,9 @@ namespace ModengTerm.Addon
 
         #region 属性
 
-        public string ID { get; private set; }
+        public string ID { get { return this.metadata.ID; } }
 
         public AddonMetadata Metadata { get { return this.metadata; } }
-
-        /// <summary>
-        /// 插件注册的所有命令
-        /// </summary>
-        public Dictionary<string, Command> RegisteredCommand { get { return this.registerCommands; } }
 
         #endregion
 
@@ -66,9 +53,7 @@ namespace ModengTerm.Addon
         /// </summary>
         public void Active(ActiveContext context)
         {
-            this.ID = context.Definition.ID;
             this.factory = context.Factory;
-            this.registerCommands = new Dictionary<string, Command>();
             this.overlayPanels = new List<IOverlayPanel>();
             this.metadata = context.Definition;
 
@@ -82,9 +67,6 @@ namespace ModengTerm.Addon
         public void Deactive()
         {
             this.OnDeactive();
-
-            // Release
-            this.registerCommands.Clear();
         }
 
         #endregion
@@ -92,24 +74,17 @@ namespace ModengTerm.Addon
         #region 受保护方法
 
         /// <summary>
-        /// 监听某个命令
+        /// 注册命令处理器
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="handler"></param>
-        public void RegisterCommand(string command, AddonCommandDelegate handler, object userData = null)
+        /// <param name="command">要注册的命令</param>
+        /// <param name="delegate">命令执行函数</param>
+        /// <param name="userData">回传给回调的用户数据</param>
+        public void RegisterCommand(string command, AddonCommandDelegate @delegate, object userData = null)
         {
-            if (this.registerCommands.ContainsKey(command))
-            {
-                return;
-            }
+            // 多个插件可能注册了相同的command，需要保证每个插件注册的command不一致
+            string commandKey = AddonUtils.GetCommandKey(this.ID, command);
 
-            Command cmd = new Command()
-            {
-                Delegate = handler,
-                UserData = userData
-            };
-
-            this.registerCommands[command] = cmd;
+            this.eventRegistry.RegisterCommand(commandKey, @delegate, userData);
         }
 
         protected string GetObjectId()

@@ -36,7 +36,7 @@ namespace ModengTerm.Terminal.Engines
 
     public class LocalConsoleChannelOptions : ChannelOptions
     {
-        public override SessionTypeEnum SessionType => SessionTypeEnum.LocalConsole;
+        public override SessionTypeEnum SessionType => SessionTypeEnum.Console;
 
         /// <summary>
         /// 如果该会话是LocalConsole会话

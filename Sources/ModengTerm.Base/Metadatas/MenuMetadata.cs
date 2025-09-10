@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ModengTerm.Base.Enumerations;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModengTerm.Base.Metadatas
@@ -40,14 +41,15 @@ namespace ModengTerm.Base.Metadatas
         public string ParentId { get; set; }
 
         /// <summary>
-        /// 菜单所对应的插件Id
+        /// 指定菜单在哪些区域里显示
         /// </summary>
-        [JsonIgnore]
-        public string AddonId { get; set; }
+        [JsonProperty("scopes")]
+        public List<MenuScopeEnum> Scopes { get; set; }
 
         public MenuMetadata()
         {
             this.Children = new List<MenuMetadata>();
+            this.Scopes = new List<MenuScopeEnum>();
         }
     }
 }

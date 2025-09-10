@@ -3,6 +3,7 @@ using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
+using ModengTerm.Base.Metadatas;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -25,7 +26,7 @@ namespace ModengTerm.Base
 
         private static readonly VTColorTable DefaultSessionColorTable = new VTColorTable()
         {
-            RgbKeys = new List<string>() 
+            RgbKeys = new List<string>()
             {
                 "54,52,46,255", "165,100,52,255", "0,128,0,255", "153,150,6,255", "70,70,255,255", "123,81,117,255", "0,162,196,255", "207,216,211,255",
                 "83,87,85,255", "207,158,114,255", "28,196,112,255", "226,226,52,255", "111,111,244,255", "169,126,173,255", "80,235,252,255", "236,238,238,255"
@@ -39,7 +40,7 @@ namespace ModengTerm.Base
         {
             ID = "0",
             Name = "控制台会话",
-            Type = (int)SessionTypeEnum.LocalConsole,
+            Type = (int)SessionTypeEnum.Console,
             Options = new Dictionary<string, Dictionary<string, object>>()
             {
                 {
@@ -93,7 +94,7 @@ namespace ModengTerm.Base
             {
                 ID = "0",
                 Name = "本地命令行",
-                Type = SessionTypeEnum.LocalConsole
+                Type = SessionTypeEnum.Console
             },
 
             new SessionMetadata()
@@ -135,9 +136,9 @@ namespace ModengTerm.Base
             { "%SYS_FONT%", VTBaseUtils.GetDefaultFontFamilyName() }
         };
 
-        public static readonly List<ThemePackage> TerminalThemes = new List<ThemePackage>() 
+        public static readonly List<ThemePackage> TerminalThemes = new List<ThemePackage>()
         {
-            new ThemePackage() 
+            new ThemePackage()
             {
                 ID = "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
                 Name = "Xshell - NewBlack",
@@ -180,10 +181,24 @@ namespace ModengTerm.Base
             }
         };
 
-        public static readonly List<int> FontSizes = new List<int>() 
+        public static readonly List<int> FontSizes = new List<int>()
         {
             12, 14, 16, 18, 20
         };
+
+        /// <summary>
+        /// 顶部根菜单
+        /// </summary>
+        public static readonly List<MenuMetadata> TitleMenus = new List<MenuMetadata>()
+        {
+            new MenuMetadata() { ID = "70DCA138-F1E2-4F98-A545-CCC2008F1E0A", Name = "会话" },
+            new MenuMetadata() { ID = "05B8D545-77CD-4F4E-908B-65A5C27E842D", Name = "视图" },
+            new MenuMetadata() { ID = "50ED6E4E-4252-4D92-99DD-E72AC646FACB", Name = "编辑" },
+            new MenuMetadata() { ID = "BF0E0737-CE95-403E-ABD2-2768FFBE11B9", Name = "配置" },
+            new MenuMetadata() { ID = "000C1900-DC7E-4710-B8B1-46CE00E35E33", Name = "工具" },
+            new MenuMetadata() { ID = "A592C670-3B36-495D-89CE-364691D9DFDA", Name = "帮助" }
+        };
+
 
         /// <summary>
         /// 最多保存10个最近打开的会话

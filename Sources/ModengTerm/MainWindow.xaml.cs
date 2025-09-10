@@ -233,26 +233,6 @@ namespace ModengTerm
             this.addons = addons;
         }
 
-        private void DispatchCommand(CommandArgs e)
-        {
-            AddonModule addon = this.addons.FirstOrDefault(v => v.ID == e.AddonId);
-            if (addon == null)
-            {
-                logger.ErrorFormat("查找插件失败, {0}", e.AddonId);
-                return;
-            }
-
-            Command command;
-            if (!addon.RegisteredCommand.TryGetValue(e.Command, out command))
-            {
-                logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, e.Command);
-                return;
-            }
-
-            e.UserData = command.UserData;
-            command.Delegate(e);
-        }
-
         private void PublishTabEvent(TabEventArgs e)
         {
             this.eventRegistry.PublishTabEvent(e);
@@ -569,11 +549,6 @@ namespace ModengTerm
             this.PublishTabEvent(e);
         }
 
-        private void SessionContent_ExecuteCommand(CommandArgs e)
-        {
-            this.DispatchCommand(e);
-        }
-
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             // 直接打开Windows命令行，可以更快速的进入工作状态
@@ -734,11 +709,8 @@ namespace ModengTerm
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandArgs.Instance.Command = contextMenu.Command;
-            CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IClientTab;
-            this.DispatchCommand(CommandArgs.Instance);
+            MenuItemVM menuItemVm = menuItem.DataContext as MenuItemVM;
+            ClientUtils.DispatchCommand(menuItemVm);
         }
 
 
@@ -979,12 +951,6 @@ namespace ModengTerm
             }
 
             this.OpenSession(session);
-        }
-
-        private void ExecuteAddonCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            CommandArgs args = e.Parameter as CommandArgs;
-            this.DispatchCommand(args);
         }
 
         #endregion

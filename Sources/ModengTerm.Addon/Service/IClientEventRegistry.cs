@@ -9,6 +9,12 @@ namespace ModengTerm.Addon.Service
 
     public delegate void ClientHotkeyDelegate(object userData);
 
+    /// <summary>
+    /// 点击顶部菜单栏或者右键菜单所执行的事件处理器
+    /// </summary>
+    /// <param name="e"></param>
+    public delegate void AddonCommandDelegate(CommandArgs e);
+
     public interface IClientEventRegistry
     {
         #region ClientEvent
@@ -98,6 +104,16 @@ namespace ModengTerm.Addon.Service
         /// <param name="hotkey"></param>
         /// <returns>是否执行了快捷键事件</returns>
         bool PublishHotkeyEvent(string hotkey);
+
+        #endregion
+
+        #region Command
+
+        void RegisterCommand(string commandKey, AddonCommandDelegate @delegate, object userData);
+
+        void UnregisterCommand(string commandKey);
+
+        bool PublishCommand(CommandArgs cmdArgs);
 
         #endregion
     }

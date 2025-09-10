@@ -216,11 +216,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandArgs.Instance.Command = contextMenu.Command;
-            CommandArgs.Instance.ActiveTab = this.shellSession;
-            MCommands.ExecuteAddonCommand.Execute(CommandArgs.Instance, Application.Current.MainWindow);
+            MenuItemVM menuItemVm = menuItem.DataContext as MenuItemVM;
+            ClientUtils.DispatchCommand(menuItemVm);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

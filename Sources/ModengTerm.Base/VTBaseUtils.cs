@@ -44,7 +44,7 @@ namespace ModengTerm.Base
                 case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.Ssh:
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         return true;
                     }
@@ -181,7 +181,7 @@ namespace ModengTerm.Base
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.LocalConsole: return "local";
+                case SessionTypeEnum.Console: return "local";
                 case SessionTypeEnum.SerialPort: return "serial";
                 case SessionTypeEnum.Tcp: return "tcp";
                 case SessionTypeEnum.Sftp: return "sftp";

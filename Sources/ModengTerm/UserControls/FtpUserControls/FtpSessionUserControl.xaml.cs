@@ -28,7 +28,7 @@ namespace ModengTerm.UserControls.FileTransUserControls
         #region 实例变量
 
         private XTermSession sesison;
-        private FsSessionVM fsSession;
+        private FtpSessionVM fsSession;
 
         #endregion
 
@@ -61,7 +61,7 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         public int Open(OpenedSessionVM sessionVM)
         {
-            this.fsSession = sessionVM as FsSessionVM;
+            this.fsSession = sessionVM as FtpSessionVM;
             this.fsSession.Open();
 
             base.DataContext = this.fsSession;

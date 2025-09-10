@@ -1,4 +1,7 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Service;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
@@ -11,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ModengTerm
@@ -127,6 +131,24 @@ namespace ModengTerm
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 执行一个命令
+        /// </summary>
+        /// <param name="menuItemVm">要触发命令的菜单</param>
+        public static void DispatchCommand(MenuItemVM menuItemVm) 
+        {
+            if (string.IsNullOrEmpty(menuItemVm.CommandKey))
+            {
+                // 此时说明该菜单没有注册对应的事件
+                return;
+            }
+
+            ClientFactory factory = ClientFactory.GetFactory();
+            IClientEventRegistry eventRegistry = factory.GetEventRegistry();
+            CommandArgs.Instance.CommandKey = menuItemVm.CommandKey;
+            eventRegistry.PublishCommand(CommandArgs.Instance);
         }
     }
 }

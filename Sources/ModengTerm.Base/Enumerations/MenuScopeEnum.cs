@@ -2,37 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ModengTerm.Base.Enumerations
 {
     /// <summary>
-    /// 标识会话类型
+    /// 指定菜单显示的区域
     /// </summary>
-    public enum SessionTypeEnum
+    public enum MenuScopeEnum
     {
         /// <summary>
-        /// 本地控制台会话
+        /// 控制台
         /// </summary>
         Console,
 
-        /// <summary>
-        /// 是一个SSH远程主机
-        /// </summary>
         Ssh,
 
-        /// <summary>
-        /// 是一个串口设备
-        /// </summary>
         SerialPort,
 
-        /// <summary>
-        /// SFTP会话
-        /// </summary>
-        Sftp,
+        Tcp,
 
         /// <summary>
-        /// Tcp会话
+        /// sftp本地文件列表
         /// </summary>
-        Tcp
+        FtpLocalFileList,
+
+        /// <summary>
+        /// sftp远程文件列表
+        /// </summary>
+        FtpRemoteFileList
     }
 }

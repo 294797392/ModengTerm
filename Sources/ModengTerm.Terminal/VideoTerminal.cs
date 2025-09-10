@@ -1081,7 +1081,7 @@ namespace ModengTerm.Terminal
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         // 对Windows命令行做特殊处理
                         // Windows的命令行比较特殊，在窗口放大的时候，它不会把上面被隐藏的行显示出来，而是在下面增加了新的行

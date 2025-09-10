@@ -99,7 +99,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的Sftp类型的会话界面
     /// </summary>
-    public interface IClientFileTransTab : IClientTab
+    public interface IClientFtpTab : IClientTab
     {
 
     }

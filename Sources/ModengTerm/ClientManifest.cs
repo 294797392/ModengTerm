@@ -12,12 +12,6 @@ namespace ModengTerm.Base
     public class ClientManifest : AppManifest
     {
         /// <summary>
-        /// 默认顶部根菜单
-        /// </summary>
-        [JsonProperty("toolbarMenus")]
-        public List<MenuMetadata> ToolbarMenus { get; private set; }
-
-        /// <summary>
         /// 窗口主题列表
         /// </summary>
         [JsonProperty("themes")]
@@ -31,7 +25,6 @@ namespace ModengTerm.Base
 
         public ClientManifest()
         {
-            this.ToolbarMenus = new List<MenuMetadata>();
             this.AppThemes = new List<AppTheme>();
             this.Addons = new List<AddonMetadata>();
         }

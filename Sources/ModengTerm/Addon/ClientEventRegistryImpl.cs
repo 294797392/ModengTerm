@@ -111,12 +111,21 @@ namespace ModengTerm.Addon
             public object UserData { get; set; }
         }
 
+        private class CommandData
+        {
+            public AddonCommandDelegate Delegate { get; set; }
+
+            public object UserData { get; set; }
+        }
+
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientEventRegistoryImpl");
 
         private Registry<ClientEvent, ClientEventDelegate> clientRegistry;
         private Registry<TabEvent, TabEventDelegate> tabRegistry;
         private Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>> tabEventRegistry;
         private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
+        private Dictionary<string, CommandData> commandRegistry;
 
         public ClientEventRegistryImpl()
         {
@@ -124,6 +133,7 @@ namespace ModengTerm.Addon
             this.tabRegistry = new Registry<TabEvent, TabEventDelegate>();
             this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
+            this.commandRegistry = new Dictionary<string, CommandData>();
         }
 
 
@@ -279,6 +289,39 @@ namespace ModengTerm.Addon
                     logger.Error("快捷键执行异常", ex);
                 }
             }
+
+            return true;
+        }
+
+
+
+
+        public void RegisterCommand(string commandKey, AddonCommandDelegate @delegate, object userData)
+        {
+            CommandData commandData = new CommandData() 
+            {
+                Delegate = @delegate,
+                UserData = userData
+            };
+
+            this.commandRegistry[commandKey] = commandData;
+        }
+
+        public void UnregisterCommand(string commandKey)
+        {
+            this.commandRegistry.Remove(commandKey);
+        }
+
+        public bool PublishCommand(CommandArgs cmdArgs)
+        {
+            CommandData commandData;
+            if (!this.commandRegistry.TryGetValue(cmdArgs.CommandKey, out commandData))
+            {
+                return false;
+            }
+
+            cmdArgs.UserData = commandData.UserData;
+            commandData.Delegate(cmdArgs);
 
             return true;
         }

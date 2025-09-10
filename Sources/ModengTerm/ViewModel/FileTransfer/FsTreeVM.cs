@@ -1,4 +1,5 @@
 ﻿using ModengTerm.FileTrans.Clients;
+using ModengTerm.Styles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,11 @@ namespace ModengTerm.ViewModel.FileTrans
             }
         }
 
+        /// <summary>
+        /// 树形列表的右键菜单
+        /// </summary>
+        public BindableCollection<MenuItemVM> MenuItems { get; private set; }
+
         #endregion
 
         #region 公开接口
@@ -72,6 +78,15 @@ namespace ModengTerm.ViewModel.FileTrans
             {
                 hiddenItem.IsVisible = isShow;
             }
+        }
+
+        #endregion
+
+        #region 构造方法
+
+        public FsTreeVM() 
+        {
+            this.MenuItems = new BindableCollection<MenuItemVM>();
         }
 
         #endregion

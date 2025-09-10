@@ -5,9 +5,9 @@ using WPFToolkit.MVVM;
 namespace ModengTerm.ViewModel
 {
     /// <summary>
-    /// 标题栏菜单ViewModel
+    /// 右键菜单和标题栏菜单ViewModel
     /// </summary>
-    public class ContextMenuVM : ItemViewModel
+    public class MenuItemVM : ItemViewModel
     {
         #region 类变量
 
@@ -23,12 +23,15 @@ namespace ModengTerm.ViewModel
 
         #region 属性
 
-        public MenuMetadata Definition { get; private set; }
+        /// <summary>
+        /// 菜单的元数据信息
+        /// </summary>
+        public MenuMetadata Metadata { get; private set; }
 
         /// <summary>
         /// 子菜单列表
         /// </summary>
-        public BindableCollection<ContextMenuVM> Children { get; private set; }
+        public BindableCollection<MenuItemVM> Children { get; private set; }
 
         /// <summary>
         /// 是否可以勾选
@@ -46,20 +49,22 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public string AddonId { get { return Definition.AddonId; } }
-
-        public string Command { get { return Definition.Command; } }
+        /// <summary>
+        /// 该菜单所触发的命令Key
+        /// 
+        /// </summary>
+        public string CommandKey { get; set; }
 
         #endregion
 
         #region 构造方法
 
-        public ContextMenuVM(MenuMetadata definition)
+        public MenuItemVM(MenuMetadata metadata)
         {
-            this.ID = definition.ID;
-            this.Name = definition.Name;
-            Children = new BindableCollection<ContextMenuVM>();
-            Definition = definition;
+            this.ID = metadata.ID;
+            this.Name = metadata.Name;
+            this.Children = new BindableCollection<MenuItemVM>();
+            this.Metadata = metadata;
             this.IsVisible = true;
         }
 

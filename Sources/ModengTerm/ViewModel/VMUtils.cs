@@ -1,11 +1,15 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Metadatas;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Panels;
 using ModengTerm.ViewModel.Session;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -90,49 +94,34 @@ namespace ModengTerm.ViewModel
             return sessionTreeVM;
         }
 
-        public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)
+        /// <summary>
+        /// 创建顶部菜单或者右键菜单
+        /// </summary>
+        /// <param name="toolbarMenu"></param>
+        /// <returns></returns>
+        public static List<MenuItemVM> CreateAddonMenuItems(bool toolbarMenu)
         {
-            List<MenuMetadata> menuItems = new List<MenuMetadata>();
+            List<MenuItemVM> result = new List<MenuItemVM>();
 
-            if (toolbarMenu)
-            {
-                // 先加载所有的根节点菜单
-                menuItems.AddRange(ClientContext.Context.Manifest.ToolbarMenus);
-            }
-
-            // 再加载所有的插件菜单
+            // 加载所有的插件菜单
             foreach (AddonMetadata addon in ClientContext.Context.Manifest.Addons)
             {
                 List<MenuMetadata> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
 
                 foreach (MenuMetadata menuItem in menus)
                 {
-                    menuItem.AddonId = addon.ID;
+                    MenuItemVM mivm = new MenuItemVM(menuItem);
+
+                    if (!string.IsNullOrEmpty(menuItem.Command))
+                    {
+                        mivm.CommandKey = AddonUtils.GetCommandKey(addon.ID, menuItem.Command);
+                    }
+
+                    result.Add(mivm);
+
+                    // 加载这个菜单的子节点
+                    LoadChildMenuItems(mivm, menuItem.Children, addon);
                 }
-
-                menuItems.AddRange(menus);
-            }
-
-            List<ContextMenuVM> result = new List<ContextMenuVM>();
-
-            foreach (MenuMetadata menuItem in menuItems)
-            {
-                ContextMenuVM cmvm = new ContextMenuVM(menuItem);
-
-                if (string.IsNullOrEmpty(menuItem.ParentId))
-                {
-                    // 此时说明是根菜单
-                    result.Add(cmvm);
-                }
-                else
-                {
-                    // 此时说明不是根菜单
-                    ContextMenuVM parentVM = result.FirstOrDefault(v => v.ID.ToString() == menuItem.ParentId);
-                    parentVM.Children.Add(cmvm);
-                }
-
-                // 加载这个菜单的子节点
-                LoadChildMenuItems(cmvm, menuItem.Children);
             }
 
             return result;
@@ -175,14 +164,20 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        private static void LoadChildMenuItems(ContextMenuVM parentVM, List<MenuMetadata> children)
+        private static void LoadChildMenuItems(MenuItemVM parentVM, List<MenuMetadata> children, AddonMetadata addon)
         {
             foreach (MenuMetadata menuItem in children)
             {
-                menuItem.AddonId = parentVM.AddonId;
+                MenuItemVM mivm = new MenuItemVM(menuItem);
 
-                ContextMenuVM contextMenuVM = new ContextMenuVM(menuItem);
-                parentVM.Children.Add(contextMenuVM);
+                if (!string.IsNullOrEmpty(menuItem.Command))
+                {
+                    mivm.CommandKey = AddonUtils.GetCommandKey(addon.ID, menuItem.Command);
+                }
+
+                parentVM.Children.Add(mivm);
+
+                LoadChildMenuItems(mivm, menuItem.Children, addon);
             }
         }
     }

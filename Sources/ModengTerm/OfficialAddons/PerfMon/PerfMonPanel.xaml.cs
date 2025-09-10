@@ -737,7 +737,7 @@ namespace ModengTerm.OfficialAddons.PerfMon
                         break;
                     }
 
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         this.UpdateWin32PerfMon();
                         break;

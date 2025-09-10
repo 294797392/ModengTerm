@@ -23,7 +23,7 @@ namespace ModengTerm.Terminal.Engines
                         return new SshNetChannel();
                     }
 
-                case SessionTypeEnum.LocalConsole:
+                case SessionTypeEnum.Console:
                     {
                         LocalConsoleChannelOptions channelOptions = options as LocalConsoleChannelOptions;
 

@@ -16,20 +16,9 @@ namespace ModengTerm.Addon
         public object UserData { get; set; }
 
         /// <summary>
-        /// 要执行的命令
+        /// 要执行的命令Key
         /// </summary>
-        public string Command { get; set; }
-
-        /// <summary>
-        /// 触发命令的插件Id
-        /// 如果为空，则说明是AddonCommand
-        /// </summary>
-        public string AddonId { get; set; }
-
-        /// <summary>
-        /// 当前选中的Tab页
-        /// </summary>
-        public IClientTab ActiveTab { get; set; }
+        public string CommandKey { get; set; }
 
         private CommandArgs() 
         {
