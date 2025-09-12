@@ -20,5 +20,10 @@ namespace ModengTerm.FileTrans.Enumerations
         /// 该节点是一个目录
         /// </summary>
         Directory,
+
+        /// <summary>
+        /// 返回上册目录
+        /// </summary>
+        ParentDirectory
     }
 }

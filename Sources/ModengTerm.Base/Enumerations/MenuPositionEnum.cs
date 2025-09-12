@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ModengTerm.Base.Enumerations
 {
     /// <summary>
-    /// 指定菜单显示的区域
+    /// 指定菜单显示的位置
     /// </summary>
-    public enum MenuScopeEnum
+    public enum MenuPositionEnum
     {
         /// <summary>
         /// 控制台

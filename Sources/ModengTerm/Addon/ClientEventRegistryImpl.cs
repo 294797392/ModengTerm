@@ -113,7 +113,7 @@ namespace ModengTerm.Addon
 
         private class CommandData
         {
-            public AddonCommandDelegate Delegate { get; set; }
+            public CommandDelegate Delegate { get; set; }
 
             public object UserData { get; set; }
         }
@@ -296,7 +296,7 @@ namespace ModengTerm.Addon
 
 
 
-        public void RegisterCommand(string commandKey, AddonCommandDelegate @delegate, object userData)
+        public void RegisterCommand(string commandKey, CommandDelegate @delegate, object userData = null)
         {
             CommandData commandData = new CommandData() 
             {

@@ -138,7 +138,7 @@ namespace ModengTerm
         }
 
         /// <summary>
-        /// 注册插件里的SidePanel相关的事件
+        /// 注册插件里的打开和关闭Panel的事件
         /// </summary>
         /// <param name="addon"></param>
         private void SubscribePanelEvent(AddonModule addon)

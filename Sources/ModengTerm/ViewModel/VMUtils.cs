@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -95,6 +96,27 @@ namespace ModengTerm.ViewModel
         }
 
         /// <summary>
+        /// 创建客户端默认的菜单
+        /// </summary>
+        /// <param name="metadatas">要创建的菜单列表</param>
+        /// <returns></returns>
+        public static List<MenuItemVM> CreateDefaultMenuItems(List<MenuMetadata> metadatas)
+        {
+            List<MenuItemVM> result = new List<MenuItemVM>();
+
+            foreach (MenuMetadata metadata in metadatas)
+            {
+                MenuItemVM mivm = new MenuItemVM(metadata);
+                mivm.CommandKey = metadata.Command;
+                result.Add(mivm);
+                // 加载这个菜单的子节点
+                LoadChildMenuItems(mivm, metadata.Children);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 创建顶部菜单或者右键菜单
         /// </summary>
         /// <param name="toolbarMenu"></param>
@@ -178,6 +200,17 @@ namespace ModengTerm.ViewModel
                 parentVM.Children.Add(mivm);
 
                 LoadChildMenuItems(mivm, menuItem.Children, addon);
+            }
+        }
+
+        private static void LoadChildMenuItems(MenuItemVM parentVM, List<MenuMetadata> children)
+        {
+            foreach (MenuMetadata metadata in children)
+            {
+                MenuItemVM mivm = new MenuItemVM(metadata);
+                mivm.CommandKey = metadata.Command;
+                parentVM.Children.Add(mivm);
+                LoadChildMenuItems(mivm, metadata.Children);
             }
         }
     }

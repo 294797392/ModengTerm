@@ -12,6 +12,11 @@ namespace ModengTerm.FileTrans
     public enum ProcessStates
     {
         /// <summary>
+        /// 等待入队
+        /// </summary>
+        WaitQueued,
+
+        /// <summary>
         /// 已经入队
         /// </summary>
         Queued,

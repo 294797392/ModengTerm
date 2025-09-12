@@ -4,19 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.FileTransUserControls"
+             xmlns:toolkitcontrols="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit"
              xmlns:converters="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <ResourceDictionary>
 
-        <converters:FsOperationTypeNameConverter x:Key="FsOperationTypeNameConverter"/>
-        <converters:ProcessStatesNameConverter x:Key="ProcessStatesNameConverter"/>
+            <converters:FsOperationTypeNameConverter x:Key="FsOperationTypeNameConverter"/>
+            <converters:ProcessStatesNameConverter x:Key="ProcessStatesNameConverter"/>
 
-        <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
 
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
@@ -52,79 +55,97 @@
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
         <Grid Grid.Row="2">
-            <DataGrid x:Name="DataGridFileStatusList" ItemsSource="{Binding Path=FileStatus}" 
-                      Style="{StaticResource ResourceKey=StyleDataGrid}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="ColumnDefinitionSourceFilePath" Width="1*"/>
+                    <ColumnDefinition x:Name="ColumnDefinitionTargetFilePath" Width="1*"/>
+                    <ColumnDefinition x:Name="ColumnDefinition3" Width="100"/>
+                    <ColumnDefinition x:Name="ColumnDefinition4" Width="60"/>
+                    <ColumnDefinition x:Name="ColumnDefinition5" Width="100"/>
+                </Grid.ColumnDefinitions>
 
-                <DataGrid.RowStyle>
-                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
-                        <Setter Property="Height" Value="30"/>
-                    </Style>
-                </DataGrid.RowStyle>
+                <Border Grid.Column="0" x:Name="Border1"/>
 
-                <DataGrid.ColumnHeaderStyle>
-                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
-                        <Setter Property="Height" Value="30"/>
-                    </Style>
-                </DataGrid.ColumnHeaderStyle>
+            </Grid>
 
-                <DataGrid.Columns>
+            <toolkitcontrols:TreeListView DataContext="{Binding Path=TaskTree}" ItemsSource="{Binding Path=Roots}" Style="{StaticResource ResourceKey=StyleTreeListView}">
 
-                    <DataGridTemplateColumn Header="操作" Width="70">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
+                <toolkitcontrols:TreeListView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}" />
+                </toolkitcontrols:TreeListView.ItemTemplate>
+
+                <toolkitcontrols:TreeListView.Columns>
+
+                    <GridViewColumnCollection>
+
+                        <!-- 第一列必须设置成带有ToggleButton的模板，不然没法展开 -->
+                        <GridViewColumn Header="源路径" Width="{Binding ElementName=Border1, Path=ActualWidth}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <ToggleButton x:Name="Expander" Style="{StaticResource ResourceKey=StyleTreeListViewToggleButton}" Margin="{Binding Level,Converter={StaticResource LevelIndentConverter},RelativeSource={RelativeSource AncestorType={x:Type toolkitcontrols:TreeListViewItem}}}" 
+                                                      IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource AncestorType={x:Type toolkitcontrols:TreeListViewItem}}}" ClickMode="Press"/>
+
+                                        <Image Margin="5,0,0,0" Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
+                                        <TextBlock Margin="5,0,0,0" Text="{Binding Path=SourceFullPath}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                    </DockPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=HasItems,RelativeSource={RelativeSource AncestorType={x:Type toolkitcontrols:TreeListViewItem}}}" Value="False">
+                                            <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="目标路径" Width="{Binding ElementName=Border1, Path=ActualWidth}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=TargetFullPath}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!--<GridViewColumn Header="操作" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
                                     <TextBlock Text="{Binding Path=OpType, Converter={StaticResource ResourceKey=FsOperationTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>-->
 
-                    <DataGridTemplateColumn Header="源路径" Width="1*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=SourceFullPath}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                        <GridViewColumn Header="传输速度" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Speed}" HorizontalAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <DataGridTemplateColumn Header="目标路径" Width="1*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=TargetFullPath}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                        <GridViewColumn Header="进度" Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <!--<ProgressBar Minimum="0" Maximum="100" Height="20" Value="{Binding Path=Progress}"/>-->
+                                        <TextBlock Text="{Binding Path=Progress, StringFormat='{}{0}%'}" HorizontalAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <DataGridTemplateColumn Header="速度" Width="100">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Speed}" HorizontalAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                        <GridViewColumn Header="状态" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=State, Converter={StaticResource ResourceKey=ProcessStatesNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <DataGridTemplateColumn Header="进度" Width="100">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <ProgressBar Minimum="0" Maximum="100" Height="20" Value="{Binding Path=Progress}"/>
-                                    <TextBlock Text="{Binding Path=Progress, StringFormat='{}{0}%'}" HorizontalAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    </GridViewColumnCollection>
 
-                    <DataGridTemplateColumn Header="状态" Width="150">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=State, Converter={StaticResource ResourceKey=ProcessStatesNameConverter}}" HorizontalAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                </toolkitcontrols:TreeListView.Columns>
 
-                </DataGrid.Columns>
-
-            </DataGrid>
+            </toolkitcontrols:TreeListView>
         </Grid>
 
     </Grid>

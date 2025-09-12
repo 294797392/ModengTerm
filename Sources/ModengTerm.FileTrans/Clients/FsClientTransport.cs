@@ -22,7 +22,7 @@ namespace ModengTerm.FileTrans.Clients
         /// <summary>
         /// 当上传状态改变的时候触发
         /// </summary>
-        public event Action<FileTask, double> UploadProgress;
+        public event Action<AbstractTask, double> UploadProgress;
 
         #endregion
 
@@ -89,7 +89,6 @@ namespace ModengTerm.FileTrans.Clients
             catch (Exception ex)
             {
                 logger.Error("ListFiles异常", ex);
-                this.Close();
                 return null;
             }
         }
@@ -109,7 +108,6 @@ namespace ModengTerm.FileTrans.Clients
             catch (Exception ex)
             {
                 logger.Error("ChangeDirectory异常", ex);
-                this.Close();
                 return false;
             }
         }
@@ -134,10 +132,48 @@ namespace ModengTerm.FileTrans.Clients
             catch (Exception ex)
             {
                 logger.Error("CreateDirectory异常", ex);
-                this.Close();
                 return false;
             }
         }
+
+        public bool DeleteFile(string filePath) 
+        {
+            if (!this.CheckStatus()) 
+            {
+                return false;
+            }
+
+            try 
+            {
+                this.client.DeleteFile(filePath);
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                logger.Error("删除文件异常", ex);
+                return false;
+            }
+        }
+
+        public bool DeleteDirectory(string directoryPath) 
+        {
+            if (!this.CheckStatus()) 
+            {
+                return false;
+            }
+
+            try
+            {
+                this.client.DeleteDirectory(directoryPath);
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                logger.Error("删除目录异常", ex);
+                return false;
+            }
+        }
+
 
         #endregion
 

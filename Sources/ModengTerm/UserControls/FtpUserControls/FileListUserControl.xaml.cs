@@ -1,11 +1,16 @@
 ﻿using log4net.Repository.Hierarchy;
 using ModengTerm.FileTrans.Enumerations;
-using ModengTerm.ViewModel.FileTrans;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Ftp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,6 +44,16 @@ namespace ModengTerm.UserControls.FileTransUserControls
         public FileSystemTreeUserControl()
         {
             InitializeComponent();
+
+            this.InitializeUserControl();
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void InitializeUserControl()
+        {
         }
 
         #endregion
@@ -55,6 +70,7 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
             switch (fsItemVM.Type)
             {
+                case FsItemTypeEnum.ParentDirectory:
                 case FsItemTypeEnum.Directory:
                     {
                         this.EnterDirectory?.Invoke(DataGridFsList.DataContext as FsTreeVM, fsItemVM);
@@ -75,9 +91,30 @@ namespace ModengTerm.UserControls.FileTransUserControls
             fsTree.ToggleHiddenItems(showHidden);
         }
 
-        #endregion
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItemVM menuItemVm = (sender as FrameworkElement).DataContext as MenuItemVM;
+            ClientUtils.DispatchCommand(menuItemVm);
+        }
 
-        #region 实例方法
+        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+        }
+
+        private void UserControl1_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            ContextMenu contextMenu = this.FindResource("ContextMenuFileList") as ContextMenu;
+
+            FsTreeVM fsTreeVM = e.NewValue as FsTreeVM;
+            if (fsTreeVM != null)
+            {
+                contextMenu.ItemsSource = fsTreeVM.ContextMenus;
+            }
+            else
+            {
+                contextMenu.ItemsSource = null;
+            }
+        }
 
         #endregion
 
@@ -90,14 +127,15 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
             // 拖放到哪个节点
             FsItemVM dropItem = dropInfo.TargetItem as FsItemVM;
-            if (dropItem == null)
-            {
-                dropInfo.Effects = DragDropEffects.Copy;
-                return;
-            }
 
             if (sourceFsTree == targetFsTree)
             {
+                if (dropItem == null)
+                {
+                    dropInfo.Effects = DragDropEffects.None;
+                    return;
+                }
+
                 if (dropItem.Type != FsItemTypeEnum.Directory)
                 {
                     dropInfo.Effects = DragDropEffects.None;
@@ -106,6 +144,11 @@ namespace ModengTerm.UserControls.FileTransUserControls
             }
             else
             {
+                if (dropItem == null)
+                {
+                    dropInfo.Effects = DragDropEffects.Copy;
+                    return;
+                }
             }
 
             if (dropInfo.Data is List<FsItemVM>)

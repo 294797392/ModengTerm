@@ -4,18 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.ViewModel.FileTrans
+namespace ModengTerm.ViewModel.Ftp
 {
-    public enum FsTreeTypeEnum
+    /// <summary>
+    /// 定义客户端和服务器枚举
+    /// </summary>
+    public enum FtpRoleEnum
     {
         /// <summary>
-        /// 服务器文件系统列表
+        /// 服务器
         /// </summary>
-        ServerTree,
+        Server,
 
         /// <summary>
-        /// 客户端文件系统列表
+        /// 客户端
         /// </summary>
-        ClientTree,
+        Client,
     }
 }

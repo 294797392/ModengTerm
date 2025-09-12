@@ -55,10 +55,26 @@ namespace ModengTerm.FileTrans.Clients
         /// 创建目录
         /// </summary>
         /// <remarks>操作失败直接扔异常，不扔异常就说明操作成功</remarks>
-        public abstract void CreateDirectory(string directory);
+        public abstract void CreateDirectory(string directoryPath);
+
+        /// <summary>
+        /// 删除文件
+        /// </summary>
+        /// <param name="filePath">要删除的文件完整路径</param>
+        public abstract void DeleteFile(string filePath);
+
+        /// <summary>
+        /// 删除目录
+        /// </summary>
+        /// <param name="directoryPath">要删除的目录完整路径</param>
+        public abstract void DeleteDirectory(string directoryPath);
+
+        #region 上传接口
 
         public abstract void BeginUpload(string targetFilePath, int bufferSize);
         public abstract void Upload(byte[] buffer, int offset, int length);
         public abstract void EndUpload();
+
+        #endregion
     }
 }

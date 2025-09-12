@@ -9,7 +9,8 @@
              xmlns:converters="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             x:Name="UserControl1">
+             x:Name="UserControl1"
+             DataContextChanged="UserControl1_DataContextChanged">
 
     <UserControl.Resources>
 
@@ -23,6 +24,22 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <ContextMenu x:Key="ContextMenuFileList" Style="{StaticResource ResourceKey=StyleContextMenu}">
+
+            <ContextMenu.ItemContainerStyle>
+                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItem}">
+                    <!-- 直接在ContextMenu里定义MenuItem.Click事件无法触发，使用EventSetter可以触发 -->
+                    <EventSetter Event="Click" Handler="MenuItem_Click"/>
+                </Style>
+            </ContextMenu.ItemContainerStyle>
+            
+            <ContextMenu.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                    <TextBlock Text="{Binding Path=Name}"/>
+                </HierarchicalDataTemplate>
+            </ContextMenu.ItemTemplate>
+        </ContextMenu>
+
     </UserControl.Resources>
 
     <Grid>
@@ -31,30 +48,21 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <DataGrid x:Name="DataGridFsList" ItemsSource="{Binding Path=Roots}" MouseDoubleClick="DataGridFsList_MouseDoubleClick" 
-                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" 
-                  dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
-                  Style="{StaticResource ResourceKey=StyleDataGrid}">
-
-            <DataGrid.ContextMenu>
-                <ContextMenu>
-                    <ContextMenu.Resources>
-                        <CollectionViewSource x:Key="CollectionViewSource1" Source="{Binding Path=ContextMenus}"/>
-                    </ContextMenu.Resources>
-
-                    <ContextMenu.ItemsSource>
-                        <CompositeCollection>
-                            <CollectionContainer Collection="{Binding Source={StaticResource CollectionViewSource1}}"/>
-                        </CompositeCollection>
-                    </ContextMenu.ItemsSource>
-                </ContextMenu>
-            </DataGrid.ContextMenu>
+        <DataGrid x:Name="DataGridFsList" ItemsSource="{Binding Path=Roots}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
+                  MouseDoubleClick="DataGridFsList_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Type}" Value="ParentDirectory">
+                            <Setter Property="ContextMenu" Value="{x:Null}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
                     <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="Foreground" Value="{Binding Path=IsHidden, Converter={StaticResource ResourceKey=FsItemIsHidden2ForegroundConverter}}"/>
+                    <Setter Property="ContextMenu" Value="{StaticResource ResourceKey=ContextMenuFileList}"/>
                 </Style>
             </DataGrid.RowStyle>
 
@@ -104,7 +112,7 @@
                 </DataGridTemplateColumn>
 
             </DataGrid.Columns>
-            
+
         </DataGrid>
 
         <Grid Grid.Row="1" VerticalAlignment="Center">

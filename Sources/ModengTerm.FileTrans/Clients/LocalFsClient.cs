@@ -71,17 +71,32 @@ namespace ModengTerm.FileTrans.Clients
 
         public override void CreateDirectory(string directory)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(directory);
+        }
+
+        public override void DeleteFile(string filePath)
+        {
+            File.Delete(filePath);
+        }
+
+        public override void DeleteDirectory(string directoryPath)
+        {
+            Directory.Delete(directoryPath, true);
         }
 
         public override void BeginUpload(string targetFilePath, int bufferSize)
         {
+            throw new NotSupportedException();
         }
 
         public override void Upload(byte[] buffer, int offset, int length)
-        { }
+        {
+            throw new NotSupportedException();
+        }
 
         public override void EndUpload()
-        { }
+        {
+            throw new NotSupportedException();
+        }
     }
 }

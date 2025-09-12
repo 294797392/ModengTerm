@@ -9,6 +9,15 @@ using System.IO;
 
 namespace ModengTerm.Base
 {
+    public static class FtpCommandKeys
+    {
+        public const string CLIENT_OPEN_ITEM = "FTP.CLIENT_OPEN_ITEM";
+        public const string CLIENT_UPLOAD_ITEM = "FTP.CLIENT_UPLOAD_ITEM";
+        public const string CLIENT_DELETE_ITEM = "FTP.CLIENT_DELETE_ITEM";
+        public const string CLIENT_RENAME_ITEM = "FTP.CLIENT_RENAME_ITEM";
+        public const string CLIENT_SHOW_ITEM_PROPERTY = "FTP.CLIENT_SHOW_ITEM_PROPERTY";
+    }
+
     /// <summary>
     /// XTerminal使用的默认值
     /// </summary>
@@ -197,6 +206,25 @@ namespace ModengTerm.Base
             new MenuMetadata() { ID = "BF0E0737-CE95-403E-ABD2-2768FFBE11B9", Name = "配置" },
             new MenuMetadata() { ID = "000C1900-DC7E-4710-B8B1-46CE00E35E33", Name = "工具" },
             new MenuMetadata() { ID = "A592C670-3B36-495D-89CE-364691D9DFDA", Name = "帮助" }
+        };
+
+        /// <summary>
+        /// Ftp本地文件右键菜单列表
+        /// </summary>
+        public static readonly List<MenuMetadata> FtpClientFileListMenus = new List<MenuMetadata>()
+        {
+            new MenuMetadata("打开", FtpCommandKeys.CLIENT_OPEN_ITEM),
+            new MenuMetadata("上传", FtpCommandKeys.CLIENT_UPLOAD_ITEM),
+            new MenuMetadata("删除", FtpCommandKeys.CLIENT_DELETE_ITEM),
+            new MenuMetadata("重命名", FtpCommandKeys.CLIENT_RENAME_ITEM),
+            new MenuMetadata("属性", FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY)
+        };
+
+        /// <summary>
+        /// Ftp服务器文件右键菜单列表
+        /// </summary>
+        public static readonly List<MenuMetadata> FtpServerFileListMenus = new List<MenuMetadata>()
+        {
         };
 
 

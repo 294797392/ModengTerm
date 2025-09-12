@@ -2,7 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.FileTrans.Clients;
 using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.FileTrans;
+using ModengTerm.ViewModel.Ftp;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel.FileTrans
+namespace ModengTerm.ViewModel.Ftp
 {
     public class FsItemVM : TreeNodeViewModel
     {

@@ -7,7 +7,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using XTerminal;
 using ModengTerm.ViewModel.Terminal;
-using ModengTerm.ViewModel.FileTrans;
+using ModengTerm.ViewModel.Ftp;
 
 namespace ModengTerm.ViewModel
 {

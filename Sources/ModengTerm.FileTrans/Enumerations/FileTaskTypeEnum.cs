@@ -21,6 +21,8 @@ namespace ModengTerm.FileTrans.Enumerations
         /// <summary>
         /// 创建目录任务
         /// </summary>
-        CreateDirectory
+        CreateDirectory,
+
+        D
     }
 }

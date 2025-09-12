@@ -3,6 +3,7 @@ using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.FileTrans.Clients;
 using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.Enumerations;
 using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
@@ -16,8 +17,11 @@ namespace ModengTerm.FileTrans
 {
     /// <summary>
     /// 负责把文件上传到服务器，或者从服务器下载文件
+    /// 多线程上传注意事项：
+    /// 不要使用多个Sftp实例同时写入同一个文件的不同部分，因为服务器在多线程写入文件的时候可能会有出问题
+    /// 如果服务器使用的是同一个FileStream，那么多线程同时写入同一个FileStream的时候，FileStream的当前位置指针会发成访问冲突
     /// </summary>
-    public class FileAgent
+    public class FtpAgent
     {
         #region 公开事件
 
@@ -29,7 +33,7 @@ namespace ModengTerm.FileTrans
         /// int：bytesTransferd，本次传输字节数
         /// ProcessStates：ProcessStates
         /// </summary>
-        public event Action<FileAgent, string, double, string, int, ProcessStates> ProgressChanged;
+        public event Action<FtpAgent, string, double, string, int, ProcessStates> ProgressChanged;
 
         #endregion
 
@@ -47,10 +51,15 @@ namespace ModengTerm.FileTrans
         // 每个线程负责处理一个文件的上传和下载
         private List<Thread> threadList;
         private ManualResetEvent taskEvent;
-        private List<FileTask> taskList;
+        private List<AbstractTask> taskList;
 
         private Queue<FsClientBase> clientQueue;
         private bool initOnce;
+
+        /// <summary>
+        /// 创建目录的锁
+        /// </summary>
+        private object dirLock = new object();
 
         #endregion
 
@@ -82,7 +91,7 @@ namespace ModengTerm.FileTrans
 
         #region 构造方法
 
-        public FileAgent()
+        public FtpAgent()
         {
         }
 
@@ -92,7 +101,7 @@ namespace ModengTerm.FileTrans
 
         public void Initialize()
         {
-            this.taskList = new List<FileTask>();
+            this.taskList = new List<AbstractTask>();
             this.clientQueue = new Queue<FsClientBase>();
             this.taskEvent = new ManualResetEvent(false);
             this.threadList = new List<Thread>();
@@ -106,7 +115,15 @@ namespace ModengTerm.FileTrans
             this.clientTransport.Close();
         }
 
-        public void EnqueueTask(List<FileTask> tasks)
+        public void EnqueueTask(AbstractTask task)
+        {
+            List<AbstractTask> tasks = new List<AbstractTask>();
+            tasks.Add(task);
+
+            this.EnqueueTask(tasks);
+        }
+
+        public void EnqueueTask(List<AbstractTask> tasks)
         {
             if (!this.initOnce)
             {
@@ -134,9 +151,9 @@ namespace ModengTerm.FileTrans
         /// 从任务队列中选择一个要上传的任务
         /// </summary>
         /// <returns></returns>
-        private FileTask SelectTask()
+        private AbstractTask SelectTask()
         {
-            FileTask task = null;
+            AbstractTask task = null;
 
             lock (this.taskList)
             {
@@ -192,33 +209,35 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private bool UploadFile(FileTask task, FsClientBase fsClient)
+        private bool UploadFile(AbstractTask task, FsClientBase fsClient)
         {
+            UploadFileTask uploadTask = task as UploadFileTask;
+
             FileStream stream = null;
             try
             {
-                stream = new FileStream(task.SourceFilePath, FileMode.Open, FileAccess.Read);
+                stream = new FileStream(uploadTask.SourceFilePath, FileMode.Open, FileAccess.Read);
             }
             catch (FileNotFoundException ex)
             {
-                this.NotifyProgressChanged(task.SourceFilePath, 0, "要上传的文件不存在", 0, ProcessStates.Failure);
-                logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", task.SourceFilePath);
+                this.NotifyProgressChanged(uploadTask.SourceFilePath, 0, "要上传的文件不存在", 0, ProcessStates.Failure);
+                logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", uploadTask.SourceFilePath);
                 return false;
             }
             catch (Exception ex)
             {
-                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
-                logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, task.SourceFilePath);
+                this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, uploadTask.SourceFilePath);
                 return false;
             }
 
             bool success = true;
 
-            fsClient.BeginUpload(task.TargetFilePath, this.UploadBufferSize);
+            fsClient.BeginUpload(uploadTask.TargetFilePath, this.UploadBufferSize);
 
             byte[] buffer = new byte[this.UploadBufferSize];
 
-            this.NotifyProgressChanged(task.Id, 0, string.Empty, 0, ProcessStates.StartTransfer);
+            this.NotifyProgressChanged(uploadTask.Id, 0, string.Empty, 0, ProcessStates.StartTransfer);
 
             while (stream.Position != stream.Length)
             {
@@ -228,20 +247,20 @@ namespace ModengTerm.FileTrans
                     fsClient.Upload(buffer, 0, len);
 
                     double percent = Math.Round(((double)stream.Position / stream.Length) * 100, 2);
-                    this.NotifyProgressChanged(task.Id, percent, string.Empty, len, ProcessStates.BytesTransfered);
+                    this.NotifyProgressChanged(uploadTask.Id, percent, string.Empty, len, ProcessStates.BytesTransfered);
                     //logger.InfoFormat("上传百分比:{0}", percent);
                 }
                 catch (SshException ex)
                 {
                     success = false;
-                    this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                    this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
                     logger.Error("上传数据段异常", ex);
                     break;
                 }
                 catch (Exception ex)
                 {
                     success = false;
-                    this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                    this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
                     logger.Error("上传数据段异常", ex);
                     break;
                 }
@@ -259,25 +278,63 @@ namespace ModengTerm.FileTrans
             fsClient.EndUpload();
 
             // 如果出现异常导致传输失败，那么在catch里触发事件
-            if (success) 
+            if (success)
             {
-                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                this.NotifyProgressChanged(uploadTask.Id, 100, string.Empty, 0, ProcessStates.Completed);
             }
 
             return success;
         }
 
-        private bool CreateDirectory(FileTask task, FsClientBase fsClient)
+        private bool DeleteFile(AbstractTask task, FsClientBase fsClient)
         {
+            DeleteFileTask dfTask = task as DeleteFileTask;
+
             try
             {
-                fsClient.CreateDirectory(task.TargetFilePath);
+                fsClient.DeleteFile(dfTask.FilePath);
+                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("删除文件异常", ex);
+                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                return false;
+            }
+        }
+
+        private bool CreateDirectory(AbstractTask task, FsClientBase fsClient)
+        {
+            CreateDirectoryTask cdTask = task as CreateDirectoryTask;
+
+            try
+            {
+                fsClient.CreateDirectory(cdTask.DirectoryPath);
                 this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
                 return true;
             }
             catch (Exception ex)
             {
                 logger.Error("创建目录异常", ex);
+                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                return false;
+            }
+        }
+
+        private bool DeleteDirectory(AbstractTask task, FsClientBase fsClient)
+        {
+            DeleteDirectoryTask ddTask = task as DeleteDirectoryTask;
+
+            try
+            {
+                fsClient.DeleteDirectory(ddTask.DirectoryPath);
+                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("删除目录异常", ex);
                 this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
                 return false;
             }
@@ -293,7 +350,7 @@ namespace ModengTerm.FileTrans
             {
                 this.taskEvent.WaitOne();
 
-                FileTask task = this.SelectTask();
+                AbstractTask task = this.SelectTask();
                 if (task == null)
                 {
                     continue;
@@ -306,22 +363,51 @@ namespace ModengTerm.FileTrans
                     continue;
                 }
 
+                bool success = false;
+
                 switch (task.Type)
                 {
-                    case FileTaskTypeEnum.CreateDirectory:
+                    case FsOperationTypeEnum.CreateDirectory:
                         {
-                            this.CreateDirectory(task, fsClient);
+                            success = this.CreateDirectory(task, fsClient);
                             break;
                         }
 
-                    case FileTaskTypeEnum.UploadFile:
+                    case FsOperationTypeEnum.DeleteDirectory:
                         {
-                            this.UploadFile(task, fsClient);
+                            success = this.DeleteDirectory(task, fsClient);
+                            break;
+                        }
+
+                    case FsOperationTypeEnum.UploadFile:
+                        {
+                            success = this.UploadFile(task, fsClient);
+                            break;
+                        }
+
+                    case FsOperationTypeEnum.DeleteFile:
+                        {
+                            success = this.DeleteFile(task, fsClient);
                             break;
                         }
 
                     default:
                         throw new NotImplementedException();
+                }
+
+
+                // 子任务必须在父任务成功运行结束之后再运行
+                if (success)
+                {
+                    // 此时父任务成功运行结束，让子任务入队
+                    if (task.SubTasks.Count > 0)
+                    {
+                        lock (this.taskList)
+                        {
+                            this.taskList.AddRange(task.SubTasks);
+                            this.taskEvent.Set();
+                        }
+                    }
                 }
 
                 this.ReuseFsClient(fsClient);

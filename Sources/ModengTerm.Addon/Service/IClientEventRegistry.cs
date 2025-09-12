@@ -13,7 +13,7 @@ namespace ModengTerm.Addon.Service
     /// 点击顶部菜单栏或者右键菜单所执行的事件处理器
     /// </summary>
     /// <param name="e"></param>
-    public delegate void AddonCommandDelegate(CommandArgs e);
+    public delegate void CommandDelegate(CommandArgs e);
 
     public interface IClientEventRegistry
     {
@@ -109,7 +109,7 @@ namespace ModengTerm.Addon.Service
 
         #region Command
 
-        void RegisterCommand(string commandKey, AddonCommandDelegate @delegate, object userData);
+        void RegisterCommand(string commandKey, CommandDelegate @delegate, object userData = null);
 
         void UnregisterCommand(string commandKey);
 

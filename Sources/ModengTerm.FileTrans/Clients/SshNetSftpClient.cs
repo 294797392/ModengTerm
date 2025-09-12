@@ -139,6 +139,19 @@ namespace ModengTerm.FileTrans.Clients
             this.client.CreateDirectory(directory);
         }
 
+        public override void DeleteFile(string filePath)
+        {
+            this.client.DeleteFile(filePath);
+        }
+
+        public override void DeleteDirectory(string directoryPath)
+        {
+            this.client.DeleteDirectory(directoryPath);
+        }
+
+
+
+
         public override void BeginUpload(string targetFilePath, int bufferSize)
         {
             this.client.BufferSize = (uint)bufferSize;

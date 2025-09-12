@@ -79,7 +79,7 @@ namespace ModengTerm.Addon
         /// <param name="command">要注册的命令</param>
         /// <param name="delegate">命令执行函数</param>
         /// <param name="userData">回传给回调的用户数据</param>
-        public void RegisterCommand(string command, AddonCommandDelegate @delegate, object userData = null)
+        public void RegisterCommand(string command, CommandDelegate @delegate, object userData = null)
         {
             // 多个插件可能注册了相同的command，需要保证每个插件注册的command不一致
             string commandKey = AddonUtils.GetCommandKey(this.ID, command);

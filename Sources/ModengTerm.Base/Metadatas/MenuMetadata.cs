@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Media.Animation;
 
 namespace ModengTerm.Base.Metadatas
 {
@@ -36,20 +37,30 @@ namespace ModengTerm.Base.Metadatas
         /// <summary>
         /// 根菜单的Id
         /// 空表示自己就是根菜单
+        /// 如果该菜单为二级或更高级菜单，那么不会使用这个字段
         /// </summary>
         [JsonProperty("pid")]
         public string ParentId { get; set; }
 
         /// <summary>
-        /// 指定菜单在哪些区域里显示
+        /// 指定菜单在哪些位置显示
         /// </summary>
-        [JsonProperty("scopes")]
-        public List<MenuScopeEnum> Scopes { get; set; }
+        [JsonProperty("positions")]
+        public List<MenuPositionEnum> Positions { get; private set; }
 
         public MenuMetadata()
         {
             this.Children = new List<MenuMetadata>();
-            this.Scopes = new List<MenuScopeEnum>();
+            this.Positions = new List<MenuPositionEnum>();
+        }
+
+        public MenuMetadata(string name, string command)
+        {
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+            this.Command = command;
+            this.Children = new List<MenuMetadata>();
+            this.Positions = new List<MenuPositionEnum>();
         }
     }
 }

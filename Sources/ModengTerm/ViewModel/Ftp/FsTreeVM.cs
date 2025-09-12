@@ -7,14 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel.FileTrans
+namespace ModengTerm.ViewModel.Ftp
 {
     public class FsTreeContext : TreeViewModelContext
     {
         /// <summary>
         /// 获取是服务器树形列表还是客户端树形列表
         /// </summary>
-        public FsTreeTypeEnum Type { get; set; }
+        public FtpRoleEnum Type { get; set; }
     }
 
     public class FsTreeVM : TreeViewModel<FsTreeContext>
@@ -60,7 +60,7 @@ namespace ModengTerm.ViewModel.FileTrans
         /// <summary>
         /// 树形列表的右键菜单
         /// </summary>
-        public BindableCollection<MenuItemVM> MenuItems { get; private set; }
+        public BindableCollection<MenuItemVM> ContextMenus { get; private set; }
 
         #endregion
 
@@ -86,7 +86,7 @@ namespace ModengTerm.ViewModel.FileTrans
 
         public FsTreeVM() 
         {
-            this.MenuItems = new BindableCollection<MenuItemVM>();
+            this.ContextMenus = new BindableCollection<MenuItemVM>();
         }
 
         #endregion

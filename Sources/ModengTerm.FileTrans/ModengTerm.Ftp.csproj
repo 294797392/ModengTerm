@@ -23,6 +23,8 @@
   <ItemGroup>
     <Compile Remove="DataModels\FsDirInfo.cs" />
     <Compile Remove="DataModels\FsFileInfo.cs" />
+    <Compile Remove="Enumerations\FileTaskTypeEnum.cs" />
+    <Compile Remove="Enumerations\FsTransferTypeEnum.cs" />
   </ItemGroup>
 
   <ItemGroup>

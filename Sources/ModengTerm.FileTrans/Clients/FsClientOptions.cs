@@ -12,7 +12,7 @@ namespace ModengTerm.FileTrans.Clients
 {
     public abstract class FsClientOptions
     {
-        public abstract FsClientTypeEnum Type { get; }
+        public abstract FileSystemTypeEnum Type { get; }
 
         /// <summary>
         /// 初始目录
@@ -22,7 +22,7 @@ namespace ModengTerm.FileTrans.Clients
 
     public class SftpClientOptions : FsClientOptions
     {
-        public override FsClientTypeEnum Type => FsClientTypeEnum.Sftp;
+        public override FileSystemTypeEnum Type => FileSystemTypeEnum.Sftp;
 
         /// <summary>
         /// 如果该会话是Ssh
@@ -45,6 +45,6 @@ namespace ModengTerm.FileTrans.Clients
 
     public class LocalFsClientOptions : FsClientOptions
     {
-        public override FsClientTypeEnum Type => FsClientTypeEnum.LocalFs;
+        public override FileSystemTypeEnum Type => FileSystemTypeEnum.LocalFs;
     }
 }

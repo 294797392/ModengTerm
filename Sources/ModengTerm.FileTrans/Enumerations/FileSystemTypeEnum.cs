@@ -10,7 +10,7 @@ namespace ModengTerm.FileTrans.Enumerations
     /// 文件系统客户端类型
     /// 文件系统客户端用来增删改查文件系统
     /// </summary>
-    public enum FsClientTypeEnum
+    public enum FileSystemTypeEnum
     {
         /// <summary>
         /// Sftp客户端

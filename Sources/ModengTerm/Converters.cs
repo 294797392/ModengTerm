@@ -10,10 +10,11 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.FileTrans;
 using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.Enumerations;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls.TerminalUserControls;
-using ModengTerm.ViewModel.FileTrans;
+using ModengTerm.ViewModel.Ftp;
 using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
@@ -689,6 +690,7 @@ namespace ModengTerm
             {
                 case FsItemTypeEnum.File: return "文件";
                 case FsItemTypeEnum.Directory: return "文件夹";
+                case FsItemTypeEnum.ParentDirectory: return "上级目录";
                 default:
                     throw new NotImplementedException();
             }
@@ -728,7 +730,10 @@ namespace ModengTerm
 
             switch (type)
             {
-                case FsOperationTypeEnum.Upload: return "上传";
+                case FsOperationTypeEnum.UploadFile: return "上传文件";
+                case FsOperationTypeEnum.DeleteFile: return "删除文件";
+                case FsOperationTypeEnum.DeleteDirectory: return "删除目录";
+                case FsOperationTypeEnum.CreateDirectory: return "新建目录";
                 case FsOperationTypeEnum.Download: return "下载";
                 default:
                     throw new NotImplementedException();
@@ -753,6 +758,7 @@ namespace ModengTerm
                 case ProcessStates.BytesTransfered: return "传输中";
                 case ProcessStates.Failure: return "传输失败";
                 case ProcessStates.Completed: return "传输完成";
+                case ProcessStates.WaitQueued: return "等待入队";
                 case ProcessStates.Queued: return "已入队, 等待传输";
                 default:
                     throw new NotImplementedException();
@@ -769,7 +775,7 @@ namespace ModengTerm
     {
         private static readonly Brush HiddenItemForeground = new SolidColorBrush(Color.FromArgb(150, 0, 0, 0));
 
-        static FsItemIsHidden2ForegroundConverter() 
+        static FsItemIsHidden2ForegroundConverter()
         {
             HiddenItemForeground.Freeze();
         }

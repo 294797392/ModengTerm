@@ -248,11 +248,7 @@ namespace ModengTerm.ViewModel
         /// </summary>
         private void LoadTitleMenus()
         {
-            foreach (MenuMetadata titleMenu in VTBaseConsts.TitleMenus)
-            {
-                MenuItemVM mivm = new MenuItemVM(titleMenu);
-                this.TitleMenus.Add(mivm);
-            }
+            this.TitleMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.TitleMenus));
 
             List<MenuItemVM> menuItems = VMUtils.CreateAddonMenuItems(true);
 
