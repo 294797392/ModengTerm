@@ -1,12 +1,13 @@
-﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
+﻿using ModengTerm.Addon.ClientBridges;
+using ModengTerm.Addon.ClientBridges.Impl;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
 using System.Collections.Generic;
 using System.Windows;
 
 namespace ModengTerm.Addon
 {
-    public class ClientFactoryImpl : ClientFactory
+    internal class ClientFactoryImpl : ClientBridge
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientFactoryImpl");
 

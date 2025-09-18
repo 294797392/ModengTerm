@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Compile Remove="AddonContext.cs" />
-    <Compile Remove="Command.cs" />
+    <Compile Remove="CommandArgs.cs" />
     <Compile Remove="Interactive\IHostOverlayPanel.cs" />
     <Compile Remove="Interactive\IHostSidePanel.cs" />
     <Compile Remove="Controls\IOverlayPanel.cs" />

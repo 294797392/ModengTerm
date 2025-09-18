@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
@@ -34,7 +35,7 @@ namespace ModengTerm.OfficialAddons.SessionManager
             if ((bool)sessionListWindow.ShowDialog())
             {
                 XTermSession session = sessionListWindow.SelectedSession;
-                this.client.OpenSession(session);
+                Client.GetClient().OpenSession(session);
             }
         }
 
@@ -60,7 +61,7 @@ namespace ModengTerm.OfficialAddons.SessionManager
             }
 
             // 打开会话
-            this.client.OpenSession(session);
+            Client.GetClient().OpenSession(session);
         }
 
         private void GroupManager(CommandArgs e)

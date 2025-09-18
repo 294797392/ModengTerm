@@ -25,21 +25,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Addon\**" />
     <Compile Remove="DataModels\**" />
     <Compile Remove="OfficialAddons\Record\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
     <Compile Remove="ViewModel\CreateSession\SessionOptions\**" />
     <Compile Remove="ViewModel\CreateSession\TerminalOptions\**" />
+    <EmbeddedResource Remove="Addon\**" />
     <EmbeddedResource Remove="DataModels\**" />
     <EmbeddedResource Remove="OfficialAddons\Record\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
     <EmbeddedResource Remove="ViewModel\CreateSession\SessionOptions\**" />
     <EmbeddedResource Remove="ViewModel\CreateSession\TerminalOptions\**" />
+    <None Remove="Addon\**" />
     <None Remove="DataModels\**" />
     <None Remove="OfficialAddons\Record\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
     <None Remove="ViewModel\CreateSession\SessionOptions\**" />
     <None Remove="ViewModel\CreateSession\TerminalOptions\**" />
+    <Page Remove="Addon\**" />
     <Page Remove="DataModels\**" />
     <Page Remove="OfficialAddons\Record\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
@@ -48,8 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Addon\PanelContext.cs" />
-    <Compile Remove="Addon\WindowImpl.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="OfficialAddons\Broadcast\BroadcastInputManagerWindow.xaml.cs" />
     <Compile Remove="OfficialAddons\Broadcast\BroadcastSession.cs" />

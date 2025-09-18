@@ -4,6 +4,7 @@ using ModengTerm.Addon.Controls;
 using ModengTerm.Base.Addon;
 using System.Windows.Threading;
 using Panel = ModengTerm.Addon.Controls.Panel;
+using ModengTerm.Addon.ClientBridges;
 
 namespace ModengTerm.ViewModel.Panels
 {
@@ -21,7 +22,6 @@ namespace ModengTerm.ViewModel.Panels
         #region 实例变量
 
         private OverlayPanelDocks dock;
-        private ClientFactory factory;
 
         #endregion
 
@@ -51,7 +51,6 @@ namespace ModengTerm.ViewModel.Panels
 
         public OverlayPanelVM() 
         {
-            this.factory = ClientFactory.GetFactory();
         }
 
         #endregion

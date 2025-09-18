@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -75,8 +75,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.Background = Brushes.Transparent;
             this.userInput = new VTKeyboardInput();
 
-            ClientFactory factory = ClientFactory.GetFactory();
-            this.eventRegistry = factory.GetEventRegistry();
+            this.eventRegistry = Client.GetEventRegistry();
         }
 
         private Point GetPositionRelativeToTerminal()

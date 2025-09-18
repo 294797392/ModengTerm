@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Metadatas;
+using System;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -50,8 +51,7 @@ namespace ModengTerm.ViewModel
         }
 
         /// <summary>
-        /// 该菜单所触发的命令Key
-        /// 
+        /// 该菜单触发的命令
         /// </summary>
         public string CommandKey { get; set; }
 

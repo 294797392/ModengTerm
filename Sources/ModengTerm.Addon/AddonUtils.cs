@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.Metadatas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,15 @@ namespace ModengTerm.Addon
             return Guid.NewGuid().ToString();
         }
 
-        public static string GetCommandKey(string addonId, string command) 
+        /// <summary>
+        /// 解决多个插件定义了相同命令的情况
+        /// </summary>
+        /// <param name="addonId"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static string GetCommandKey(AddonMetadata metadata, string command) 
         {
-            return string.Format("{0}.{1}", addonId, command);
+            return string.Format("{0}.{1}", metadata.ID, command);
         }
     }
 }

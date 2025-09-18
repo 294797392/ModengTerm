@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Linq;

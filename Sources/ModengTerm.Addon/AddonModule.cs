@@ -1,7 +1,8 @@
-﻿using ModengTerm.Addon.Controls;
+﻿using ModengTerm.Addon.ClientBridges;
+using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base;
+using ModengTerm.Base.Addon;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Metadatas;
 using System;
@@ -29,12 +30,9 @@ namespace ModengTerm.Addon
 
         private AddonMetadata metadata;
 
-        private List<IOverlayPanel> overlayPanels;
-
-        protected ClientFactory factory;
-        protected IClient client;
-        protected IClientStorage storageService;
-        protected IClientEventRegistry eventRegistry;
+        internal IClient client;
+        internal IClientStorage storageService;
+        internal IClientEventRegistry eventRegistry;
 
         #endregion
 
@@ -53,13 +51,11 @@ namespace ModengTerm.Addon
         /// </summary>
         public void Active(ActiveContext context)
         {
-            this.factory = context.Factory;
-            this.overlayPanels = new List<IOverlayPanel>();
             this.metadata = context.Definition;
 
-            this.client = this.factory.GetClient();
-            this.storageService = this.factory.GetStorageService();
-            this.eventRegistry = this.factory.GetEventRegistry();
+            this.client = Client.GetClient();
+            this.storageService = Client.GetStorage();
+            this.eventRegistry = Client.GetEventRegistry();
 
             this.OnActive(context);
         }
@@ -75,21 +71,16 @@ namespace ModengTerm.Addon
 
         /// <summary>
         /// 注册命令处理器
+        /// 该命令可以通过任意一个会话的菜单触发，开发者可以在处理器里获取到触发该命令的会话
         /// </summary>
         /// <param name="command">要注册的命令</param>
         /// <param name="delegate">命令执行函数</param>
         /// <param name="userData">回传给回调的用户数据</param>
         public void RegisterCommand(string command, CommandDelegate @delegate, object userData = null)
         {
-            // 多个插件可能注册了相同的command，需要保证每个插件注册的command不一致
-            string commandKey = AddonUtils.GetCommandKey(this.ID, command);
+            string commandKey = AddonUtils.GetCommandKey(this.metadata, command);
 
             this.eventRegistry.RegisterCommand(commandKey, @delegate, userData);
-        }
-
-        protected string GetObjectId()
-        {
-            return Guid.NewGuid().ToString();
         }
 
         #endregion

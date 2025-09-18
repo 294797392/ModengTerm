@@ -1,5 +1,5 @@
-﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
+﻿using ModengTerm.Addon.ClientBridges;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Metadatas;
 
 namespace ModengTerm.Addon
@@ -9,7 +9,7 @@ namespace ModengTerm.Addon
     /// </summary>
     public class ActiveContext
     {
-        public ClientFactory Factory { get; set; }
+        //public ClientBridge Factory { get; set; }
 
         public IClient HostWindow { get; set; }
 

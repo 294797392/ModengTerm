@@ -1,17 +1,8 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Base;
-using ModengTerm.Document;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.FileTrans.Clients;
-using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Ftp.Enumerations;
 using Renci.SshNet.Common;
-using System;
-using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans
 {
@@ -30,36 +21,32 @@ namespace ModengTerm.FileTrans
         /// string：taskId
         /// double：progress
         /// string：serverMessage
-        /// int：bytesTransferd，本次传输字节数
+        /// string：speed
         /// ProcessStates：ProcessStates
+        /// object：UserData
         /// </summary>
-        public event Action<FtpAgent, string, double, string, int, ProcessStates> ProgressChanged;
+        public event Action<FtpAgent, string, double, string, string, ProcessStates, object> ProcessStateChanged;
 
         #endregion
 
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileAgent");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FtpAgent");
 
         #endregion
 
         #region 实例变量
 
-        private FsClientTransport clientTransport;
-
         // 用来下载和上传的后台线程数量
         // 每个线程负责处理一个文件的上传和下载
         private List<Thread> threadList;
         private ManualResetEvent taskEvent;
-        private List<AbstractTask> taskList;
+        private List<AgentTask> taskList;
 
         private Queue<FsClientBase> clientQueue;
         private bool initOnce;
 
-        /// <summary>
-        /// 创建目录的锁
-        /// </summary>
-        private object dirLock = new object();
+        private bool isRunning;
 
         #endregion
 
@@ -101,7 +88,8 @@ namespace ModengTerm.FileTrans
 
         public void Initialize()
         {
-            this.taskList = new List<AbstractTask>();
+            this.isRunning = true;
+            this.taskList = new List<AgentTask>();
             this.clientQueue = new Queue<FsClientBase>();
             this.taskEvent = new ManualResetEvent(false);
             this.threadList = new List<Thread>();
@@ -112,18 +100,25 @@ namespace ModengTerm.FileTrans
         /// </summary>
         public void Release()
         {
-            this.clientTransport.Close();
+            this.isRunning = false;
+            lock (this.taskList)
+            {
+                this.taskList.Clear();
+                this.taskEvent.Set();
+                this.taskEvent.Dispose();
+            }
+            this.threadList.ForEach(v => v.Join());
         }
 
-        public void EnqueueTask(AbstractTask task)
+        public void EnqueueTask(AgentTask task)
         {
-            List<AbstractTask> tasks = new List<AbstractTask>();
+            List<AgentTask> tasks = new List<AgentTask>();
             tasks.Add(task);
 
             this.EnqueueTask(tasks);
         }
 
-        public void EnqueueTask(List<AbstractTask> tasks)
+        public void EnqueueTask(List<AgentTask> tasks)
         {
             if (!this.initOnce)
             {
@@ -151,9 +146,9 @@ namespace ModengTerm.FileTrans
         /// 从任务队列中选择一个要上传的任务
         /// </summary>
         /// <returns></returns>
-        private AbstractTask SelectTask()
+        private AgentTask DequeueTask()
         {
-            AbstractTask task = null;
+            AgentTask task = null;
 
             lock (this.taskList)
             {
@@ -169,11 +164,6 @@ namespace ModengTerm.FileTrans
             }
 
             return task;
-        }
-
-        private void NotifyProgressChanged(string taskId, double progress, string serverMessage, int bytesTransfer, ProcessStates processStates)
-        {
-            this.ProgressChanged?.Invoke(this, taskId, progress, serverMessage, bytesTransfer, processStates);
         }
 
         private FsClientBase GetFreeFsClient()
@@ -209,7 +199,17 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private bool UploadFile(AbstractTask task, FsClientBase fsClient)
+        private string CalculateSpeed(DateTime startTime, DateTime endTime, int bytesTransfered) 
+        {
+            TimeSpan ts = endTime - startTime;
+            double bytesSpeed = bytesTransfered / ts.TotalSeconds;
+            double toValue;
+            SizeUnitEnum toUnit;
+            VTBaseUtils.AutoFitSize(bytesSpeed, SizeUnitEnum.bytes, out toValue, out toUnit);
+            return string.Format("{0} {1}/s", toValue, toUnit);
+        }
+
+        private bool UploadFile(AgentTask task, FsClientBase fsClient)
         {
             UploadFileTask uploadTask = task as UploadFileTask;
 
@@ -220,13 +220,13 @@ namespace ModengTerm.FileTrans
             }
             catch (FileNotFoundException ex)
             {
-                this.NotifyProgressChanged(uploadTask.SourceFilePath, 0, "要上传的文件不存在", 0, ProcessStates.Failure);
+                this.HandleFailureTask(uploadTask, "要上传的文件不存在");
                 logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", uploadTask.SourceFilePath);
                 return false;
             }
             catch (Exception ex)
             {
-                this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                this.HandleFailureTask(uploadTask, ex.Message);
                 logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, uploadTask.SourceFilePath);
                 return false;
             }
@@ -237,7 +237,8 @@ namespace ModengTerm.FileTrans
 
             byte[] buffer = new byte[this.UploadBufferSize];
 
-            this.NotifyProgressChanged(uploadTask.Id, 0, string.Empty, 0, ProcessStates.StartTransfer);
+            this.NotifyProgressChanged(uploadTask, 0, string.Empty, string.Empty, ProcessStates.Starting);
+            DateTime startTime = DateTime.Now;
 
             while (stream.Position != stream.Length)
             {
@@ -245,22 +246,22 @@ namespace ModengTerm.FileTrans
                 {
                     int len = stream.Read(buffer, 0, buffer.Length);
                     fsClient.Upload(buffer, 0, len);
-
+                    string speed = this.CalculateSpeed(startTime, DateTime.Now, len);
                     double percent = Math.Round(((double)stream.Position / stream.Length) * 100, 2);
-                    this.NotifyProgressChanged(uploadTask.Id, percent, string.Empty, len, ProcessStates.BytesTransfered);
+                    this.NotifyProgressChanged(uploadTask, percent, string.Empty, speed, ProcessStates.ProgressChanged);
                     //logger.InfoFormat("上传百分比:{0}", percent);
                 }
                 catch (SshException ex)
                 {
                     success = false;
-                    this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                    this.HandleFailureTask(uploadTask, ex.Message);
                     logger.Error("上传数据段异常", ex);
                     break;
                 }
                 catch (Exception ex)
                 {
                     success = false;
-                    this.NotifyProgressChanged(uploadTask.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                    this.HandleFailureTask(uploadTask, ex.Message);
                     logger.Error("上传数据段异常", ex);
                     break;
                 }
@@ -280,64 +281,200 @@ namespace ModengTerm.FileTrans
             // 如果出现异常导致传输失败，那么在catch里触发事件
             if (success)
             {
-                this.NotifyProgressChanged(uploadTask.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                this.HandleCompletedTask(uploadTask);
             }
 
             return success;
         }
 
-        private bool DeleteFile(AbstractTask task, FsClientBase fsClient)
+        private bool DeleteFile(AgentTask task, FsClientBase fsClient)
         {
             DeleteFileTask dfTask = task as DeleteFileTask;
 
             try
             {
                 fsClient.DeleteFile(dfTask.FilePath);
-                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                this.HandleCompletedTask(dfTask);
                 return true;
             }
             catch (Exception ex)
             {
                 logger.Error("删除文件异常", ex);
-                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                this.HandleFailureTask(dfTask, ex.Message);
                 return false;
             }
         }
 
-        private bool CreateDirectory(AbstractTask task, FsClientBase fsClient)
+        private bool CreateDirectory(AgentTask task, FsClientBase fsClient)
         {
             CreateDirectoryTask cdTask = task as CreateDirectoryTask;
 
             try
             {
                 fsClient.CreateDirectory(cdTask.DirectoryPath);
-                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                this.HandleCompletedTask(task);
                 return true;
             }
             catch (Exception ex)
             {
                 logger.Error("创建目录异常", ex);
-                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                this.HandleFailureTask(task, ex.Message);
                 return false;
             }
         }
 
-        private bool DeleteDirectory(AbstractTask task, FsClientBase fsClient)
+        private bool DeleteDirectory(AgentTask task, FsClientBase fsClient)
         {
             DeleteDirectoryTask ddTask = task as DeleteDirectoryTask;
 
             try
             {
                 fsClient.DeleteDirectory(ddTask.DirectoryPath);
-                this.NotifyProgressChanged(task.Id, 100, string.Empty, 0, ProcessStates.Completed);
+                this.HandleCompletedTask(task);
                 return true;
             }
             catch (Exception ex)
             {
                 logger.Error("删除目录异常", ex);
-                this.NotifyProgressChanged(task.Id, 0, ex.Message, 0, ProcessStates.Failure);
+                this.HandleFailureTask(task, ex.Message);
                 return false;
             }
+        }
+
+        private void NotifyProgressChanged(AgentTask task, double progress, string serverMessage, string speed, ProcessStates processStates)
+        {
+            this.ProcessStateChanged?.Invoke(this, task.Id, progress, serverMessage, speed, processStates, task.UserData);
+        }
+
+        private void HandleParentTaskState(AgentTask task) 
+        {
+            // 此时有父节点，触发父节点的进度事件
+            AgentTask parentTask = task.Parent;
+
+            while (parentTask != null)
+            {
+                int success = parentTask.SubTasks.Count(v => v.State == AgentTaskStates.Success);
+                int failure = parentTask.SubTasks.Count(v => v.State == AgentTaskStates.Failure);
+                int total = parentTask.SubTasks.Count;
+
+                if (success + failure == total)
+                {
+                    // 只有等所有子任务全部传输完成，再通知状态改变
+                    if (failure > 0)
+                    {
+                        lock (parentTask)
+                        {
+                            parentTask.State = AgentTaskStates.Failure;
+                            this.ProcessStateChanged?.Invoke(this, parentTask.Id, 0, "子目录或文件上传失败", string.Empty, ProcessStates.Failure, parentTask.UserData);
+                        }
+                    }
+                    else
+                    {
+                        lock (parentTask)
+                        {
+                            parentTask.State = AgentTaskStates.Success;
+                            parentTask.Progress = 100;
+                            this.ProcessStateChanged?.Invoke(this, parentTask.Id, 100, string.Empty, string.Empty, ProcessStates.Success, parentTask.UserData);
+                        }
+                    }
+                }
+                else
+                {
+                    // 如果有的任务还在传输，那么不通知父任务状态改变，只通知传输进度
+                    lock (parentTask)
+                    {
+                        if (parentTask.State == AgentTaskStates.Processing)
+                        {
+                            double percent = Math.Round(((double)success / total) * 100, 2);
+                            parentTask.Progress = percent;
+
+                            double percent1 = Math.Round(parentTask.SubTasks.Sum(v => v.Progress) / (parentTask.SubTasks.Count * 100) * 100, 2);
+                            this.ProcessStateChanged?.Invoke(this, parentTask.Id, percent1, string.Empty, string.Empty, ProcessStates.ProgressChanged, parentTask.UserData);
+                        }
+                    }
+                }
+
+                parentTask = parentTask.Parent;
+            }
+        }
+
+        /// <summary>
+        /// 当上传失败之后调用
+        /// </summary>
+        /// <param name="task">上传失败的任务</param>
+        /// <param name="message">失败消息</param>
+        private void HandleFailureTask(AgentTask task, string message)
+        {
+            task.State = AgentTaskStates.Failure;
+
+            if (task.SubTasks.Count == 0)
+            {
+                this.ProcessStateChanged?.Invoke(this, task.Id, 0, message, string.Empty, ProcessStates.Failure, task.UserData);
+            }
+
+            // 如果该节点有父节点，那么需要通知所有父节点失败
+            AgentTask parentTask = task.Parent;
+
+            while (parentTask != null)
+            {
+                int success = parentTask.SubTasks.Count(v => v.State == AgentTaskStates.Success);
+                int failure = parentTask.SubTasks.Count(v => v.State == AgentTaskStates.Failure);
+                int total = parentTask.SubTasks.Count;
+
+                if (success + failure == total)
+                {
+                    // 只有等所有子任务全部传输完成，再通知状态改变
+                    lock (parentTask)
+                    {
+                        if (parentTask.State == AgentTaskStates.Failure)
+                        {
+                            this.ProcessStateChanged?.Invoke(this, parentTask.Id, 0, message, string.Empty, ProcessStates.Failure, parentTask.UserData);
+                        }
+                    }
+                }
+                else
+                {
+                    // 如果有的任务还在传输，那么不通知父任务状态改变，只通知传输进度
+                    // 因为传输失败，所以此时传输进度不变，所以不需要通知
+                }
+
+                parentTask = parentTask.Parent;
+            }
+        }
+
+        /// <summary>
+        /// 当上传成功之后调用
+        /// </summary>
+        /// <param name="task">上传成功的任务</param>
+        private void HandleCompletedTask(AgentTask task)
+        {
+            switch (task.Type)
+            {
+                case FsOperationTypeEnum.UploadFile:
+                    {
+                        task.State = AgentTaskStates.Success;
+                        task.Progress = 100;
+                        this.ProcessStateChanged?.Invoke(this, task.Id, 100, string.Empty, string.Empty, ProcessStates.Success, task.UserData);
+                        this.HandleParentTaskState(task);
+                        break;
+                    }
+
+                case FsOperationTypeEnum.CreateDirectory:
+                    {
+                        if (task.SubTasks.Count == 0)
+                        {
+                            task.State = AgentTaskStates.Success;
+                            task.Progress = 100;
+                            this.ProcessStateChanged?.Invoke(this, task.Id, 100, string.Empty, string.Empty, ProcessStates.Success, task.UserData);
+                            this.HandleParentTaskState(task);
+                        }
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
         }
 
         #endregion
@@ -346,21 +483,38 @@ namespace ModengTerm.FileTrans
 
         private void WorkerThreadProc()
         {
-            while (true)
+            FsClientBase fsClient = null;
+
+            while (this.isRunning)
             {
                 this.taskEvent.WaitOne();
 
-                AbstractTask task = this.SelectTask();
+                if (!this.isRunning) 
+                {
+                    break;
+                }
+
+                AgentTask task = this.DequeueTask();
                 if (task == null)
                 {
                     continue;
                 }
 
-                FsClientBase fsClient = this.GetFreeFsClient();
                 if (fsClient == null)
                 {
-                    this.NotifyProgressChanged(task.Id, 0, "连接服务器失败", 0, ProcessStates.Failure);
-                    continue;
+                    fsClient = this.GetFreeFsClient();
+
+                    if (fsClient == null)
+                    {
+                        // 这个线程连接服务器失败, 把任务重新入队, 等待下次某个线程继续上传
+                        lock (this.taskList)
+                        {
+                            this.taskList.Insert(0, task);
+                            this.taskEvent.Set();
+                        }
+                        this.HandleFailureTask(task, "连接服务器失败");
+                        continue;
+                    }
                 }
 
                 bool success = false;
@@ -395,7 +549,6 @@ namespace ModengTerm.FileTrans
                         throw new NotImplementedException();
                 }
 
-
                 // 子任务必须在父任务成功运行结束之后再运行
                 if (success)
                 {
@@ -409,8 +562,11 @@ namespace ModengTerm.FileTrans
                         }
                     }
                 }
+            }
 
-                this.ReuseFsClient(fsClient);
+            if (fsClient != null) 
+            {
+                fsClient.Close();
             }
         }
 

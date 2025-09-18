@@ -8,10 +8,28 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans
 {
+    public enum AgentTaskStates
+    {
+        /// <summary>
+        /// 正在处理中
+        /// </summary>
+        Processing,
+
+        /// <summary>
+        /// 处理成功
+        /// </summary>
+        Success,
+
+        /// <summary>
+        /// 处理失败
+        /// </summary>
+        Failure,
+    }
+
     /// <summary>
     /// 表示一个要上传的项目
     /// </summary>
-    public abstract class AbstractTask
+    public abstract class AgentTask
     {
         /// <summary>
         /// 要上传的项目的Id
@@ -27,15 +45,35 @@ namespace ModengTerm.FileTrans
         /// 子任务
         /// 子任务必须在父任务运行结束之后再运行
         /// </summary>
-        public List<AbstractTask> SubTasks { get; private set; }
+        public List<AgentTask> SubTasks { get; private set; }
 
-        public AbstractTask() 
+        /// <summary>
+        /// 父任务
+        /// </summary>
+        public AgentTask Parent { get; set; }
+
+        /// <summary>
+        /// 用户数据
+        /// </summary>
+        public object UserData { get; set; }
+
+        /// <summary>
+        /// 该任务的操作状态
+        /// </summary>
+        internal AgentTaskStates State { get; set; }
+
+        /// <summary>
+        /// 上传进度
+        /// </summary>
+        internal double Progress { get; set; }
+
+        public AgentTask()
         {
-            this.SubTasks = new List<AbstractTask>();
+            this.SubTasks = new List<AgentTask>();
         }
     }
 
-    public class UploadFileTask : AbstractTask
+    public class UploadFileTask : AgentTask
     {
         public override FsOperationTypeEnum Type => FsOperationTypeEnum.UploadFile;
 
@@ -50,7 +88,7 @@ namespace ModengTerm.FileTrans
         public string TargetFilePath { get; set; }
     }
 
-    public class CreateDirectoryTask : AbstractTask
+    public class CreateDirectoryTask : AgentTask
     {
         public override FsOperationTypeEnum Type => FsOperationTypeEnum.CreateDirectory;
 
@@ -60,7 +98,7 @@ namespace ModengTerm.FileTrans
         public string DirectoryPath { get; set; }
     }
 
-    public class DeleteDirectoryTask : AbstractTask
+    public class DeleteDirectoryTask : AgentTask
     {
         public override FsOperationTypeEnum Type => FsOperationTypeEnum.DeleteDirectory;
 
@@ -70,7 +108,7 @@ namespace ModengTerm.FileTrans
         public string DirectoryPath { get; set; }
     }
 
-    public class DeleteFileTask : AbstractTask
+    public class DeleteFileTask : AgentTask
     {
         public override FsOperationTypeEnum Type => FsOperationTypeEnum.DeleteFile;
 

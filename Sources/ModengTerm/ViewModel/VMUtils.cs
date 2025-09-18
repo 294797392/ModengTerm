@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Addon;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -10,7 +9,6 @@ using ModengTerm.ViewModel.Session;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -117,7 +115,7 @@ namespace ModengTerm.ViewModel
         }
 
         /// <summary>
-        /// 创建顶部菜单或者右键菜单
+        /// 创建插件的顶部菜单或者右键菜单
         /// </summary>
         /// <param name="toolbarMenu"></param>
         /// <returns></returns>
@@ -126,23 +124,21 @@ namespace ModengTerm.ViewModel
             List<MenuItemVM> result = new List<MenuItemVM>();
 
             // 加载所有的插件菜单
-            foreach (AddonMetadata addon in ClientContext.Context.Manifest.Addons)
+            foreach (AddonMetadata addonMetadata in ClientContext.Context.Manifest.Addons)
             {
-                List<MenuMetadata> menus = toolbarMenu ? addon.ToolbarMenus : addon.ContextMenus;
+                List<MenuMetadata> metadatas = toolbarMenu ? addonMetadata.ToolbarMenus : addonMetadata.ContextMenus;
 
-                foreach (MenuMetadata menuItem in menus)
+                foreach (MenuMetadata metadata in metadatas)
                 {
-                    MenuItemVM mivm = new MenuItemVM(menuItem);
-
-                    if (!string.IsNullOrEmpty(menuItem.Command))
-                    {
-                        mivm.CommandKey = AddonUtils.GetCommandKey(addon.ID, menuItem.Command);
-                    }
-
+                    MenuItemVM mivm = new MenuItemVM(metadata);
                     result.Add(mivm);
-
                     // 加载这个菜单的子节点
-                    LoadChildMenuItems(mivm, menuItem.Children, addon);
+                    LoadChildMenuItems(mivm, metadata.Children, addonMetadata);
+
+                    if (!string.IsNullOrEmpty(metadata.Command))
+                    {
+                        mivm.CommandKey = AddonUtils.GetCommandKey(addonMetadata, metadata.Command);
+                    }
                 }
             }
 
@@ -186,31 +182,19 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        private static void LoadChildMenuItems(MenuItemVM parentVM, List<MenuMetadata> children, AddonMetadata addon)
-        {
-            foreach (MenuMetadata menuItem in children)
-            {
-                MenuItemVM mivm = new MenuItemVM(menuItem);
-
-                if (!string.IsNullOrEmpty(menuItem.Command))
-                {
-                    mivm.CommandKey = AddonUtils.GetCommandKey(addon.ID, menuItem.Command);
-                }
-
-                parentVM.Children.Add(mivm);
-
-                LoadChildMenuItems(mivm, menuItem.Children, addon);
-            }
-        }
-
-        private static void LoadChildMenuItems(MenuItemVM parentVM, List<MenuMetadata> children)
+        private static void LoadChildMenuItems(MenuItemVM parentVM, List<MenuMetadata> children, AddonMetadata addonMetadata = null)
         {
             foreach (MenuMetadata metadata in children)
             {
                 MenuItemVM mivm = new MenuItemVM(metadata);
                 mivm.CommandKey = metadata.Command;
                 parentVM.Children.Add(mivm);
-                LoadChildMenuItems(mivm, metadata.Children);
+                LoadChildMenuItems(mivm, metadata.Children, addonMetadata);
+
+                if (addonMetadata != null && !string.IsNullOrEmpty(metadata.Command))
+                {
+                    mivm.CommandKey = AddonUtils.GetCommandKey(addonMetadata, metadata.Command);
+                }
             }
         }
     }

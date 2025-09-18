@@ -22,7 +22,7 @@ namespace ModengTerm.FileTrans.Clients
         /// <summary>
         /// 当上传状态改变的时候触发
         /// </summary>
-        public event Action<AbstractTask, double> UploadProgress;
+        public event Action<AgentTask, double> UploadProgress;
 
         #endregion
 

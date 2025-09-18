@@ -1,6 +1,6 @@
 ﻿using DotNEToolkit;
 using DotNEToolkit.DataAccess;
-using ModengTerm.Addon.Service;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Base;
 using Newtonsoft.Json;
 using System;
@@ -14,7 +14,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
-using Xceed.Wpf.Toolkit;
 
 namespace ModengTerm.Addon
 {

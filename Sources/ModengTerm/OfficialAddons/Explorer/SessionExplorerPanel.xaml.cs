@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
@@ -57,9 +58,8 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            ClientFactory factory = ClientFactory.GetFactory();
-            IClient hostWindow = factory.GetClient();
-            hostWindow.OpenSession(sessionVM.Session);
+            IClient client = Client.GetClient();
+            client.OpenSession(sessionVM.Session);
         }
 
         #endregion

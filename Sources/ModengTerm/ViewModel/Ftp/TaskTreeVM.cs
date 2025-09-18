@@ -13,12 +13,13 @@ namespace ModengTerm.ViewModel.Ftp
 {
     /// <summary>
     /// 文件上传列表是一个常规的文件列表树形结构
-    /// 考虑到在上传文件的时候，有可能该文件所在的目录没有创建，所以得先创建目录
-    /// 子任务必须等父任务结束运行之后再运行
+    /// 考虑到在上传文件的时候，需要先创建文件所在目录，并且目录有可能是递归的，所以把上传文件和创建目录都当做是一个任务，任务列表是树形结构。子任务必须等父任务结束运行之后再运行
     /// </summary>
     public class TaskTreeVM : TreeViewModel<TreeViewModelContext>
     {
-
+        public TaskTreeVM() 
+        {
+        }
     }
 
     /// <summary>

@@ -109,6 +109,8 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 在所有属性都赋值之后，Open之前调用
         /// 和构造函数相比有个不同的地方，Initialize调用的时候所有属性都赋值了，而构造函数调用的时候则没有
+        /// 
+        /// TODO：考虑删除Initialize和Release函数，这两个函数的作用和Open，Close一样
         /// </summary>
         public void Initialize()
         {

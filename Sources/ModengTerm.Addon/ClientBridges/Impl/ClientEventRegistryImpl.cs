@@ -1,11 +1,12 @@
-﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModengTerm.Addon
+namespace ModengTerm.Addon.ClientBridges.Impl
 {
     public class ClientEventRegistryImpl : IClientEventRegistry
     {
@@ -111,10 +112,16 @@ namespace ModengTerm.Addon
             public object UserData { get; set; }
         }
 
-        private class CommandData
+        private class CommandInfo
         {
+            /// <summary>
+            /// 执行命令的函数
+            /// </summary>
             public CommandDelegate Delegate { get; set; }
 
+            /// <summary>
+            /// 执行命令回调给用户的数据
+            /// </summary>
             public object UserData { get; set; }
         }
 
@@ -125,7 +132,7 @@ namespace ModengTerm.Addon
         private Registry<TabEvent, TabEventDelegate> tabRegistry;
         private Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>> tabEventRegistry;
         private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
-        private Dictionary<string, CommandData> commandRegistry;
+        private Dictionary<string, CommandInfo> commandRegistry;
 
         public ClientEventRegistryImpl()
         {
@@ -133,7 +140,7 @@ namespace ModengTerm.Addon
             this.tabRegistry = new Registry<TabEvent, TabEventDelegate>();
             this.tabEventRegistry = new Dictionary<IClientTab, Registry<TabEvent, TabEventDelegate>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
-            this.commandRegistry = new Dictionary<string, CommandData>();
+            this.commandRegistry = new Dictionary<string, CommandInfo>();
         }
 
 
@@ -298,7 +305,7 @@ namespace ModengTerm.Addon
 
         public void RegisterCommand(string commandKey, CommandDelegate @delegate, object userData = null)
         {
-            CommandData commandData = new CommandData() 
+            CommandInfo commandData = new CommandInfo() 
             {
                 Delegate = @delegate,
                 UserData = userData
@@ -312,16 +319,17 @@ namespace ModengTerm.Addon
             this.commandRegistry.Remove(commandKey);
         }
 
-        public bool PublishCommand(CommandArgs cmdArgs)
+        public bool PublishCommand(CommandArgs e)
         {
-            CommandData commandData;
-            if (!this.commandRegistry.TryGetValue(cmdArgs.CommandKey, out commandData))
+            CommandInfo commandData;
+            if (!this.commandRegistry.TryGetValue(e.CommandKey, out commandData))
             {
                 return false;
             }
 
-            cmdArgs.UserData = commandData.UserData;
-            commandData.Delegate(cmdArgs);
+            e.UserData = commandData.UserData;
+            //e.ActiveTab = 
+            commandData.Delegate(e);
 
             return true;
         }

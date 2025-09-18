@@ -1,18 +1,21 @@
 ﻿using DotNEToolkit;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base;
+using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Ssh;
+using ModengTerm.Base.Metadatas;
 using ModengTerm.FileTrans;
 using ModengTerm.FileTrans.Clients;
 using ModengTerm.FileTrans.DataModels;
 using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Ftp.Enumerations;
+using ModengTerm.Terminal.Modem;
 using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
@@ -21,11 +24,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -78,6 +83,12 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 构造方法
 
+        static FtpSessionVM()
+        {
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_OPEN_ITEM, OnFtpOpenClientItem);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_DELETE_ITEM, OnFtpDeleteClientItem);
+        }
+
         public FtpSessionVM(XTermSession session) :
             base(session)
         {
@@ -89,11 +100,6 @@ namespace ModengTerm.ViewModel.Ftp
 
         protected override void OnInitialize()
         {
-            this.clientFsTree = new FsTreeVM();
-            this.clientFsTree.Context.Type = FtpRoleEnum.Client;
-            this.serverFsTree = new FsTreeVM();
-            this.serverFsTree.Context.Type = FtpRoleEnum.Server;
-            this.taskTree = new TaskTreeVM();
         }
 
         protected override void OnRelease()
@@ -102,16 +108,18 @@ namespace ModengTerm.ViewModel.Ftp
 
         protected override int OnOpen()
         {
+            this.clientFsTree = new FsTreeVM();
+            this.clientFsTree.Context.Type = FtpRoleEnum.Client;
+            this.serverFsTree = new FsTreeVM();
+            this.serverFsTree.Context.Type = FtpRoleEnum.Server;
+            this.taskTree = new TaskTreeVM();
+
             this.serverFsTree.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_SERVER_INITIAL_DIR);
             this.clientFsTree.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
 
             // 加载树形列表右键菜单
             this.serverFsTree.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileListMenus));
             this.clientFsTree.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpClientFileListMenus));
-            ClientFactory factory = ClientFactory.GetFactory();
-            IClientEventRegistry eventRegistry = factory.GetEventRegistry();
-            eventRegistry.RegisterCommand(FtpCommandKeys.CLIENT_OPEN_ITEM, this.FtpClientOpenItem);
-            eventRegistry.RegisterCommand(FtpCommandKeys.CLIENT_DELETE_ITEM, this.FtpClientDeleteItem);
 
             FsClientOptions options = this.CreateOptions();
             FsClientTransport transport = new FsClientTransport();
@@ -126,7 +134,7 @@ namespace ModengTerm.ViewModel.Ftp
             this.ftpAgent.Threads = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_THREADS);
             this.ftpAgent.UploadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_UPLOAD_BUFFER_SIZE) * 1024;
             this.ftpAgent.DownloadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_DOWNLOAD_BUFFER_SIZE) * 1024;
-            this.ftpAgent.ProgressChanged += this.FileAgent_ProgressChanged;
+            this.ftpAgent.ProcessStateChanged += this.FtpAgent_ProcessStateChanged;
             this.ftpAgent.Initialize();
 
             this.LoadFsTreeAsync(this.clientFsTree, this.clientFsTree.CurrentDirectory);
@@ -136,7 +144,7 @@ namespace ModengTerm.ViewModel.Ftp
 
         protected override void OnClose()
         {
-            this.ftpAgent.ProgressChanged -= this.FileAgent_ProgressChanged;
+            this.ftpAgent.ProcessStateChanged -= this.FtpAgent_ProcessStateChanged;
             this.ftpAgent.Release();
 
             this.serverFsTransport.StatusChanged -= this.Transport_StatusChanged;
@@ -219,8 +227,8 @@ namespace ModengTerm.ViewModel.Ftp
         private void UploadFiles(List<FsItemVM> localFsItems, string serverDir)
         {
             List<TaskTreeNodeVM> taskVms = this.CreateUploadTasks(localFsItems, serverDir);
-            List<AbstractTask> agentTasks = this.CreateAgentTasks(taskVms);
-            taskVms.ForEach(v => this.taskTree.AddRootNode(v));
+            List<AgentTask> agentTasks = this.CreateAgentTasks(null, taskVms);
+            taskVms.ForEach(v => taskTree.AddRootNode(v));
             this.ftpAgent.EnqueueTask(agentTasks);
         }
 
@@ -238,7 +246,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             foreach (FileSystemInfo fsInfo in fileSystemInfos)
             {
-                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(this.taskTree.Context)
+                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(taskTree.Context)
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = fsInfo.FullName,
@@ -285,7 +293,7 @@ namespace ModengTerm.ViewModel.Ftp
                     continue;
                 }
 
-                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(this.taskTree.Context)
+                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(taskTree.Context)
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = fsItem.FullPath,
@@ -314,14 +322,15 @@ namespace ModengTerm.ViewModel.Ftp
 
         #endregion
 
-        private List<AbstractTask> CreateAgentTasks(IEnumerable<TaskTreeNodeVM> tasks)
+        private List<AgentTask> CreateAgentTasks(AgentTask parentTask, IEnumerable<TaskTreeNodeVM> tasks)
         {
-            List<AbstractTask> agentTasks = new List<AbstractTask>();
+            List<AgentTask> agentTasks = new List<AgentTask>();
 
             foreach (TaskTreeNodeVM taskVm in tasks)
             {
-                AbstractTask agentTask = this.CreateAgentTask(taskVm);
-                List<AbstractTask> subAgentTasks = this.CreateAgentTasks(taskVm.Children.Cast<TaskTreeNodeVM>());
+                AgentTask agentTask = this.CreateAgentTask(taskVm);
+                agentTask.Parent = parentTask;
+                List<AgentTask> subAgentTasks = this.CreateAgentTasks(agentTask, taskVm.Children.Cast<TaskTreeNodeVM>());
                 agentTask.SubTasks.AddRange(subAgentTasks);
                 agentTasks.Add(agentTask);
             }
@@ -329,7 +338,7 @@ namespace ModengTerm.ViewModel.Ftp
             return agentTasks;
         }
 
-        private AbstractTask CreateAgentTask(TaskTreeNodeVM taskVm)
+        private AgentTask CreateAgentTask(TaskTreeNodeVM taskVm)
         {
             switch (taskVm.OpType)
             {
@@ -340,6 +349,7 @@ namespace ModengTerm.ViewModel.Ftp
                             Id = taskVm.ID.ToString(),
                             SourceFilePath = taskVm.SourceFullPath,
                             TargetFilePath = taskVm.TargetFullPath,
+                            UserData = taskVm
                         };
                     }
 
@@ -349,6 +359,7 @@ namespace ModengTerm.ViewModel.Ftp
                         {
                             Id = taskVm.ID.ToString(),
                             DirectoryPath = taskVm.TargetFullPath,
+                            UserData = taskVm
                         };
                     }
 
@@ -357,7 +368,8 @@ namespace ModengTerm.ViewModel.Ftp
                         return new DeleteDirectoryTask()
                         {
                             Id = taskVm.ID.ToString(),
-                            DirectoryPath = taskVm.TargetFullPath
+                            DirectoryPath = taskVm.TargetFullPath,
+                            UserData = taskVm
                         };
                     }
 
@@ -367,6 +379,7 @@ namespace ModengTerm.ViewModel.Ftp
                         {
                             Id = taskVm.ID.ToString(),
                             FilePath = taskVm.SourceFullPath,
+                            UserData = taskVm
                         };
                     }
 
@@ -575,32 +588,19 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
-        private void FileAgent_ProgressChanged(FtpAgent fileAgent, string taskId, double progress, string serverMessage, int bytesTransfer, ProcessStates processStates)
+        private void FtpAgent_ProcessStateChanged(FtpAgent ftpAgent, string taskId, double progress, string serverMessage, string speed, ProcessStates processStates, object userData)
         {
-            TreeNodeViewModel treeNodeVm;
-            if (!this.taskTree.TryGetNode(taskId, out treeNodeVm))
-            {
-                logger.ErrorFormat("查找文件状态失败, {0}, {1}, {2}", taskId, progress, serverMessage);
-                return;
-            }
-
-            TaskTreeNodeVM taskVm = treeNodeVm as TaskTreeNodeVM;
+            TaskTreeNodeVM taskVm = userData as TaskTreeNodeVM;
 
             taskVm.State = processStates;
             taskVm.Message = serverMessage;
 
             switch (processStates)
             {
-                case ProcessStates.BytesTransfered:
+                case ProcessStates.ProgressChanged:
                     {
-                        TimeSpan ts = DateTime.Now - taskVm.PrevTransferTime;
-                        double speed = bytesTransfer / ts.TotalSeconds;
-                        double toValue;
-                        SizeUnitEnum toUnit;
-                        VTBaseUtils.AutoFitSize(speed, SizeUnitEnum.bytes, out toValue, out toUnit);
-                        taskVm.Speed = string.Format("{0} {1}/s", toValue, toUnit);
                         taskVm.Progress = progress;
-                        taskVm.PrevTransferTime = DateTime.Now;
+                        taskVm.Speed = speed;
                         break;
                     }
 
@@ -609,13 +609,13 @@ namespace ModengTerm.ViewModel.Ftp
                         break;
                     }
 
-                case ProcessStates.Completed:
+                case ProcessStates.Success:
                     {
                         taskVm.Progress = progress;
                         break;
                     }
 
-                case ProcessStates.StartTransfer:
+                case ProcessStates.Starting:
                     {
                         taskVm.PrevTransferTime = DateTime.Now;
                         break;
@@ -626,7 +626,7 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
-        private void FtpClientOpenItem(CommandArgs e)
+        private void FtpOpenClientItem()
         {
             FsItemVM selectedItem = this.clientFsTree.SelectedItem as FsItemVM;
             if (selectedItem == null)
@@ -680,7 +680,7 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
-        private void FtpClientDeleteItem(CommandArgs e)
+        private void FtpDeleteClientItem()
         {
             FsItemVM selectedItem = this.clientFsTree.SelectedItem as FsItemVM;
             if (selectedItem == null)
@@ -700,7 +700,9 @@ namespace ModengTerm.ViewModel.Ftp
                 opType = FsOperationTypeEnum.DeleteDirectory;
             }
 
-            //TaskTreeNodeVM fileStatus = new TaskTreeNodeVM()
+
+
+            //TaskTreeNodeVM taskNode = new TaskTreeNodeVM(this.taskTree.Context)
             //{
             //    ID = Guid.NewGuid().ToString(),
             //    SourceFullPath = selectedItem.FullPath,
@@ -709,16 +711,23 @@ namespace ModengTerm.ViewModel.Ftp
             //    OpType = opType,
             //    SourceItemType = selectedItem.Type,
             //};
-            //this.taskList.Add(fileStatus);
+            //this.taskTree.AddRootNode(taskNode);
+            //AgentTask agentTask = this.CreateAgentTask(taskNode);
+            //this.ftpAgent.EnqueueTask(agentTask);
+        }
 
-            //AbstractTask task = new AbstractTask()
-            //{
-            //    Id = fileStatus.ID.ToString(),
-            //};
+        #endregion
 
-            //this.fileAgent.EnqueueTask()
+        #region 默认右键菜单处理器
 
-            //this.LoadFsTreeAsync(this.clientFsTree, this.clientFsTree.CurrentDirectory);
+        private static void OnFtpOpenClientItem(CommandArgs e) 
+        {
+            (e.ActiveTab as FtpSessionVM).FtpOpenClientItem();
+        }
+
+        private static void OnFtpDeleteClientItem(CommandArgs e)
+        {
+            (e.ActiveTab as FtpSessionVM).FtpDeleteClientItem();
         }
 
         #endregion

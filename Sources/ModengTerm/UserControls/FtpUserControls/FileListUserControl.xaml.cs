@@ -1,4 +1,5 @@
 ﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Addon;
 using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Ftp;

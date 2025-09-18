@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Base;
 
-namespace ModengTerm.Addon.Service
+namespace ModengTerm.Addon.ClientBridges
 {
     public abstract class StorageObject
     {
@@ -66,14 +66,14 @@ namespace ModengTerm.Addon.Service
         /// <returns></returns>
         public int DeleteObject<T>(T obj) where T : StorageObject
         {
-            return this.DeleteObject<T>(obj.Id);
+            return DeleteObject<T>(obj.Id);
         }
 
         public int DeleteObjects<T>(List<T> objs) where T : StorageObject
         {
             foreach (T obj in objs)
             {
-                this.DeleteObject<T>(obj);
+                DeleteObject(obj);
             }
 
             return ResponseCode.SUCCESS;

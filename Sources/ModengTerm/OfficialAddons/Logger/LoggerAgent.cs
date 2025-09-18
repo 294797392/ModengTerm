@@ -1,7 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using System;
@@ -46,8 +46,7 @@ namespace ModengTerm.OfficialAddons.Logger
 
         public LoggerAgent()
         {
-            ClientFactory clientFactory = ClientFactory.GetFactory();
-            this.eventRegistry = clientFactory.GetEventRegistry();
+            this.eventRegistry = Client.GetEventRegistry();
             this.loggerEvent = new ManualResetEvent(false);
             this.loggerList = new List<LoggerVM>();
             this.loggerListCopy = new List<LoggerVM>();

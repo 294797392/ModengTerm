@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addon.Service;
+﻿using ModengTerm.Addon.ClientBridges;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

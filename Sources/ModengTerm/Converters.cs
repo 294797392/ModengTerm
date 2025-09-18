@@ -734,7 +734,7 @@ namespace ModengTerm
                 case FsOperationTypeEnum.DeleteFile: return "删除文件";
                 case FsOperationTypeEnum.DeleteDirectory: return "删除目录";
                 case FsOperationTypeEnum.CreateDirectory: return "新建目录";
-                case FsOperationTypeEnum.Download: return "下载";
+                case FsOperationTypeEnum.DownloadFile: return "下载文件";
                 default:
                     throw new NotImplementedException();
             }
@@ -754,10 +754,10 @@ namespace ModengTerm
 
             switch (processStates)
             {
-                case ProcessStates.StartTransfer:
-                case ProcessStates.BytesTransfered: return "传输中";
+                case ProcessStates.Starting:
+                case ProcessStates.ProgressChanged: return "传输中";
                 case ProcessStates.Failure: return "传输失败";
-                case ProcessStates.Completed: return "传输完成";
+                case ProcessStates.Success: return "传输完成";
                 case ProcessStates.WaitQueued: return "等待入队";
                 case ProcessStates.Queued: return "已入队, 等待传输";
                 default:

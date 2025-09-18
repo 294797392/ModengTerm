@@ -1,19 +1,13 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 
-namespace ModengTerm.Addon.Service
+namespace ModengTerm.Addon.ClientBridges
 {
     public delegate void ClientEventDelegate(ClientEventArgs e, object userData);
 
     public delegate void TabEventDelegate(TabEventArgs e, object userData);
 
     public delegate void ClientHotkeyDelegate(object userData);
-
-    /// <summary>
-    /// 点击顶部菜单栏或者右键菜单所执行的事件处理器
-    /// </summary>
-    /// <param name="e"></param>
-    public delegate void CommandDelegate(CommandArgs e);
 
     public interface IClientEventRegistry
     {

@@ -19,7 +19,7 @@ namespace ModengTerm.Ftp.Enumerations
         /// <summary>
         /// 下载操作
         /// </summary>
-        Download,
+        DownloadFile,
 
         /// <summary>
         /// 删除目录

@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
@@ -11,6 +11,7 @@ using ModengTerm.ViewModel.Session;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure.Interception;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -145,9 +146,9 @@ namespace ModengTerm
                 return;
             }
 
-            ClientFactory factory = ClientFactory.GetFactory();
-            IClientEventRegistry eventRegistry = factory.GetEventRegistry();
+            IClientEventRegistry eventRegistry = Client.GetEventRegistry();
             CommandArgs.Instance.CommandKey = menuItemVm.CommandKey;
+            CommandArgs.Instance.ActiveTab = Client.GetActiveTab<IClientTab>();
             eventRegistry.PublishCommand(CommandArgs.Instance);
         }
     }

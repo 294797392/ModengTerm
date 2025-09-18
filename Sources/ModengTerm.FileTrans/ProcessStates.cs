@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.FileTrans
 {
     /// <summary>
-    /// 定义文件的处理状态
+    /// 定义任务的处理状态
     /// </summary>
     public enum ProcessStates
     {
@@ -22,24 +22,25 @@ namespace ModengTerm.FileTrans
         Queued,
 
         /// <summary>
-        /// 传输失败
+        /// 在执行处理之前触发
+        /// </summary>
+        Starting,
+
+        /// <summary>
+        /// 处理失败
+        /// 当上传对象是文件夹时，只有等文件夹里的所有子项上传结束才可能会改变成此状态
         /// </summary>
         Failure,
 
         /// <summary>
-        /// 传输成功
+        /// 处理成功
+        /// 当上传对象是文件夹时，只有等文件夹里的所有子项上传结束才可能会改变成此状态
         /// </summary>
-        Completed,
+        Success,
 
         /// <summary>
-        /// 开始传输
-        /// 在传输开始之前触发
+        /// 处理进度改变
         /// </summary>
-        StartTransfer,
-
-        /// <summary>
-        /// 有部分数据成功传输
-        /// </summary>
-        BytesTransfered,
+        ProgressChanged,
     }
 }

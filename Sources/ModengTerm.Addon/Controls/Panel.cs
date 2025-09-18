@@ -1,5 +1,5 @@
-﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
+﻿using ModengTerm.Addon.ClientBridges;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using System.Windows.Controls;
 
@@ -10,7 +10,7 @@ namespace ModengTerm.Addon.Controls
     /// </summary>
     public abstract class Panel : UserControl
     {
-        protected ClientFactory factory;
+        internal ClientBridge factory;
         protected IClientEventRegistry eventRegistry;
         protected IClientStorage storage;
         protected IClient client;
@@ -27,7 +27,7 @@ namespace ModengTerm.Addon.Controls
 
         public Panel()
         {
-            this.factory = ClientFactory.GetFactory();
+            this.factory = ClientBridge.GetBridge();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.storage = this.factory.GetStorageService();
             this.client = this.factory.GetClient();

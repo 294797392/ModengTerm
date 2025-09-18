@@ -3,9 +3,9 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
+using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Addon.Controls;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.Service;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -55,7 +55,6 @@ namespace ModengTerm
         private ServiceAgent serviceAgent;
         private DefaultMainUserControl defaultMainUserControl;
         private List<AddonModule> addons;
-        private ClientFactory factory;
         private IClientEventRegistry eventRegistry;
         private HotkeyState kstat;
         private List<Key> pressedKeys;
@@ -81,8 +80,7 @@ namespace ModengTerm
         private void InitializeWindow()
         {
             this.serviceAgent = ServiceAgentFactory.Get();
-            this.factory = ClientFactory.GetFactory();
-            this.eventRegistry = this.factory.GetEventRegistry();
+            this.eventRegistry = Client.GetEventRegistry();
             this.pressedKeys = new List<Key>();
 
             this.mainWindowVM = new MainWindowVM();
@@ -207,7 +205,6 @@ namespace ModengTerm
                     {
                         Definition = metadata,
                         StorageService = new SqliteStorageService(),
-                        Factory = ClientFactory.GetFactory(),
                         HostWindow = this
                     };
 

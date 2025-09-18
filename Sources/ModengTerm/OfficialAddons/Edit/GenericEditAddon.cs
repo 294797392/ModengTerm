@@ -25,38 +25,38 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = e.ActiveTab as IClientShellTab;
             shell.ClearScreen();
         }
 
