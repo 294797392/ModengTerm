@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
-using ModengTerm.UserControls.FileTransUserControls;
+using ModengTerm.UserControls.FtpUserControls;
 using ModengTerm.UserControls.TerminalUserControls;
 using System;
 
@@ -23,7 +23,7 @@ namespace ModengTerm
 
                 case SessionTypeEnum.Sftp:
                     {
-                        return new WorkbenchUserControl();
+                        return new FtpSessionUserControl();
                     }
 
                 default:

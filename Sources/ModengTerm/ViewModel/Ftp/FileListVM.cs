@@ -17,7 +17,7 @@ namespace ModengTerm.ViewModel.Ftp
         public FtpRoleEnum Type { get; set; }
     }
 
-    public class FsTreeVM : TreeViewModel<FsTreeContext>
+    public class FileListVM : TreeViewModel<FsTreeContext>
     {
         #region 实例变量
 
@@ -72,9 +72,9 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="isShow">是否显示隐藏目录</param>
         public void ToggleHiddenItems(bool isShow) 
         {
-            IEnumerable<FsItemVM> hiddenItems = this.Context.NodeList.Cast<FsItemVM>().Where(v => v.IsHidden);
+            IEnumerable<FileItemVM> hiddenItems = this.Context.NodeList.Cast<FileItemVM>().Where(v => v.IsHidden);
 
-            foreach (FsItemVM hiddenItem in hiddenItems)
+            foreach (FileItemVM hiddenItem in hiddenItems)
             {
                 hiddenItem.IsVisible = isShow;
             }
@@ -84,7 +84,7 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 构造方法
 
-        public FsTreeVM() 
+        public FileListVM() 
         {
             this.ContextMenus = new BindableCollection<MenuItemVM>();
         }

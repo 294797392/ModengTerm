@@ -174,6 +174,43 @@ namespace ModengTerm.FileTrans.Clients
             }
         }
 
+        public bool RenameDirectory(string oldPath, string newPath)
+        {
+            if (!this.CheckStatus())
+            {
+                return false;
+            }
+
+            try
+            {
+                this.client.RenameDirectory(oldPath, newPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("重命名目录异常", ex);
+                return false;
+            }
+        }
+
+        public bool RenameFile(string oldPath, string newPath)
+        {
+            if (!this.CheckStatus())
+            {
+                return false;
+            }
+
+            try
+            {
+                this.client.RenameFile(oldPath, newPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("重命名文件异常", ex);
+                return false;
+            }
+        }
 
         #endregion
 

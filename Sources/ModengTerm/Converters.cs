@@ -798,6 +798,21 @@ namespace ModengTerm
         {
             throw new NotImplementedException();
         }
+    }
 
+    public class FsItemStates2VisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            FsItemStates state1 = (FsItemStates)value;
+            FsItemStates state2 = (FsItemStates)parameter;
+
+            return state1 == state2 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

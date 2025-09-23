@@ -1,16 +1,15 @@
-﻿<UserControl x:Class="ModengTerm.UserControls.FileTransUserControls.FileSystemTreeUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.FtpUserControls.FileListUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ModengTerm.UserControls.FileTransUserControls"
              xmlns:dd="clr-namespace:WPFToolkit.DragDrop;assembly=WPFToolkit"
              xmlns:toolkitconverters="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              xmlns:converters="clr-namespace:ModengTerm"
+             xmlns:vmftp="clr-namespace:ModengTerm.ViewModel.Ftp"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             x:Name="UserControl1"
-             DataContextChanged="UserControl1_DataContextChanged">
+             x:Name="UserControl1">
 
     <UserControl.Resources>
 
@@ -18,27 +17,12 @@
         <converters:FsItemTypeNameConverter x:Key="FsItemTypeNameConverter"/>
         <converters:FsItemType2SizeVisibleConverter x:Key="FsItemType2SizeVisibleConverter"/>
         <converters:FsItemIsHidden2ForegroundConverter x:Key="FsItemIsHidden2ForegroundConverter"/>
+        <converters:FsItemStates2VisibleConverter x:Key="FsItemStates2VisibleConverter"/>
         <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
         <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-
-        <ContextMenu x:Key="ContextMenuFileList" Style="{StaticResource ResourceKey=StyleContextMenu}">
-
-            <ContextMenu.ItemContainerStyle>
-                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItem}">
-                    <!-- 直接在ContextMenu里定义MenuItem.Click事件无法触发，使用EventSetter可以触发 -->
-                    <EventSetter Event="Click" Handler="MenuItem_Click"/>
-                </Style>
-            </ContextMenu.ItemContainerStyle>
-            
-            <ContextMenu.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </HierarchicalDataTemplate>
-            </ContextMenu.ItemTemplate>
-        </ContextMenu>
 
     </UserControl.Resources>
 
@@ -55,6 +39,7 @@
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
                     <Style.Triggers>
+                        <!-- 如果节点类型是“向上一级”，那么不显示右键菜单 -->
                         <DataTrigger Binding="{Binding Path=Type}" Value="ParentDirectory">
                             <Setter Property="ContextMenu" Value="{x:Null}"/>
                         </DataTrigger>
@@ -62,7 +47,7 @@
                     <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="Foreground" Value="{Binding Path=IsHidden, Converter={StaticResource ResourceKey=FsItemIsHidden2ForegroundConverter}}"/>
-                    <Setter Property="ContextMenu" Value="{StaticResource ResourceKey=ContextMenuFileList}"/>
+                    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Style>
             </DataGrid.RowStyle>
 
@@ -80,13 +65,26 @@
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
                                 <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0"
+                                           Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.None}}"
                                            Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                                <TextBox Text="{Binding Path=EditName}" Margin="5,0,0,0"
+                                         Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.EditName}}"
+                                         Style="{StaticResource ResourceKey=StyleTextBox}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
+                                <TextBox x:Name="TextBoxEditName" Text="{Binding Path=EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         VerticalContentAlignment="Center" Padding="5,0,3,0" Margin="3"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="类型" Width="70" CanUserSort="True" SortMemberPath="Type">
+                <DataGridTemplateColumn Header="类型" Width="70" CanUserSort="True" SortMemberPath="Type" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -94,7 +92,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="大小" Width="80" CanUserSort="True" SortMemberPath="Size">
+                <DataGridTemplateColumn Header="大小" Width="80" CanUserSort="True" SortMemberPath="Size" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Size, Converter={StaticResource ResourceKey=FileItemDisplaySizeConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"
@@ -103,7 +101,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="最后修改日期" Width="150" CanUserSort="True">
+                <DataGridTemplateColumn Header="最后修改日期" Width="150" CanUserSort="True" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=LastUpdateTime, StringFormat='yyyy/MM/dd hh:mm:ss'}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>

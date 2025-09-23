@@ -1,5 +1,6 @@
 ﻿using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
+using ModengTerm.Base;
 using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Ftp;
@@ -10,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,26 +25,77 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFToolkit.DragDrop;
+using WPFToolkit.Utils;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
-namespace ModengTerm.UserControls.FileTransUserControls
+namespace ModengTerm.UserControls.FtpUserControls
 {
-    /// <summary>
-    /// FileSystemTreeUserControl.xaml 的交互逻辑
-    /// </summary>
-    public partial class FileSystemTreeUserControl : UserControl, IDropHandler
+    public enum FileListModes
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileSystemTreeUserControl");
+        /// <summary>
+        /// 列表模式
+        /// </summary>
+        List,
+    }
+
+    /// <summary>
+    /// FileListUserControl.xaml 的交互逻辑
+    /// </summary>
+    public partial class FileListUserControl : UserControl, IDropHandler
+    {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileListUserControl");
 
         #region 公开事件
 
-        public event Action<FsTreeVM, FsTreeVM, List<FsItemVM>, string> TransferFile;
-        public event Action<FsTreeVM, FsItemVM> EnterDirectory;
+        public event Action<FileListVM, FileListVM, List<FileItemVM>, string> TransferFile;
+
+        #endregion
+
+        #region 实例变量
+
+        private ContextMenu fileListContextMenu;
+        private FileListModes mode;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 获取FtpSession
+        /// </summary>
+        public FtpSessionVM FtpSession { get; set; }
+
+        /// <summary>
+        /// 设置或获取文件列表右键菜单
+        /// </summary>
+        public ContextMenu FileListContextMenu 
+        {
+            get
+            {
+                return this.fileListContextMenu;
+            }
+            set
+            {
+                if (this.fileListContextMenu != value)
+                {
+                    this.fileListContextMenu = value;
+                    Setter setter = new Setter(DataGridRow.ContextMenuProperty, value);
+                    Style style = DataGridFsList.RowStyle as Style;
+                    style.Setters.Add(setter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取该控件绑定的FsTreeVM
+        /// </summary>
+        public FileListVM FileListVM { get { return base.DataContext as FileListVM; } }
 
         #endregion
 
         #region 构造方法
 
-        public FileSystemTreeUserControl()
+        public FileListUserControl()
         {
             InitializeComponent();
 
@@ -57,24 +110,21 @@ namespace ModengTerm.UserControls.FileTransUserControls
         {
         }
 
-        #endregion
-
-        #region 事件处理器
-
-        private void DataGridFsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OnFileListDoubleClick()
         {
-            FsItemVM fsItemVM = DataGridFsList.SelectedItem as FsItemVM;
-            if (fsItemVM == null)
+            FileListVM fsTree = base.DataContext as FileListVM;
+            FileItemVM fsItem = fsTree.SelectedItem as FileItemVM;
+            if (fsItem == null)
             {
                 return;
             }
 
-            switch (fsItemVM.Type)
+            switch (fsItem.Type)
             {
                 case FsItemTypeEnum.ParentDirectory:
                 case FsItemTypeEnum.Directory:
                     {
-                        this.EnterDirectory?.Invoke(DataGridFsList.DataContext as FsTreeVM, fsItemVM);
+                        this.FtpSession.LoadFsTreeAsync(fsTree, fsItem.FullPath);
                         break;
                     }
 
@@ -83,38 +133,119 @@ namespace ModengTerm.UserControls.FileTransUserControls
             }
         }
 
+        #endregion
+
+        #region 公开接口
+
+        /// <summary>
+        /// 进入编辑模式
+        /// </summary>
+        /// <param name="fileItem"></param>
+        public void RenameItem(FileItemVM fileItem) 
+        {
+            switch (this.mode) 
+            {
+
+            }
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        #region DataGrid事件
+
+        private void DataGridFsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            TextBox textBox = VisualTreeExtensions.GetVisualAncestor<TextBox>(e.OriginalSource as DependencyObject);
+            if (textBox != null)
+            {
+                // 说明此时双击的是TextBox
+                return;
+            }
+
+            this.OnFileListDoubleClick();
+        }
+
+        private void DataGridFsList_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            MouseButtonEventArgs mouseButtonEventArgs = e.EditingEventArgs as MouseButtonEventArgs;
+            if (mouseButtonEventArgs.ClickCount == 2)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // 不能编辑“返回上级目录”项
+            FileItemVM fsItem = e.Row.DataContext as FileItemVM;
+            if (fsItem.Type == FsItemTypeEnum.ParentDirectory)
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+
+        private void DataGridFsList_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
+        {
+            ContentPresenter contentPresenter = e.EditingElement as ContentPresenter;
+            TextBox textBox = contentPresenter.ContentTemplate.FindName("TextBoxEditName", contentPresenter) as TextBox;
+            textBox.Focus();
+            string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(textBox.Text);
+            textBox.Select(0, fileNameWithoutExtension.Length);
+        }
+
+        private void DataGridFsList_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            switch (e.EditAction)
+            {
+                case DataGridEditAction.Commit:
+                    {
+                        FileItemVM fsItem = e.EditingElement.DataContext as FileItemVM;
+                        string editName = fsItem.EditName;
+
+                        if (string.IsNullOrEmpty(editName))
+                        {
+                            MTMessageBox.Info("请输入正确的文件名");
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
+                        bool containsAnyInvalidChar = invalidChars.Any(x => editName.Contains(x));
+                        if (containsAnyInvalidChar)
+                        {
+                            MTMessageBox.Info("请输入正确的文件名");
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        FileListVM fsTree = base.DataContext as FileListVM;
+                        this.FtpSession.CompleteRenameItem(fsTree, fsItem);
+
+                        e.Cancel = false;
+
+                        break;
+                    }
+
+                case DataGridEditAction.Cancel:
+                    {
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
         private void CheckBoxShowHiddenItems_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            FsTreeVM fsTree = DataGridFsList.DataContext as FsTreeVM;
+            FileListVM fsTree = DataGridFsList.DataContext as FileListVM;
 
             bool showHidden = CheckBoxToggleHiddenItem.IsChecked.Value;
 
             fsTree.ToggleHiddenItems(showHidden);
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItemVM menuItemVm = (sender as FrameworkElement).DataContext as MenuItemVM;
-            ClientUtils.DispatchCommand(menuItemVm);
-        }
-
-        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-        }
-
-        private void UserControl1_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            ContextMenu contextMenu = this.FindResource("ContextMenuFileList") as ContextMenu;
-
-            FsTreeVM fsTreeVM = e.NewValue as FsTreeVM;
-            if (fsTreeVM != null)
-            {
-                contextMenu.ItemsSource = fsTreeVM.ContextMenus;
-            }
-            else
-            {
-                contextMenu.ItemsSource = null;
-            }
         }
 
         #endregion
@@ -123,11 +254,11 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         public void OnDragOver(DropInfo dropInfo)
         {
-            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
-            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
+            FileListVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FileListVM;
+            FileListVM targetFsTree = DataGridFsList.DataContext as FileListVM;
 
             // 拖放到哪个节点
-            FsItemVM dropItem = dropInfo.TargetItem as FsItemVM;
+            FileItemVM dropItem = dropInfo.TargetItem as FileItemVM;
 
             if (sourceFsTree == targetFsTree)
             {
@@ -152,16 +283,16 @@ namespace ModengTerm.UserControls.FileTransUserControls
                 }
             }
 
-            if (dropInfo.Data is List<FsItemVM>)
+            if (dropInfo.Data is List<FileItemVM>)
             {
-                List<FsItemVM> dragItems = dropInfo.Data as List<FsItemVM>;
+                List<FileItemVM> dragItems = dropInfo.Data as List<FileItemVM>;
                 if (dropInfo == null || dragItems.Contains(dropItem))
                 {
                     dropInfo.Effects = DragDropEffects.None;
                     return;
                 }
             }
-            else if (dropInfo.Data is FsItemVM)
+            else if (dropInfo.Data is FileItemVM)
             {
                 if (dropItem == dropInfo.Data)
                 {
@@ -175,20 +306,20 @@ namespace ModengTerm.UserControls.FileTransUserControls
 
         public void OnDrop(DropInfo dropInfo)
         {
-            FsTreeVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FsTreeVM;
-            FsTreeVM targetFsTree = DataGridFsList.DataContext as FsTreeVM;
+            FileListVM sourceFsTree = (dropInfo.DragInfo.VisualSource as DataGrid).DataContext as FileListVM;
+            FileListVM targetFsTree = DataGridFsList.DataContext as FileListVM;
 
-            List<FsItemVM> dragItems = dropInfo.Data as List<FsItemVM>;
+            List<FileItemVM> dragItems = dropInfo.Data as List<FileItemVM>;
             if (dragItems == null)
             {
-                dragItems = new List<FsItemVM>();
-                FsItemVM fsItemVm = dropInfo.Data as FsItemVM;
+                dragItems = new List<FileItemVM>();
+                FileItemVM fsItemVm = dropInfo.Data as FileItemVM;
                 dragItems.Add(fsItemVm);
             }
 
             string dstDir = string.Empty;
 
-            FsItemVM dropItem = dropInfo.TargetItem as FsItemVM;
+            FileItemVM dropItem = dropInfo.TargetItem as FileItemVM;
             if (dropItem == null)
             {
                 // 拖到了DataGrid的空白处，说明是要传输到当前显示的目录里
@@ -212,3 +343,4 @@ namespace ModengTerm.UserControls.FileTransUserControls
         #endregion
     }
 }
+

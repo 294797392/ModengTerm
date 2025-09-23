@@ -3,6 +3,7 @@ using ModengTerm.FileTrans.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -10,7 +11,20 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Ftp
 {
-    public class FsItemVM : TreeNodeViewModel
+    public enum FsItemStates
+    {
+        /// <summary>
+        /// 无状态
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// 编辑节点名字状态
+        /// </summary>
+        EditName
+    }
+
+    public class FileItemVM : TreeNodeViewModel
     {
         private string fullPath;
         private FsItemTypeEnum type;
@@ -18,6 +32,8 @@ namespace ModengTerm.ViewModel.Ftp
         private long size;
         private BitmapSource icon;
         private bool isHidden;
+        private string editName;
+        private FsItemStates state;
 
         /// <summary>
         /// 完整路径
@@ -114,7 +130,39 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
-        public FsItemVM(TreeViewModelContext context, object data = null) :
+        /// <summary>
+        /// 编辑后的名称
+        /// </summary>
+        public string EditName
+        {
+            get { return this.editName; }
+            set
+            {
+                if (this.editName != value)
+                {
+                    this.editName = value;
+                    this.NotifyPropertyChanged("EditName");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 节点的当前状态
+        /// </summary>
+        public FsItemStates State
+        {
+            get { return this.state; }
+            set
+            {
+                if (this.state != value)
+                {
+                    this.state = value;
+                    this.NotifyPropertyChanged("State");
+                }
+            }
+        }
+
+        public FileItemVM(TreeViewModelContext context, object data = null) :
             base(context, data)
         {
         }
