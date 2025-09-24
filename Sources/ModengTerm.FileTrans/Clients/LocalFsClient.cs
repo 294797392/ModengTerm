@@ -67,7 +67,15 @@ namespace ModengTerm.FileTrans.Clients
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalFsClient");
 
+        #region 实例变量
+
         private string currentDirectory;
+
+        #endregion
+
+        #region 实例方法
+
+        #endregion
 
         public override int Open()
         {
@@ -155,19 +163,15 @@ namespace ModengTerm.FileTrans.Clients
 
 
 
-        public override void BeginUpload(string targetFilePath, int bufferSize)
+
+        public override Stream OpenRead(string filePath)
         {
-            throw new NotSupportedException();
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read);
         }
 
-        public override void Upload(byte[] buffer, int offset, int length)
+        public override Stream OpenWrite(string filePath)
         {
-            throw new NotSupportedException();
-        }
-
-        public override void EndUpload()
-        {
-            throw new NotSupportedException();
+            return new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
         }
     }
 }

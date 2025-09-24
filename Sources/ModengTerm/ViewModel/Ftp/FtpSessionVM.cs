@@ -213,9 +213,14 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 上传文件
 
-        private void UploadFiles(List<FileItemVM> localFsItems, string serverDir)
+        /// <summary>
+        /// 传输文件
+        /// </summary>
+        /// <param name="srcFileItems">要传输的原始文件列表</param>
+        /// <param name="targetDirectory">要传输到的目录</param>
+        private void UploadFiles(List<FileItemVM> srcFileItems, string targetDirectory)
         {
-            List<TaskTreeNodeVM> taskVms = this.CreateUploadTasks(localFsItems, serverDir);
+            List<TaskTreeNodeVM> taskVms = this.CreateUploadTasks(srcFileItems, targetDirectory);
             List<AgentTask> agentTasks = this.CreateAgentTasks(null, taskVms);
             taskVms.ForEach(v => taskTree.AddRootNode(v));
             this.ftpAgent.EnqueueTask(agentTasks);
@@ -270,11 +275,11 @@ namespace ModengTerm.ViewModel.Ftp
             return tasks;
         }
 
-        private List<TaskTreeNodeVM> CreateUploadTasks(List<FileItemVM> localFsItems, string serverDir)
+        private List<TaskTreeNodeVM> CreateUploadTasks(List<FileItemVM> srcFileItems, string targetDirectory)
         {
             List<TaskTreeNodeVM> tasks = new List<TaskTreeNodeVM>();
 
-            foreach (FileItemVM fsItem in localFsItems)
+            foreach (FileItemVM fsItem in srcFileItems)
             {
                 // 不可以上传“返回上级目录”节点
                 if (fsItem.Type == FsItemTypeEnum.ParentDirectory)
@@ -287,7 +292,7 @@ namespace ModengTerm.ViewModel.Ftp
                     ID = Guid.NewGuid().ToString(),
                     Name = fsItem.FullPath,
                     SourceFullPath = fsItem.FullPath,
-                    TargetFullPath = string.Format("{0}/{1}", serverDir, fsItem.Name),
+                    TargetFullPath = string.Format("{0}/{1}", targetDirectory, fsItem.Name),
                     SourceItemType = fsItem.Type,
                     Icon = fsItem.Icon
                 };
@@ -399,7 +404,7 @@ namespace ModengTerm.ViewModel.Ftp
                     case Shell32.SE_ERR_NOASSOC:
                         {
                             // 没有找到关联的应用程序
-                            Shell32.OpenAs_RunDLL(IntPtr.Zero, IntPtr.Zero, fileItem.FullPath, 0);
+                            Shell32.OpenAs_RunDLL(IntPtr.Zero, IntPtr.Zero, fullPath, 0);
                             break;
                         }
 
@@ -407,7 +412,7 @@ namespace ModengTerm.ViewModel.Ftp
                         {
                             // 打开失败
                             MTMessageBox.Info("打开失败, 错误码:{0}", rc);
-                            logger.ErrorFormat("打开文件失败, {0}, 错误码:{1}", fileItem.FullPath, rc);
+                            logger.ErrorFormat("打开文件失败, {0}, 错误码:{1}", fullPath, rc);
                             break;
                         }
                 }

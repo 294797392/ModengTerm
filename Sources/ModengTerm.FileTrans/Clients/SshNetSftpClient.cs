@@ -5,9 +5,9 @@ using ModengTerm.Base.ServiceAgents;
 using ModengTerm.FileTrans.DataModels;
 using ModengTerm.FileTrans.Enumerations;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
 using System.Text;
-using System.Windows.Media.Animation;
 
 namespace ModengTerm.FileTrans.Clients
 {
@@ -22,7 +22,6 @@ namespace ModengTerm.FileTrans.Clients
         #region 实例变量
 
         private SftpClient client;
-        private SftpFileStream stream;
 
         #endregion
 
@@ -160,29 +159,14 @@ namespace ModengTerm.FileTrans.Clients
         }
 
 
-
-
-
-        public override void BeginUpload(string targetFilePath, int bufferSize)
+        public override Stream OpenRead(string filePath)
         {
-            this.client.BufferSize = (uint)bufferSize;
-            this.stream = this.client.OpenWrite(targetFilePath);
+            return this.client.OpenRead(filePath);
         }
 
-        public override void Upload(byte[] buffer, int offset, int length)
+        public override Stream OpenWrite(string filePath)
         {
-            this.stream.Write(buffer, offset, length);
-        }
-
-        public override void EndUpload()
-        {
-            if (this.stream == null)
-            {
-                return;
-            }
-
-            this.stream.Dispose();
-            this.stream = null;
+            return this.client.OpenWrite(filePath);
         }
 
         #endregion

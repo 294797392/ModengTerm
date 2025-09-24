@@ -16,6 +16,7 @@ namespace ModengTerm.FileTrans.Clients
 
         /// <summary>
         /// 初始目录
+        /// TODO：考虑删除这个属性，由FsClientTransport维护初始目录
         /// </summary>
         public string InitialDirectory { get; set; }
     }

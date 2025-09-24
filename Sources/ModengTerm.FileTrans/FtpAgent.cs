@@ -1,8 +1,10 @@
-﻿using ModengTerm.Base;
+﻿using log4net.Filter;
+using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.FileTrans.Clients;
 using ModengTerm.Ftp.Enumerations;
 using Renci.SshNet.Common;
+using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans
 {
@@ -43,6 +45,7 @@ namespace ModengTerm.FileTrans
         private ManualResetEvent taskEvent;
         private List<AgentTask> taskList;
 
+        private LocalFsClient localFsClient;
         private Queue<FsClientBase> clientQueue;
         private bool initOnce;
 
@@ -53,7 +56,7 @@ namespace ModengTerm.FileTrans
         #region 属性
 
         /// <summary>
-        /// 客户端传输通道配置项
+        /// 服务器文件系统客户端配置
         /// </summary>
         public FsClientOptions ClientOptions { get; set; }
 
@@ -93,6 +96,9 @@ namespace ModengTerm.FileTrans
             this.clientQueue = new Queue<FsClientBase>();
             this.taskEvent = new ManualResetEvent(false);
             this.threadList = new List<Thread>();
+            this.localFsClient = new LocalFsClient();
+            this.localFsClient.Options = new LocalFsClientOptions();
+            this.localFsClient.Open();
         }
 
         /// <summary>
@@ -209,79 +215,94 @@ namespace ModengTerm.FileTrans
             return string.Format("{0} {1}/s", toValue, toUnit);
         }
 
-        private bool UploadFile(AgentTask task, FsClientBase fsClient)
+        private Stream SafeOpenReadStream(AgentTask task, string filePath, FsClientBase fsClient) 
         {
-            UploadFileTask uploadTask = task as UploadFileTask;
-
-            FileStream stream = null;
             try
             {
-                stream = new FileStream(uploadTask.SourceFilePath, FileMode.Open, FileAccess.Read);
+                return fsClient.OpenRead(filePath);
             }
-            catch (FileNotFoundException ex)
+            catch (Exception ex) 
             {
-                this.HandleFailureTask(uploadTask, "要上传的文件不存在");
-                logger.ErrorFormat("打开要上传的文件异常, 文件不存在, {0}", uploadTask.SourceFilePath);
-                return false;
+                logger.ErrorFormat("打开读文件流异常, {0}, {1}", ex, filePath);
+                this.HandleFailureTask(task, ex.Message);
+                return null;
+            }
+        }
+
+        private Stream SafeOpenWriteStream(AgentTask task, string filePath, FsClientBase fsClient)
+        {
+            try
+            {
+                return fsClient.OpenWrite(filePath);
             }
             catch (Exception ex)
             {
-                this.HandleFailureTask(uploadTask, ex.Message);
-                logger.ErrorFormat("打开要上传的文件异常, {0}, {1}", ex, uploadTask.SourceFilePath);
+                logger.ErrorFormat("打开写文件流异常, {0}, {1}", ex, filePath);
+                this.HandleFailureTask(task, ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 上传或者下载文件
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="readFilePath"></param>
+        /// <param name="writeFilePath"></param>
+        /// <param name="readClient"></param>
+        /// <param name="writeClient"></param>
+        /// <returns></returns>
+        private bool TransferFile(AgentTask task, string readFilePath, string writeFilePath,  FsClientBase readClient, FsClientBase writeClient)
+        {
+            Stream readStream = this.SafeOpenReadStream(task, readFilePath, readClient);
+            Stream writeStream = this.SafeOpenWriteStream(task, writeFilePath, writeClient);
+            if (readStream == null || writeStream == null)
+            {
                 return false;
             }
 
             bool success = true;
-
-            fsClient.BeginUpload(uploadTask.TargetFilePath, this.UploadBufferSize);
-
+            long bytesTotal = readStream.Length;
+            int bytesTransfer = 0;
             byte[] buffer = new byte[this.UploadBufferSize];
-
-            this.NotifyProgressChanged(uploadTask, 0, string.Empty, string.Empty, ProcessStates.Starting);
+            this.NotifyProgressChanged(task, 0, string.Empty, string.Empty, ProcessStates.Starting);
             DateTime startTime = DateTime.Now;
 
-            while (stream.Position != stream.Length)
+            while (bytesTotal != bytesTransfer)
             {
                 try
                 {
-                    int len = stream.Read(buffer, 0, buffer.Length);
-                    fsClient.Upload(buffer, 0, len);
+                    int len = readStream.Read(buffer, 0, buffer.Length);
+                    writeStream.Write(buffer, 0, len);
+                    bytesTransfer += len;
                     string speed = this.CalculateSpeed(startTime, DateTime.Now, len);
-                    double percent = Math.Round(((double)stream.Position / stream.Length) * 100, 2);
-                    this.NotifyProgressChanged(uploadTask, percent, string.Empty, speed, ProcessStates.ProgressChanged);
+                    double percent = Math.Round(((double)bytesTransfer / bytesTotal) * 100, 2);
+                    this.NotifyProgressChanged(task, percent, string.Empty, speed, ProcessStates.ProgressChanged);
                     //logger.InfoFormat("上传百分比:{0}", percent);
-                }
-                catch (SshException ex)
-                {
-                    success = false;
-                    this.HandleFailureTask(uploadTask, ex.Message);
-                    logger.Error("上传数据段异常", ex);
-                    break;
                 }
                 catch (Exception ex)
                 {
                     success = false;
-                    this.HandleFailureTask(uploadTask, ex.Message);
-                    logger.Error("上传数据段异常", ex);
+                    this.HandleFailureTask(task, ex.Message);
+                    logger.Error("传输数据段异常", ex);
                     break;
                 }
             }
 
-            logger.InfoFormat("上传完成");
+            //logger.InfoFormat("传输完成, {0} -> {1}", readFilePath, writeFilePath);
 
             try
             {
-                stream.Close();
+                readStream.Close();
+                writeStream.Close();
             }
             finally
             { }
 
-            fsClient.EndUpload();
-
             // 如果出现异常导致传输失败，那么在catch里触发事件
             if (success)
             {
-                this.HandleCompletedTask(uploadTask);
+                this.HandleCompletedTask(task);
             }
 
             return success;
@@ -483,7 +504,7 @@ namespace ModengTerm.FileTrans
 
         private void WorkerThreadProc()
         {
-            FsClientBase fsClient = null;
+            FsClientBase serverFsClient = null;
 
             while (this.isRunning)
             {
@@ -500,11 +521,11 @@ namespace ModengTerm.FileTrans
                     continue;
                 }
 
-                if (fsClient == null)
+                if (serverFsClient == null)
                 {
-                    fsClient = this.GetFreeFsClient();
+                    serverFsClient = this.GetFreeFsClient();
 
-                    if (fsClient == null)
+                    if (serverFsClient == null)
                     {
                         // 这个线程连接服务器失败, 把任务重新入队, 等待下次某个线程继续上传
                         lock (this.taskList)
@@ -523,25 +544,26 @@ namespace ModengTerm.FileTrans
                 {
                     case FsOperationTypeEnum.CreateDirectory:
                         {
-                            success = this.CreateDirectory(task, fsClient);
+                            success = this.CreateDirectory(task, serverFsClient);
                             break;
                         }
 
                     case FsOperationTypeEnum.DeleteDirectory:
                         {
-                            success = this.DeleteDirectory(task, fsClient);
+                            success = this.DeleteDirectory(task, serverFsClient);
                             break;
                         }
 
                     case FsOperationTypeEnum.UploadFile:
                         {
-                            success = this.UploadFile(task, fsClient);
+                            UploadFileTask uploadTask = task as UploadFileTask;
+                            success = this.TransferFile(task, uploadTask.SourceFilePath, uploadTask.TargetFilePath, this.localFsClient, serverFsClient);
                             break;
                         }
 
                     case FsOperationTypeEnum.DeleteFile:
                         {
-                            success = this.DeleteFile(task, fsClient);
+                            success = this.DeleteFile(task, serverFsClient);
                             break;
                         }
 
@@ -564,9 +586,9 @@ namespace ModengTerm.FileTrans
                 }
             }
 
-            if (fsClient != null) 
+            if (serverFsClient != null) 
             {
-                fsClient.Close();
+                serverFsClient.Close();
             }
         }
 

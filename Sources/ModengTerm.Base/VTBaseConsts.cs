@@ -220,7 +220,8 @@ namespace ModengTerm.Base
             new MenuMetadata("上传", FtpCommandKeys.CLIENT_UPLOAD_ITEM),
             new MenuMetadata("删除", FtpCommandKeys.CLIENT_DELETE_ITEM),
             new MenuMetadata("重命名", FtpCommandKeys.CLIENT_RENAME_ITEM),
-            new MenuMetadata("属性", FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY)
+            new MenuMetadata("属性", FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY),
+            new MenuMetadata("刷新", FtpCommandKeys.CLIENT_REFRESH_ITEMS)
         };
 
         /// <summary>

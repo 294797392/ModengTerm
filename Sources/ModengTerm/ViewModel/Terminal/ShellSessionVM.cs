@@ -224,14 +224,6 @@ namespace ModengTerm.ViewModel.Terminal
 
         #region OpenedSessionVM Member
 
-        protected override void OnInitialize()
-        {
-        }
-
-        protected override void OnRelease()
-        {
-        }
-
         protected override int OnOpen()
         {
             this.HistoryCommands = new BindableCollection<string>();

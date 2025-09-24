@@ -90,17 +90,19 @@ namespace ModengTerm.FileTrans.Clients
 
         #region 读写接口
 
-        //public abstract void OpenRead(string filePath);
-        //public abstract int Read(byte[] buffer, int offset, int len);
-        //public abstract void CloseRead();
+        /// <summary>
+        /// 打开一个文件流用于读取
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public abstract Stream OpenRead(string filePath);
 
-        //public abstract void OpenWrite(string filePath);
-        //public abstract void Write(byte[] buffer, int offset, int len);
-        //public abstract void CloseWrite();
-
-        public abstract void BeginUpload(string targetFilePath, int bufferSize);
-        public abstract void Upload(byte[] buffer, int offset, int length);
-        public abstract void EndUpload();
+        /// <summary>
+        /// 打开一个文件流用于写入
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public abstract Stream OpenWrite(string filePath);
 
         #endregion
     }

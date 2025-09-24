@@ -12,7 +12,7 @@ namespace ModengTerm.Ftp.Enumerations
     public enum FsOperationTypeEnum
     {
         /// <summary>
-        /// 上传操作
+        /// 从本地上传文件到服务器
         /// </summary>
         UploadFile,
 
