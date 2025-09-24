@@ -31,9 +31,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WPFToolkit.DragDrop;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Ftp
@@ -131,7 +131,7 @@ namespace ModengTerm.ViewModel.Ftp
             this.ftpAgent.ProcessStateChanged += this.FtpAgent_ProcessStateChanged;
             this.ftpAgent.Initialize();
 
-            this.LoadFsTreeAsync(this.clientFsTree, this.clientFsTree.CurrentDirectory);
+            this.LoadFileListAsync(this.clientFsTree, this.clientFsTree.CurrentDirectory);
 
             return ResponseCode.SUCCESS;
         }
@@ -386,7 +386,7 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 公开接口
 
-        public void LoadFsTreeAsync(FileListVM fsTree, string directory)
+        public void LoadFileListAsync(FileListVM fsTree, string directory)
         {
             Task.Factory.StartNew(() =>
             {
@@ -550,15 +550,22 @@ namespace ModengTerm.ViewModel.Ftp
         #region Internal
 
         /// <summary>
-        /// 执行重命名的操作
+        /// 当提交编辑的时候触发
         /// </summary>
         /// <param name="fsTree"></param>
-        /// <param name="fsItem"></param>
-        internal bool CompleteRenameItem(FileListVM fsTree, FileItemVM fsItem)
+        /// <param name="fileItem"></param>
+        internal bool OnCommitRename(FileListVM fsTree, FileItemVM fileItem)
         {
+            fileItem.State = FsItemStates.None;
+
+            if (string.IsNullOrEmpty(fileItem.EditName)) 
+            {
+                return true;
+            }
+
             FsClientTransport fsTransport = null;
-            string oldPath = fsItem.FullPath;
-            string newPath = Path.Combine(fsTree.CurrentDirectory, fsItem.EditName);
+            string oldPath = fileItem.FullPath;
+            string newPath = Path.Combine(fsTree.CurrentDirectory, fileItem.EditName);
 
             if (fsTree == this.clientFsTree)
             {
@@ -571,7 +578,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             bool success = false;
 
-            if (fsItem.Type == FsItemTypeEnum.Directory)
+            if (fileItem.Type == FsItemTypeEnum.Directory)
             {
                 success = fsTransport.RenameDirectory(oldPath, newPath);
             }
@@ -582,12 +589,39 @@ namespace ModengTerm.ViewModel.Ftp
 
             if (!success)
             {
+                logger.ErrorFormat("修改文件夹/目录名字失败, {0}->{1}", fileItem.Name, fileItem.EditName);
                 return false;
             }
 
-            fsItem.Name = fsItem.EditName;
+            fileItem.Name = fileItem.EditName;
 
             return true;
+        }
+
+        /// <summary>
+        /// 当双击的时候触发
+        /// </summary>
+        /// <param name="fileList"></param>
+        /// <param name="fileItem"></param>
+        internal void OnDoubleClickFileItem(FileListVM fileList, FileItemVM fileItem) 
+        {
+            if (fileItem == null)
+            {
+                return;
+            }
+
+            switch (fileItem.Type)
+            {
+                case FsItemTypeEnum.ParentDirectory:
+                case FsItemTypeEnum.Directory:
+                    {
+                        this.LoadFileListAsync(fileList, fileItem.FullPath);
+                        break;
+                    }
+
+                default:
+                    break;
+            }
         }
 
         #endregion
@@ -603,7 +637,7 @@ namespace ModengTerm.ViewModel.Ftp
                 case SessionStatusEnum.Connected:
                     {
                         logger.InfoFormat("Fs客户端已连接, 开始加载服务器文件列表");
-                        this.LoadFsTreeAsync(this.serverFsTree, this.serverFsTree.CurrentDirectory);
+                        this.LoadFileListAsync(this.serverFsTree, this.serverFsTree.CurrentDirectory);
                         break;
                     }
 
@@ -675,7 +709,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             if (fsItem.Type == FsItemTypeEnum.Directory)
             {
-                this.LoadFsTreeAsync(this.clientFsTree, fsItem.FullPath);
+                this.LoadFileListAsync(this.clientFsTree, fsItem.FullPath);
             }
             else if (fsItem.Type == FsItemTypeEnum.File)
             {
@@ -761,7 +795,7 @@ namespace ModengTerm.ViewModel.Ftp
                 }
             }
 
-            this.LoadFsTreeAsync(fsTree, fsTree.CurrentDirectory);
+            this.LoadFileListAsync(fsTree, fsTree.CurrentDirectory);
         }
 
         internal void FtpUploadClientItem()
@@ -775,28 +809,6 @@ namespace ModengTerm.ViewModel.Ftp
             string dstDir = this.serverFsTree.CurrentDirectory;
 
             this.UploadFiles(srcFsItems, dstDir);
-        }
-
-        internal void FtpRenameItem(FtpRoleEnum ftpRole)
-        {
-            FileListVM fsTree = null;
-
-            if (ftpRole == FtpRoleEnum.Client)
-            {
-                fsTree = this.clientFsTree;
-            }
-            else
-            {
-                fsTree = this.serverFsTree;
-            }
-
-            FileItemVM fsItem = fsTree.SelectedItem as FileItemVM;
-            if (fsItem == null)
-            {
-                return;
-            }
-
-            fsItem.EditName = fsItem.Name;
         }
 
         #endregion

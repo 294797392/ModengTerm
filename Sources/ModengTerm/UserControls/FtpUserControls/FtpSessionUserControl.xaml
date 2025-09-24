@@ -42,14 +42,12 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <local:FileListUserControl Grid.Column="0" x:Name="FileListUserControlClient" DataContext="{Binding Path=ClientFsTree}" Margin="3,3,0,3"
-                                       TransferFile="FileSystemTreeUserControl_StartTransfer"/>
+            <local:FileListUserControl Grid.Column="0" x:Name="FileListUserControlClient" DataContext="{Binding Path=ClientFsTree}" Margin="3,3,0,3"/>
 
             <GridSplitter Grid.Column="1" ShowsPreview="True" ResizeDirection="Columns" Background="Transparent"
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-            <local:FileListUserControl Grid.Column="2" x:Name="FileListUserControlServer" DataContext="{Binding Path=ServerFsTree}" Margin="0,3,3,3"
-                                       TransferFile="FileSystemTreeUserControl_StartTransfer"/>
+            <local:FileListUserControl Grid.Column="2" x:Name="FileListUserControlServer" DataContext="{Binding Path=ServerFsTree}" Margin="0,3,3,3"/>
 
         </Grid>
 

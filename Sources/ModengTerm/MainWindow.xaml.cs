@@ -476,8 +476,8 @@ namespace ModengTerm
         private void OnOpenOverlayPanelEvent(object userData)
         {
             OverlayPanelMetadata metadata = userData as OverlayPanelMetadata;
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            OpenedSessionVM activeSession = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            OverlayPanelVM overlayPanel = activeSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
             if (overlayPanel != null)
             {
                 overlayPanel.Open();
@@ -487,8 +487,8 @@ namespace ModengTerm
         private void OnCloseOverlayPanelEvent(object userData)
         {
             OverlayPanelMetadata metadata = userData as OverlayPanelMetadata;
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            OpenedSessionVM activeSession = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            OverlayPanelVM overlayPanel = activeSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
             if (overlayPanel != null)
             {
                 overlayPanel.Close();
@@ -498,8 +498,8 @@ namespace ModengTerm
         private void OnSwitchOverlayPanelEvent(CommandArgs e)
         {
             OverlayPanelMetadata metadata = e.UserData as OverlayPanelMetadata;
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            OverlayPanelVM overlayPanel = shellSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
+            OpenedSessionVM activeSession = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            OverlayPanelVM overlayPanel = activeSession.OverlayPanels.FirstOrDefault(v => v.Metadata == metadata);
             if (overlayPanel != null)
             {
                 overlayPanel.SwitchStatus();

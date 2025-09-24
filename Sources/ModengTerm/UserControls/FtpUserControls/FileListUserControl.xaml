@@ -13,17 +13,6 @@
 
     <UserControl.Resources>
 
-        <converters:FileItemDisplaySizeConverter x:Key="FileItemDisplaySizeConverter"/>
-        <converters:FsItemTypeNameConverter x:Key="FsItemTypeNameConverter"/>
-        <converters:FsItemType2SizeVisibleConverter x:Key="FsItemType2SizeVisibleConverter"/>
-        <converters:FsItemIsHidden2ForegroundConverter x:Key="FsItemIsHidden2ForegroundConverter"/>
-        <converters:FsItemStates2VisibleConverter x:Key="FsItemStates2VisibleConverter"/>
-        <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
-
-        <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-
     </UserControl.Resources>
 
     <Grid>
@@ -32,86 +21,7 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <DataGrid x:Name="DataGridFsList" ItemsSource="{Binding Path=Roots}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
-                  MouseDoubleClick="DataGridFsList_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
-
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
-                    <Style.Triggers>
-                        <!-- 如果节点类型是“向上一级”，那么不显示右键菜单 -->
-                        <DataTrigger Binding="{Binding Path=Type}" Value="ParentDirectory">
-                            <Setter Property="ContextMenu" Value="{x:Null}"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                    <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
-                    <Setter Property="Height" Value="30"/>
-                    <Setter Property="Foreground" Value="{Binding Path=IsHidden, Converter={StaticResource ResourceKey=FsItemIsHidden2ForegroundConverter}}"/>
-                    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </Style>
-            </DataGrid.RowStyle>
-
-            <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
-                    <Setter Property="Height" Value="30"/>
-                </Style>
-            </DataGrid.ColumnHeaderStyle>
-
-            <DataGrid.Columns>
-
-                <DataGridTemplateColumn Header="名字" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
-                                <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0"
-                                           Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.None}}"
-                                           Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                                <TextBox Text="{Binding Path=EditName}" Margin="5,0,0,0"
-                                         Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.EditName}}"
-                                         Style="{StaticResource ResourceKey=StyleTextBox}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
-                                <TextBox x:Name="TextBoxEditName" Text="{Binding Path=EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                         VerticalContentAlignment="Center" Padding="5,0,3,0" Margin="3"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="类型" Width="70" CanUserSort="True" SortMemberPath="Type" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="大小" Width="80" CanUserSort="True" SortMemberPath="Size" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=Size, Converter={StaticResource ResourceKey=FileItemDisplaySizeConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"
-                                       Visibility="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemType2SizeVisibleConverter}}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="最后修改日期" Width="150" CanUserSort="True" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=LastUpdateTime, StringFormat='yyyy/MM/dd hh:mm:ss'}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-            </DataGrid.Columns>
-
-        </DataGrid>
+        <ContentControl Grid.Row="0" x:Name="ContentControlFileList"/>
 
         <Grid Grid.Row="1" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
@@ -119,20 +29,10 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="110"/>
             </Grid.ColumnDefinitions>
-
+            
             <TextBlock Grid.Column="1" Text="{Binding Path=TotalHiddens, StringFormat='一共有{0}个隐藏项目'}" Margin="0,0,10,0"/>
             <CheckBox Grid.Column="2" x:Name="CheckBoxToggleHiddenItem" Content="显示隐藏的项目" Checked="CheckBoxShowHiddenItems_CheckedChanged" Unchecked="CheckBoxShowHiddenItems_CheckedChanged"/>
 
         </Grid>
-
-        <!--<TreeView Style="{StaticResource ResourceKey=StyleTreeView}" ItemsSource="{Binding Path=Roots}">
-
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-
-        </TreeView>-->
     </Grid>
 </UserControl>
