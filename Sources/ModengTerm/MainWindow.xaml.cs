@@ -871,7 +871,6 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
-            openedSessionVM.Initialize();
 
             // 把打开的会话加到ListBoxOpenedSession里，此时会触发ListBoxOpenedSession_SelectionChanged事件
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);

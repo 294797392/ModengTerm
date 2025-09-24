@@ -16,6 +16,9 @@ namespace ModengTerm.Base
         public const string CLIENT_DELETE_ITEM = "FTP.CLIENT_DELETE_ITEM";
         public const string CLIENT_RENAME_ITEM = "FTP.CLIENT_RENAME_ITEM";
         public const string CLIENT_SHOW_ITEM_PROPERTY = "FTP.CLIENT_SHOW_ITEM_PROPERTY";
+        public const string CLIENT_REFRESH_ITEMS = "FTP.CLIENT_REFRESH_ITEMS";
+
+        public const string SERVER_OPEN_ITEM = "FTP.SERVER_OPEN_ITEM";
     }
 
     /// <summary>

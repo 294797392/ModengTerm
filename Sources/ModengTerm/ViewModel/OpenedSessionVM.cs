@@ -106,24 +106,15 @@ namespace ModengTerm.ViewModel
 
         #region 公开接口
 
-        /// <summary>
-        /// 在所有属性都赋值之后，Open之前调用
-        /// 和构造函数相比有个不同的地方，Initialize调用的时候所有属性都赋值了，而构造函数调用的时候则没有
-        /// 
-        /// TODO：考虑删除Initialize和Release函数，这两个函数的作用和Open，Close一样
-        /// </summary>
-        public void Initialize()
+        public int Open()
         {
-            // init
-
-            this.OnInitialize();
+            // 创建面板容器
+            return OnOpen();
         }
 
-        public void Release()
+        public void Close()
         {
-            this.OnRelease();
-
-            // release
+            OnClose();
 
             #region 释放OverlayPanel
 
@@ -146,17 +137,6 @@ namespace ModengTerm.ViewModel
             this.sidePanels.Clear();
 
             #endregion
-        }
-
-        public int Open()
-        {
-            // 创建面板容器
-            return OnOpen();
-        }
-
-        public void Close()
-        {
-            OnClose();
         }
 
         public void CreateSidePanels(AddonModule addon, List<SidePanelMetadata> metadatas)
@@ -253,8 +233,6 @@ namespace ModengTerm.ViewModel
 
         #region 抽象方法
 
-        protected abstract void OnInitialize();
-        protected abstract void OnRelease();
         protected abstract int OnOpen();
         protected abstract void OnClose();
 

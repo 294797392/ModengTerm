@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using DotNEToolkit.Packaging;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
 using ModengTerm.Addon.ClientBridges;
@@ -60,6 +61,8 @@ namespace ModengTerm.ViewModel.Ftp
 
         private FtpAgent ftpAgent; // 文件传输代理
 
+        private FileSystemWatcher watcher; // 监控从服务器下载的文件内容是否有变化，如果有变化则实时上传服务器
+
         #endregion
 
         #region 属性
@@ -91,14 +94,6 @@ namespace ModengTerm.ViewModel.Ftp
         #endregion
 
         #region OpenedSessionVM
-
-        protected override void OnInitialize()
-        {
-        }
-
-        protected override void OnRelease()
-        {
-        }
 
         protected override int OnOpen()
         {
@@ -382,6 +377,48 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
+        private void ShellOpenFile(string fullPath) 
+        {
+            int rc = Shell32.ShellExecute(IntPtr.Zero, "open", fullPath, null, null, Shell32.SW_SHOW);
+            if (rc > 32)
+            {
+                // 大于32表示执行成功
+            }
+            else
+            {
+                switch (rc)
+                {
+                    case Shell32.SE_ERR_PNF:
+                    case Shell32.SE_ERR_FNF:
+                        {
+                            // 文件不存在
+                            MTMessageBox.Info("打开失败, 文件不存在");
+                            break;
+                        }
+
+                    case Shell32.SE_ERR_NOASSOC:
+                        {
+                            // 没有找到关联的应用程序
+                            Shell32.OpenAs_RunDLL(IntPtr.Zero, IntPtr.Zero, fileItem.FullPath, 0);
+                            break;
+                        }
+
+                    default:
+                        {
+                            // 打开失败
+                            MTMessageBox.Info("打开失败, 错误码:{0}", rc);
+                            logger.ErrorFormat("打开文件失败, {0}, 错误码:{1}", fileItem.FullPath, rc);
+                            break;
+                        }
+                }
+            }
+        }
+
+        private void ForegroundDownloadFile(string srcFullPath, string dstFullPath) 
+        {
+
+        }
+
         #endregion
 
         #region 公开接口
@@ -624,6 +661,123 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
+        internal void FtpOpenClientItem()
+        {
+            FileItemVM fileItem = this.clientFsTree.SelectedItem as FileItemVM;
+            if (fileItem == null)
+            {
+                return;
+            }
+
+            if (fileItem.Type == FsItemTypeEnum.Directory)
+            {
+                this.LoadFileListAsync(this.clientFsTree, fileItem.FullPath);
+            }
+            else if (fileItem.Type == FsItemTypeEnum.File)
+            {
+                this.ShellOpenFile(fileItem.FullPath);
+            }
+            else
+            {
+                logger.ErrorFormat("FtpOpenClientItem, 未处理的ItemType, {0}", fileItem.Type);
+            }
+        }
+
+        internal void FtpDeleteItem(FtpRoleEnum ftpRole)
+        {
+            FileListVM fsTree = null;
+            FsClientTransport fsTransport = null;
+
+            if (ftpRole == FtpRoleEnum.Client)
+            {
+                fsTree = this.clientFsTree;
+                fsTransport = this.clientFsTransport;
+            }
+            else
+            {
+                fsTree = this.serverFsTree;
+                fsTransport = this.serverFsTransport;
+            }
+
+            FileItemVM fsItem = fsTree.SelectedItem as FileItemVM;
+            if (fsItem == null)
+            {
+                return;
+            }
+
+            if (!MTMessageBox.Confirm("是否确认删除{0}?", fsItem.Name))
+            {
+                return;
+            }
+
+            if (fsItem.Type == FsItemTypeEnum.Directory)
+            {
+                if (!fsTransport.DeleteDirectory(fsItem.FullPath))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (!fsTransport.DeleteFile(fsItem.FullPath))
+                {
+                    return;
+                }
+            }
+
+            this.LoadFileListAsync(fsTree, fsTree.CurrentDirectory);
+        }
+
+        internal void FtpUploadClientItem()
+        {
+            List<FileItemVM> srcFsItems = this.clientFsTree.Context.SelectedItems.Cast<FileItemVM>().ToList();
+            if (srcFsItems.Count == 0)
+            {
+                return;
+            }
+
+            string dstDir = this.serverFsTree.CurrentDirectory;
+
+            this.UploadFiles(srcFsItems, dstDir);
+        }
+
+        internal void FtpRefreshItems(FtpRoleEnum ftpRole)
+        {
+            FileListVM fileList = null;
+            if (ftpRole == FtpRoleEnum.Client)
+            {
+                fileList = this.clientFsTree;
+            }
+            else
+            {
+                fileList = this.serverFsTree;
+            }
+
+            this.LoadFileListAsync(fileList, fileList.CurrentDirectory);
+        }
+
+
+        internal void FtpOpenServerItem() 
+        {
+            FileItemVM fileItem = this.clientFsTree.SelectedItem as FileItemVM;
+            if (fileItem == null)
+            {
+                return;
+            }
+
+            if (fileItem.Type == FsItemTypeEnum.Directory)
+            {
+                this.LoadFileListAsync(this.serverFsTree, fileItem.FullPath);
+            }
+            else if (fileItem.Type == FsItemTypeEnum.File)
+            {
+            }
+            else 
+            {
+                logger.ErrorFormat("FtpOpenServerItem, 未处理的ItemType, {0}", fileItem.Type);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -697,118 +851,6 @@ namespace ModengTerm.ViewModel.Ftp
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        internal void FtpOpenClientItem()
-        {
-            FileItemVM fsItem = this.clientFsTree.SelectedItem as FileItemVM;
-            if (fsItem == null)
-            {
-                return;
-            }
-
-            if (fsItem.Type == FsItemTypeEnum.Directory)
-            {
-                this.LoadFileListAsync(this.clientFsTree, fsItem.FullPath);
-            }
-            else if (fsItem.Type == FsItemTypeEnum.File)
-            {
-                int rc = Shell32.ShellExecute(IntPtr.Zero, "open", fsItem.FullPath, null, null, Shell32.SW_SHOW);
-                if (rc > 32)
-                {
-                    // 大于32表示执行成功
-                }
-                else
-                {
-                    switch (rc)
-                    {
-                        case Shell32.SE_ERR_PNF:
-                        case Shell32.SE_ERR_FNF:
-                            {
-                                // 文件不存在
-                                MTMessageBox.Info("打开失败, 文件不存在");
-                                break;
-                            }
-
-                        case Shell32.SE_ERR_NOASSOC:
-                            {
-                                // 没有找到关联的应用程序
-                                Shell32.OpenAs_RunDLL(IntPtr.Zero, IntPtr.Zero, fsItem.FullPath, 0);
-                                break;
-                            }
-
-                        default:
-                            {
-                                // 打开失败
-                                MTMessageBox.Info("打开失败, 错误码:{0}", rc);
-                                logger.ErrorFormat("打开文件失败, {0}, 错误码:{1}", fsItem.FullPath, rc);
-                                break;
-                            }
-                    }
-                }
-            }
-            else
-            {
-                logger.ErrorFormat("FtpClientOpenItem, 未处理的ItemType, {0}", fsItem.Type);
-            }
-        }
-
-        internal void FtpDeleteItem(FtpRoleEnum ftpRole)
-        {
-            FileListVM fsTree = null;
-            FsClientTransport fsTransport = null;
-
-            if (ftpRole == FtpRoleEnum.Client)
-            {
-                fsTree = this.clientFsTree;
-                fsTransport = this.clientFsTransport;
-            }
-            else
-            {
-                fsTree = this.serverFsTree;
-                fsTransport = this.serverFsTransport;
-            }
-
-            FileItemVM fsItem = fsTree.SelectedItem as FileItemVM;
-            if (fsItem == null)
-            {
-                return;
-            }
-
-            if (!MTMessageBox.Confirm("是否确认删除{0}?", fsItem.Name))
-            {
-                return;
-            }
-
-            if (fsItem.Type == FsItemTypeEnum.Directory)
-            {
-                if (!fsTransport.DeleteDirectory(fsItem.FullPath))
-                {
-                    return;
-                }
-            }
-            else
-            {
-                if (!fsTransport.DeleteFile(fsItem.FullPath))
-                {
-                    return;
-                }
-            }
-
-            this.LoadFileListAsync(fsTree, fsTree.CurrentDirectory);
-        }
-
-        internal void FtpUploadClientItem()
-        {
-            List<FileItemVM> srcFsItems = this.clientFsTree.Context.SelectedItems.Cast<FileItemVM>().ToList();
-            if (srcFsItems.Count == 0)
-            {
-                return;
-            }
-
-            string dstDir = this.serverFsTree.CurrentDirectory;
-
-            this.UploadFiles(srcFsItems, dstDir);
         }
 
         #endregion

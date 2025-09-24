@@ -79,6 +79,9 @@ namespace ModengTerm.UserControls.FtpUserControls
             Client.RegisterCommand(FtpCommandKeys.CLIENT_DELETE_ITEM, OnFtpDeleteItem, FtpRoleEnum.Client);
             Client.RegisterCommand(FtpCommandKeys.CLIENT_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Client);
             Client.RegisterCommand(FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY, OnFtpShowItemProperty, FtpRoleEnum.Client);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Client);
+
+            Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
         }
 
         public FtpSessionUserControl()
@@ -116,11 +119,6 @@ namespace ModengTerm.UserControls.FtpUserControls
 
         public void Close()
         {
-            FtpSessionVM ftpSession = this.ftpSession;
-
-            ftpSession.Close();
-            ftpSession.Release();
-
             FileListUserControlClient.FtpSession = null;
             FileListUserControlClient.ItemContextMenu.RemoveHandler(MenuItem.ClickEvent, this.FileListMenuItem_Click);
             FileListUserControlServer.FtpSession = null;
@@ -128,6 +126,7 @@ namespace ModengTerm.UserControls.FtpUserControls
 
             base.DataContext = null;
 
+            this.ftpSession.Close();
             this.ftpSession = null;
         }
 
@@ -161,7 +160,7 @@ namespace ModengTerm.UserControls.FtpUserControls
         /// 当前选中的项目进入编辑模式
         /// </summary>
         /// <param name="ftpRole"></param>
-        private void BeginRename(FtpRoleEnum ftpRole) 
+        private void BeginRename(FtpRoleEnum ftpRole)
         {
             FileListUserControl fileListUserControl = null;
             FileListVM fileListVM = null;
@@ -289,6 +288,19 @@ namespace ModengTerm.UserControls.FtpUserControls
                 MTMessageBox.Info("打开属性对话框失败, {0}", error);
                 logger.ErrorFormat("打开属性对话框失败, {0}, {1}", error, fileItem.FullPath);
             }
+        }
+
+        private static void OnFtpRefreshItems(CommandArgs e)
+        {
+            FtpRoleEnum ftpRole = (FtpRoleEnum)e.UserData;
+            FtpSessionVM ftpSession = e.ActiveTab as FtpSessionVM;
+            ftpSession.FtpRefreshItems(ftpRole);
+        }
+
+
+        private static void OnFtpOpenServerItem(CommandArgs e) 
+        {
+            (e.ActiveTab as FtpSessionVM).FtpOpenServerItem();
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace ModengTerm.FileTrans.Clients
     {
         protected FsClientOptions options;
 
-        public FsClientOptions Options 
+        public FsClientOptions Options
         {
             get { return this.options; }
             set
@@ -83,7 +83,20 @@ namespace ModengTerm.FileTrans.Clients
         /// <param name="newPath"></param>
         public abstract void RenameDirectory(string oldPath, string newPath);
 
-        #region 上传接口
+
+
+
+
+
+        #region 读写接口
+
+        //public abstract void OpenRead(string filePath);
+        //public abstract int Read(byte[] buffer, int offset, int len);
+        //public abstract void CloseRead();
+
+        //public abstract void OpenWrite(string filePath);
+        //public abstract void Write(byte[] buffer, int offset, int len);
+        //public abstract void CloseWrite();
 
         public abstract void BeginUpload(string targetFilePath, int bufferSize);
         public abstract void Upload(byte[] buffer, int offset, int length);

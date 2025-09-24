@@ -595,7 +595,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             // TODO：Close和Release应该由上层统一调用
             this.shellSession.Close();
-            this.shellSession.Release();
         }
 
         public bool SetInputFocus()
