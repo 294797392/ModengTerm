@@ -9,7 +9,7 @@ namespace ModengTerm.Ftp.Enumerations
     /// <summary>
     /// 定义操作类型
     /// </summary>
-    public enum FsOperationTypeEnum
+    public enum TaskTypeEnum
     {
         /// <summary>
         /// 从本地上传文件到服务器
@@ -17,7 +17,7 @@ namespace ModengTerm.Ftp.Enumerations
         UploadFile,
 
         /// <summary>
-        /// 下载操作
+        /// 从服务器下载文件到本地
         /// </summary>
         DownloadFile,
 
@@ -31,6 +31,10 @@ namespace ModengTerm.Ftp.Enumerations
         /// </summary>
         DeleteFile,
 
+        /// <summary>
+        /// 创建目录
+        /// </summary>
         CreateDirectory,
+        CreateLocalDirectory
     }
 }

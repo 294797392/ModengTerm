@@ -196,8 +196,8 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
 
         public void OnDrop(DropInfo dropInfo)
         {
-            FileListVM sourceFsTree = (dropInfo.DragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
-            FileListVM targetFsTree = (dropInfo.VisualTarget as FrameworkElement).DataContext as FileListVM;
+            FileListVM sourceFileList = (dropInfo.DragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
+            FileListVM targetFileList = (dropInfo.VisualTarget as FrameworkElement).DataContext as FileListVM;
 
             List<FileItemVM> dragItems = dropInfo.Data as List<FileItemVM>;
             if (dragItems == null)
@@ -207,27 +207,42 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
                 dragItems.Add(fsItemVm);
             }
 
-            string dstDir = string.Empty;
+            string targetDirectory = string.Empty;
 
             FileItemVM dropItem = dropInfo.TargetItem as FileItemVM;
             if (dropItem == null)
             {
                 // 拖到了DataGrid的空白处，说明是要传输到当前显示的目录里
                 // 判断要拖到服务器还是客户端
-                if (sourceFsTree == targetFsTree)
+                if (sourceFileList == targetFileList)
                 {
                     return;
                 }
 
-                dstDir = targetFsTree.CurrentDirectory;
+                targetDirectory = targetFileList.CurrentDirectory;
             }
             else
             {
-                // 拖到了目录上，说明要传输到dropItem目录里
-                dstDir = dropItem.FullPath;
+                // 拖到了项目上
+                switch (dropItem.Type)
+                {
+                    case FsItemTypeEnum.File:
+                        {
+                            // 拖到了文件上，说明要上传到当前目录
+                            targetDirectory = targetFileList.CurrentDirectory;
+                            break;
+                        }
+
+                    default:
+                        {
+                            // 拖到了文件夹上，说明要上传到文件夹里
+                            targetDirectory = dropItem.FullPath;
+                            break;
+                        }
+                }
             }
 
-            this.FtpSession.TransferFile(sourceFsTree, targetFsTree, dragItems, dstDir);
+            this.FtpSession.TransferFile(sourceFileList, targetFileList, dragItems, targetDirectory);
         }
 
         #endregion

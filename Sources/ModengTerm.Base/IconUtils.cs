@@ -57,6 +57,11 @@ namespace ModengTerm.Base
             iconCache["folder"] = bitmapSource;
         }
 
+        /// <summary>
+        /// 根据文件扩展名获取文件对应的图标
+        /// </summary>
+        /// <param name="filePath">文件完整路径或者文件名</param>
+        /// <returns></returns>
         public static BitmapSource GetIcon(string filePath)
         {
             string ext = Path.GetExtension(filePath);

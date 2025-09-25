@@ -82,6 +82,7 @@ namespace ModengTerm.UserControls.FtpUserControls
             Client.RegisterCommand(FtpCommandKeys.CLIENT_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Client);
 
             Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Server);
         }
 
         public FtpSessionUserControl()
@@ -298,7 +299,7 @@ namespace ModengTerm.UserControls.FtpUserControls
         }
 
 
-        private static void OnFtpOpenServerItem(CommandArgs e) 
+        private static void OnFtpOpenServerItem(CommandArgs e)
         {
             (e.ActiveTab as FtpSessionVM).FtpOpenServerItem();
         }

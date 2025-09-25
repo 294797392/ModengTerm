@@ -65,9 +65,9 @@ namespace ModengTerm.ViewModel.Ftp
         public FsItemTypeEnum SourceItemType { get; set; }
 
         /// <summary>
-        /// 操作类型
+        /// 任务类型
         /// </summary>
-        public FsOperationTypeEnum OpType { get; set; }
+        public TaskTypeEnum OpType { get; set; }
 
         /// <summary>
         /// 消息

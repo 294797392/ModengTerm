@@ -19,6 +19,7 @@ namespace ModengTerm.Base
         public const string CLIENT_REFRESH_ITEMS = "FTP.CLIENT_REFRESH_ITEMS";
 
         public const string SERVER_OPEN_ITEM = "FTP.SERVER_OPEN_ITEM";
+        public const string SERVER_REFRESH_ITEMS = "FTP.SERVER_REFRESH_ITEMS";
     }
 
     /// <summary>
@@ -229,6 +230,7 @@ namespace ModengTerm.Base
         /// </summary>
         public static readonly List<MenuMetadata> FtpServerFileListMenus = new List<MenuMetadata>()
         {
+            new MenuMetadata("刷新", FtpCommandKeys.SERVER_REFRESH_ITEMS)
         };
 
 

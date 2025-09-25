@@ -726,15 +726,16 @@ namespace ModengTerm
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            FsOperationTypeEnum type = (FsOperationTypeEnum)value;
+            TaskTypeEnum type = (TaskTypeEnum)value;
 
             switch (type)
             {
-                case FsOperationTypeEnum.UploadFile: return "上传文件";
-                case FsOperationTypeEnum.DeleteFile: return "删除文件";
-                case FsOperationTypeEnum.DeleteDirectory: return "删除目录";
-                case FsOperationTypeEnum.CreateDirectory: return "新建目录";
-                case FsOperationTypeEnum.DownloadFile: return "下载文件";
+                case TaskTypeEnum.UploadFile: return "上传文件";
+                case TaskTypeEnum.DeleteFile: return "删除文件";
+                case TaskTypeEnum.DeleteDirectory: return "删除目录";
+                case TaskTypeEnum.CreateLocalDirectory:
+                case TaskTypeEnum.CreateDirectory: return "新建目录";
+                case TaskTypeEnum.DownloadFile: return "下载文件";
                 default:
                     throw new NotImplementedException();
             }

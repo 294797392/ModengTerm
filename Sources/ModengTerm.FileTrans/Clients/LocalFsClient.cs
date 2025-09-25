@@ -171,7 +171,7 @@ namespace ModengTerm.FileTrans.Clients
 
         public override Stream OpenWrite(string filePath)
         {
-            return new FileStream(filePath, FileMode.CreateNew, FileAccess.Write);
+            return new FileStream(filePath, FileMode.Create, FileAccess.Write);
         }
     }
 }

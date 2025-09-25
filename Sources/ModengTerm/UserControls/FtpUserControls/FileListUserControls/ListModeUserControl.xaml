@@ -66,7 +66,6 @@
                                            Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.None}}"
                                            Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                                 <TextBox x:Name="TextBoxEditName" Text="{Binding Path=EditName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"
-                                         PreviewTextInput="TextBox_PreviewTextInput"
                                          Visibility="{Binding Path=State, Converter={StaticResource ResourceKey=FsItemStates2VisibleConverter}, ConverterParameter={x:Static vmftp:FsItemStates.EditName}}"
                                          Style="{StaticResource ResourceKey=StyleTextBox}"/>
                             </StackPanel>

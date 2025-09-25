@@ -205,7 +205,7 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private string CalculateSpeed(DateTime startTime, DateTime endTime, int bytesTransfered) 
+        private string CalculateSpeed(DateTime startTime, DateTime endTime, int bytesTransfered)
         {
             TimeSpan ts = endTime - startTime;
             double bytesSpeed = bytesTransfered / ts.TotalSeconds;
@@ -215,13 +215,13 @@ namespace ModengTerm.FileTrans
             return string.Format("{0} {1}/s", toValue, toUnit);
         }
 
-        private Stream SafeOpenReadStream(AgentTask task, string filePath, FsClientBase fsClient) 
+        private Stream SafeOpenReadStream(AgentTask task, string filePath, FsClientBase fsClient)
         {
             try
             {
                 return fsClient.OpenRead(filePath);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logger.ErrorFormat("打开读文件流异常, {0}, {1}", ex, filePath);
                 this.HandleFailureTask(task, ex.Message);
@@ -252,8 +252,10 @@ namespace ModengTerm.FileTrans
         /// <param name="readClient"></param>
         /// <param name="writeClient"></param>
         /// <returns></returns>
-        private bool TransferFile(AgentTask task, string readFilePath, string writeFilePath,  FsClientBase readClient, FsClientBase writeClient)
+        private bool TransferFile(AgentTask task, FsClientBase readClient, FsClientBase writeClient)
         {
+            string readFilePath = task.SourceFilePath;
+            string writeFilePath = task.TargetFilePath;
             Stream readStream = this.SafeOpenReadStream(task, readFilePath, readClient);
             Stream writeStream = this.SafeOpenWriteStream(task, writeFilePath, writeClient);
             if (readStream == null || writeStream == null)
@@ -310,29 +312,25 @@ namespace ModengTerm.FileTrans
 
         private bool DeleteFile(AgentTask task, FsClientBase fsClient)
         {
-            DeleteFileTask dfTask = task as DeleteFileTask;
-
             try
             {
-                fsClient.DeleteFile(dfTask.FilePath);
-                this.HandleCompletedTask(dfTask);
+                fsClient.DeleteFile(task.TargetFilePath);
+                this.HandleCompletedTask(task);
                 return true;
             }
             catch (Exception ex)
             {
                 logger.Error("删除文件异常", ex);
-                this.HandleFailureTask(dfTask, ex.Message);
+                this.HandleFailureTask(task, ex.Message);
                 return false;
             }
         }
 
         private bool CreateDirectory(AgentTask task, FsClientBase fsClient)
         {
-            CreateDirectoryTask cdTask = task as CreateDirectoryTask;
-
             try
             {
-                fsClient.CreateDirectory(cdTask.DirectoryPath);
+                fsClient.CreateDirectory(task.TargetFilePath);
                 this.HandleCompletedTask(task);
                 return true;
             }
@@ -346,11 +344,9 @@ namespace ModengTerm.FileTrans
 
         private bool DeleteDirectory(AgentTask task, FsClientBase fsClient)
         {
-            DeleteDirectoryTask ddTask = task as DeleteDirectoryTask;
-
             try
             {
-                fsClient.DeleteDirectory(ddTask.DirectoryPath);
+                fsClient.DeleteDirectory(task.TargetFilePath);
                 this.HandleCompletedTask(task);
                 return true;
             }
@@ -367,7 +363,7 @@ namespace ModengTerm.FileTrans
             this.ProcessStateChanged?.Invoke(this, task.Id, progress, serverMessage, speed, processStates, task.UserData);
         }
 
-        private void HandleParentTaskState(AgentTask task) 
+        private void HandleParentTaskState(AgentTask task)
         {
             // 此时有父节点，触发父节点的进度事件
             AgentTask parentTask = task.Parent;
@@ -471,7 +467,8 @@ namespace ModengTerm.FileTrans
         {
             switch (task.Type)
             {
-                case FsOperationTypeEnum.UploadFile:
+                case TaskTypeEnum.DownloadFile:
+                case TaskTypeEnum.UploadFile:
                     {
                         task.State = AgentTaskStates.Success;
                         task.Progress = 100;
@@ -480,7 +477,8 @@ namespace ModengTerm.FileTrans
                         break;
                     }
 
-                case FsOperationTypeEnum.CreateDirectory:
+                case TaskTypeEnum.CreateLocalDirectory:
+                case TaskTypeEnum.CreateDirectory:
                     {
                         if (task.SubTasks.Count == 0)
                         {
@@ -510,7 +508,7 @@ namespace ModengTerm.FileTrans
             {
                 this.taskEvent.WaitOne();
 
-                if (!this.isRunning) 
+                if (!this.isRunning)
                 {
                     break;
                 }
@@ -542,26 +540,37 @@ namespace ModengTerm.FileTrans
 
                 switch (task.Type)
                 {
-                    case FsOperationTypeEnum.CreateDirectory:
+                    case TaskTypeEnum.CreateDirectory:
                         {
                             success = this.CreateDirectory(task, serverFsClient);
                             break;
                         }
 
-                    case FsOperationTypeEnum.DeleteDirectory:
+                    case TaskTypeEnum.CreateLocalDirectory:
+                        {
+                            success = this.CreateDirectory(task, this.localFsClient);
+                            break;
+                        }
+
+                    case TaskTypeEnum.DeleteDirectory:
                         {
                             success = this.DeleteDirectory(task, serverFsClient);
                             break;
                         }
 
-                    case FsOperationTypeEnum.UploadFile:
+                    case TaskTypeEnum.DownloadFile:
                         {
-                            UploadFileTask uploadTask = task as UploadFileTask;
-                            success = this.TransferFile(task, uploadTask.SourceFilePath, uploadTask.TargetFilePath, this.localFsClient, serverFsClient);
+                            success = this.TransferFile(task, serverFsClient, this.localFsClient);
                             break;
                         }
 
-                    case FsOperationTypeEnum.DeleteFile:
+                    case TaskTypeEnum.UploadFile:
+                        {
+                            success = this.TransferFile(task, this.localFsClient, serverFsClient);
+                            break;
+                        }
+
+                    case TaskTypeEnum.DeleteFile:
                         {
                             success = this.DeleteFile(task, serverFsClient);
                             break;
@@ -586,7 +595,7 @@ namespace ModengTerm.FileTrans
                 }
             }
 
-            if (serverFsClient != null) 
+            if (serverFsClient != null)
             {
                 serverFsClient.Close();
             }
