@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public class LocalFsClient : FsClientBase
+    public class LocalFileSystem : FileSystem
     {
         #region WinAPI
 
@@ -146,8 +146,6 @@ namespace ModengTerm.FileTrans.Clients
         public override void DeleteDirectory(string directoryPath)
         {
             DeleteToRecycleBinLegacy(directoryPath);
-
-            Directory.Delete(directoryPath, true);
         }
 
         public override void RenameFile(string oldPath, string newPath)
@@ -155,11 +153,20 @@ namespace ModengTerm.FileTrans.Clients
             File.Move(oldPath, newPath);
         }
 
+        public override bool IsFileEixst(string filePath)
+        {
+            return File.Exists(filePath);
+        }
+
         public override void RenameDirectory(string oldPath, string newPath)
         {
             Directory.Move(oldPath, newPath);
         }
 
+        public override bool IsDirectoryExist(string directoryPath)
+        {
+            return Directory.Exists(directoryPath);
+        }
 
 
 

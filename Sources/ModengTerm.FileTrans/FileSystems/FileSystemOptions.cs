@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public abstract class FsClientOptions
+    public abstract class FileSystemOptions
     {
         public abstract FileSystemTypeEnum Type { get; }
 
@@ -21,7 +21,7 @@ namespace ModengTerm.FileTrans.Clients
         public string InitialDirectory { get; set; }
     }
 
-    public class SftpClientOptions : FsClientOptions
+    public class SftpClientOptions : FileSystemOptions
     {
         public override FileSystemTypeEnum Type => FileSystemTypeEnum.Sftp;
 
@@ -44,7 +44,7 @@ namespace ModengTerm.FileTrans.Clients
         public int ServerPort { get; set; }
     }
 
-    public class LocalFsClientOptions : FsClientOptions
+    public class LocalFsClientOptions : FileSystemOptions
     {
         public override FileSystemTypeEnum Type => FileSystemTypeEnum.LocalFs;
     }

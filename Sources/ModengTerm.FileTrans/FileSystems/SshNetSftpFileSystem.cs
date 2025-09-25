@@ -11,7 +11,7 @@ using System.Text;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public class SshNetSftpClient : FsClientBase
+    public class SshNetSftpFileSystem : FileSystem
     {
         #region 类变量
 
@@ -25,7 +25,7 @@ namespace ModengTerm.FileTrans.Clients
 
         #endregion
 
-        #region FsClientBase
+        #region FileSystem
 
         public override int Open()
         {
@@ -101,7 +101,7 @@ namespace ModengTerm.FileTrans.Clients
             foreach (ISftpFile file in fileList)
             {
                 // 会多出来一个名字是.的目录，不知道是做什么的
-                if (file.Name == ".")
+                if (file.Name == "." || file.Name == "..")
                 {
                     continue;
                 }
@@ -156,6 +156,16 @@ namespace ModengTerm.FileTrans.Clients
         public override void RenameDirectory(string directoryPath, string newName)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool IsDirectoryExist(string directoryPath)
+        {
+            return this.client.Exists(directoryPath);
+        }
+
+        public override bool IsFileEixst(string filePath)
+        {
+            return this.client.Exists(filePath);
         }
 
 

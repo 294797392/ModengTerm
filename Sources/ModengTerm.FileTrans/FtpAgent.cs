@@ -45,8 +45,8 @@ namespace ModengTerm.FileTrans
         private ManualResetEvent taskEvent;
         private List<AgentTask> taskList;
 
-        private LocalFsClient localFsClient;
-        private Queue<FsClientBase> clientQueue;
+        private LocalFileSystem localFs;
+        private Queue<FileSystem> clientQueue;
         private bool initOnce;
 
         private bool isRunning;
@@ -58,7 +58,7 @@ namespace ModengTerm.FileTrans
         /// <summary>
         /// 服务器文件系统客户端配置
         /// </summary>
-        public FsClientOptions ClientOptions { get; set; }
+        public FileSystemOptions ClientOptions { get; set; }
 
         /// <summary>
         /// 上传线程数量
@@ -93,12 +93,12 @@ namespace ModengTerm.FileTrans
         {
             this.isRunning = true;
             this.taskList = new List<AgentTask>();
-            this.clientQueue = new Queue<FsClientBase>();
+            this.clientQueue = new Queue<FileSystem>();
             this.taskEvent = new ManualResetEvent(false);
             this.threadList = new List<Thread>();
-            this.localFsClient = new LocalFsClient();
-            this.localFsClient.Options = new LocalFsClientOptions();
-            this.localFsClient.Open();
+            this.localFs = new LocalFileSystem();
+            this.localFs.Options = new LocalFsClientOptions();
+            this.localFs.Open();
         }
 
         /// <summary>
@@ -172,9 +172,9 @@ namespace ModengTerm.FileTrans
             return task;
         }
 
-        private FsClientBase GetFreeFsClient()
+        private FileSystem GetFreeFsClient()
         {
-            FsClientBase client = null;
+            FileSystem client = null;
 
             lock (this.clientQueue)
             {
@@ -186,7 +186,7 @@ namespace ModengTerm.FileTrans
 
             if (client == null)
             {
-                client = FsClientFactory.Create(this.ClientOptions);
+                client = FileSystemFactory.Create(this.ClientOptions);
                 client.Options = this.ClientOptions;
                 if (client.Open() != ResponseCode.SUCCESS)
                 {
@@ -197,7 +197,7 @@ namespace ModengTerm.FileTrans
             return client;
         }
 
-        private void ReuseFsClient(FsClientBase client)
+        private void ReuseFsClient(FileSystem client)
         {
             lock (this.clientQueue)
             {
@@ -215,7 +215,7 @@ namespace ModengTerm.FileTrans
             return string.Format("{0} {1}/s", toValue, toUnit);
         }
 
-        private Stream SafeOpenReadStream(AgentTask task, string filePath, FsClientBase fsClient)
+        private Stream SafeOpenReadStream(AgentTask task, string filePath, FileSystem fsClient)
         {
             try
             {
@@ -229,7 +229,7 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private Stream SafeOpenWriteStream(AgentTask task, string filePath, FsClientBase fsClient)
+        private Stream SafeOpenWriteStream(AgentTask task, string filePath, FileSystem fsClient)
         {
             try
             {
@@ -249,25 +249,25 @@ namespace ModengTerm.FileTrans
         /// <param name="task"></param>
         /// <param name="readFilePath"></param>
         /// <param name="writeFilePath"></param>
-        /// <param name="readClient"></param>
-        /// <param name="writeClient"></param>
+        /// <param name="readFs"></param>
+        /// <param name="writeFs"></param>
         /// <returns></returns>
-        private bool TransferFile(AgentTask task, FsClientBase readClient, FsClientBase writeClient)
+        private bool TransferFile(AgentTask task, FileSystem readFs, FileSystem writeFs)
         {
             string readFilePath = task.SourceFilePath;
             string writeFilePath = task.TargetFilePath;
-            Stream readStream = this.SafeOpenReadStream(task, readFilePath, readClient);
-            Stream writeStream = this.SafeOpenWriteStream(task, writeFilePath, writeClient);
+            Stream readStream = this.SafeOpenReadStream(task, readFilePath, readFs);
+            Stream writeStream = this.SafeOpenWriteStream(task, writeFilePath, writeFs);
             if (readStream == null || writeStream == null)
             {
                 return false;
             }
 
+            this.NotifyProgressChanged(task, 0, string.Empty, string.Empty, ProcessStates.Starting);
             bool success = true;
             long bytesTotal = readStream.Length;
             int bytesTransfer = 0;
             byte[] buffer = new byte[this.UploadBufferSize];
-            this.NotifyProgressChanged(task, 0, string.Empty, string.Empty, ProcessStates.Starting);
             DateTime startTime = DateTime.Now;
 
             while (bytesTotal != bytesTransfer)
@@ -310,11 +310,14 @@ namespace ModengTerm.FileTrans
             return success;
         }
 
-        private bool DeleteFile(AgentTask task, FsClientBase fsClient)
+        private bool DeleteFile(AgentTask task, FileSystem fileSystem)
         {
             try
             {
-                fsClient.DeleteFile(task.TargetFilePath);
+                if (fileSystem.IsFileEixst(task.SourceFilePath))
+                {
+                    fileSystem.DeleteFile(task.SourceFilePath);
+                }
                 this.HandleCompletedTask(task);
                 return true;
             }
@@ -326,11 +329,14 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private bool CreateDirectory(AgentTask task, FsClientBase fsClient)
+        private bool CreateDirectory(AgentTask task, FileSystem fileSystem)
         {
             try
             {
-                fsClient.CreateDirectory(task.TargetFilePath);
+                if (!fileSystem.IsDirectoryExist(task.TargetFilePath))
+                {
+                    fileSystem.CreateDirectory(task.TargetFilePath);
+                }
                 this.HandleCompletedTask(task);
                 return true;
             }
@@ -342,11 +348,14 @@ namespace ModengTerm.FileTrans
             }
         }
 
-        private bool DeleteDirectory(AgentTask task, FsClientBase fsClient)
+        private bool DeleteDirectory(AgentTask task, FileSystem fileSystem)
         {
             try
             {
-                fsClient.DeleteDirectory(task.TargetFilePath);
+                if (fileSystem.IsDirectoryExist(task.SourceFilePath))
+                {
+                    fileSystem.DeleteDirectory(task.SourceFilePath);
+                }
                 this.HandleCompletedTask(task);
                 return true;
             }
@@ -502,7 +511,7 @@ namespace ModengTerm.FileTrans
 
         private void WorkerThreadProc()
         {
-            FsClientBase serverFsClient = null;
+            FileSystem serverFs = null;
 
             while (this.isRunning)
             {
@@ -519,11 +528,11 @@ namespace ModengTerm.FileTrans
                     continue;
                 }
 
-                if (serverFsClient == null)
+                if (serverFs == null)
                 {
-                    serverFsClient = this.GetFreeFsClient();
+                    serverFs = this.GetFreeFsClient();
 
-                    if (serverFsClient == null)
+                    if (serverFs == null)
                     {
                         // 这个线程连接服务器失败, 把任务重新入队, 等待下次某个线程继续上传
                         lock (this.taskList)
@@ -540,39 +549,38 @@ namespace ModengTerm.FileTrans
 
                 switch (task.Type)
                 {
-                    case TaskTypeEnum.CreateDirectory:
+                    case TaskTypeEnum.UploadFile:
                         {
-                            success = this.CreateDirectory(task, serverFsClient);
-                            break;
-                        }
-
-                    case TaskTypeEnum.CreateLocalDirectory:
-                        {
-                            success = this.CreateDirectory(task, this.localFsClient);
-                            break;
-                        }
-
-                    case TaskTypeEnum.DeleteDirectory:
-                        {
-                            success = this.DeleteDirectory(task, serverFsClient);
+                            success = this.TransferFile(task, this.localFs, serverFs);
                             break;
                         }
 
                     case TaskTypeEnum.DownloadFile:
                         {
-                            success = this.TransferFile(task, serverFsClient, this.localFsClient);
+                            success = this.TransferFile(task, serverFs, this.localFs);
                             break;
                         }
 
-                    case TaskTypeEnum.UploadFile:
+                    case TaskTypeEnum.CreateDirectory:
                         {
-                            success = this.TransferFile(task, this.localFsClient, serverFsClient);
+                            success = this.CreateDirectory(task, serverFs);
                             break;
                         }
 
+                    case TaskTypeEnum.CreateLocalDirectory:
+                        {
+                            success = this.CreateDirectory(task, this.localFs);
+                            break;
+                        }
+
+                    case TaskTypeEnum.DeleteDirectory:
+                        {
+                            success = this.DeleteDirectory(task, serverFs);
+                            break;
+                        }
                     case TaskTypeEnum.DeleteFile:
                         {
-                            success = this.DeleteFile(task, serverFsClient);
+                            success = this.DeleteFile(task, serverFs);
                             break;
                         }
 
@@ -595,9 +603,9 @@ namespace ModengTerm.FileTrans
                 }
             }
 
-            if (serverFsClient != null)
+            if (serverFs != null)
             {
-                serverFsClient.Close();
+                serverFs.Close();
             }
         }
 

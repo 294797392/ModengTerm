@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public class FsClientTransport
+    public class FileSystemTransport
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientTransport");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileSystemTransport");
 
         #region 公开事件
 
@@ -28,17 +28,17 @@ namespace ModengTerm.FileTrans.Clients
 
         #region 实例变量
 
-        private FsClientBase client;
+        private FileSystem fileSystem;
         private SessionStatusEnum status;
 
         #endregion
 
         #region 公开接口
 
-        public void OpenAsync(FsClientOptions options)
+        public void OpenAsync(FileSystemOptions options)
         {
-            this.client = FsClientFactory.Create(options);
-            this.client.Options = options;
+            this.fileSystem = FileSystemFactory.Create(options);
+            this.fileSystem.Options = options;
 
             this.NotifyStatusChanged(SessionStatusEnum.Connecting);
 
@@ -46,8 +46,8 @@ namespace ModengTerm.FileTrans.Clients
             {
                 try
                 {
-                    this.client.Open();
-                    this.client.ChangeDirectory(options.InitialDirectory);
+                    this.fileSystem.Open();
+                    this.fileSystem.ChangeDirectory(options.InitialDirectory);
 
                     this.NotifyStatusChanged(SessionStatusEnum.Connected);
                 }
@@ -61,7 +61,7 @@ namespace ModengTerm.FileTrans.Clients
 
         public void Close()
         {
-            FsClientBase client = this.client;
+            FileSystem client = this.fileSystem;
 
             if (client == null)
             {
@@ -70,7 +70,7 @@ namespace ModengTerm.FileTrans.Clients
 
             client.Close();
 
-            this.client = null;
+            this.fileSystem = null;
 
             this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
         }
@@ -84,7 +84,7 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                return this.client.ListFiles(directory);
+                return this.fileSystem.ListFiles(directory);
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                this.client.ChangeDirectory(directory);
+                this.fileSystem.ChangeDirectory(directory);
                 return true;
             }
             catch (Exception ex)
@@ -126,12 +126,12 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                this.client.CreateDirectory(dir);
+                this.fileSystem.CreateDirectory(dir);
                 return true;
             }
             catch (Exception ex)
             {
-                logger.Error("CreateDirectory异常", ex);
+                logger.ErrorFormat("CreateDirectory异常, {0}, {1}", dir, ex);
                 return false;
             }
         }
@@ -145,12 +145,12 @@ namespace ModengTerm.FileTrans.Clients
 
             try 
             {
-                this.client.DeleteFile(filePath);
+                this.fileSystem.DeleteFile(filePath);
                 return true;
             }
             catch (Exception ex) 
             {
-                logger.Error("删除文件异常", ex);
+                logger.ErrorFormat("删除文件异常, {0}, {1}", filePath, ex);
                 return false;
             }
         }
@@ -164,12 +164,12 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                this.client.DeleteDirectory(directoryPath);
+                this.fileSystem.DeleteDirectory(directoryPath);
                 return true;
             }
             catch (Exception ex) 
             {
-                logger.Error("删除目录异常", ex);
+                logger.ErrorFormat("删除目录异常, {0}, {1}", directoryPath, ex);
                 return false;
             }
         }
@@ -183,7 +183,7 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                this.client.RenameDirectory(oldPath, newPath);
+                this.fileSystem.RenameDirectory(oldPath, newPath);
                 return true;
             }
             catch (Exception ex)
@@ -202,7 +202,7 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                this.client.RenameFile(oldPath, newPath);
+                this.fileSystem.RenameFile(oldPath, newPath);
                 return true;
             }
             catch (Exception ex)
@@ -218,7 +218,7 @@ namespace ModengTerm.FileTrans.Clients
 
         private bool CheckStatus()
         {
-            FsClientBase client = this.client;
+            FileSystem client = this.fileSystem;
 
             if (client == null)
             {

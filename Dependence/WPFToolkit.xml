@@ -2621,21 +2621,6 @@
             项目在开发的时候可以继承这个ViewModel，也可以直接使用该ViewModel
             </summary>
         </member>
-        <member name="T:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions">
-            <summary>
-            指定某个动作的选项
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions.None">
-            <summary>
-            没有选项
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions.Recursion">
-            <summary>
-            递归对子节点执行同样的动作
-            </summary>
-        </member>
         <member name="P:WPFToolkit.MVVM.TreeViewModel`1.Roots">
             <summary>
             树形列表的根节点
@@ -2693,6 +2678,15 @@
             <summary>
             展开所有子节点
             </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.PostOrderTraversal(System.Func{WPFToolkit.MVVM.TreeNodeViewModel,System.Boolean},System.Boolean)">
+            <summary>
+            后序遍历树形列表
+            先处理子节点，再处理父节点
+            </summary>
+            <param name="visit"></param>
+            <param name="forceVisit">如果为true，那么即使有一个失败的也继续遍历。如果为false，那么有一个失败的则直接退出遍历</param>
+            <returns>是否所有的节点遍历都成功</returns>
         </member>
         <member name="T:WPFToolkit.MVVM.ViewModelBase">
             <summary>
@@ -2967,6 +2961,36 @@
         <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
             <summary>
             InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

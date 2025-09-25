@@ -15,9 +15,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Clients\Channels\**" />
-    <EmbeddedResource Remove="Clients\Channels\**" />
-    <None Remove="Clients\Channels\**" />
+    <Compile Remove="FileSystems\Channels\**" />
+    <EmbeddedResource Remove="FileSystems\Channels\**" />
+    <None Remove="FileSystems\Channels\**" />
   </ItemGroup>
 
   <ItemGroup>

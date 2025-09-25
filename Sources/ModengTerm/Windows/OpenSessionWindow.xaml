@@ -7,7 +7,7 @@
               xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
               mc:Ignorable="d"
               Title="{DynamicResource ResourceKey=UIText2}" Height="450" Width="800" 
-              WindowStartupLocation="CenterScreen" 
+              WindowStartupLocation="CenterOwner" 
               Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>

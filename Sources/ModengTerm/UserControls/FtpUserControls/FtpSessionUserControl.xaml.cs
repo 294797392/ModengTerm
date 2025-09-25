@@ -82,6 +82,8 @@ namespace ModengTerm.UserControls.FtpUserControls
             Client.RegisterCommand(FtpCommandKeys.CLIENT_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Client);
 
             Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_DOWNLOAD_ITEM, OnFtpDownloadServerItem);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_DELETE_ITEM, OnFtpDeleteServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Server);
         }
 
@@ -302,6 +304,16 @@ namespace ModengTerm.UserControls.FtpUserControls
         private static void OnFtpOpenServerItem(CommandArgs e)
         {
             (e.ActiveTab as FtpSessionVM).FtpOpenServerItem();
+        }
+
+        private static void OnFtpDownloadServerItem(CommandArgs e)
+        {
+            (e.ActiveTab as FtpSessionVM).FtpDownloadServerItem();
+        }
+
+        private static void OnFtpDeleteServerItem(CommandArgs e)
+        {
+            (e.ActiveTab as FtpSessionVM).FtpDeleteServerItem();
         }
 
         #endregion

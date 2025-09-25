@@ -2,7 +2,6 @@
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.Metadatas;
 using Newtonsoft.Json;
 using System.IO;
@@ -19,7 +18,9 @@ namespace ModengTerm.Base
         public const string CLIENT_REFRESH_ITEMS = "FTP.CLIENT_REFRESH_ITEMS";
 
         public const string SERVER_OPEN_ITEM = "FTP.SERVER_OPEN_ITEM";
+        public const string SERVER_DOWNLOAD_ITEM = "FTP.SERVER_DOWNLOAD_ITEM";
         public const string SERVER_REFRESH_ITEMS = "FTP.SERVER_REFRESH_ITEMS";
+        public const string SERVER_DELETE_ITEM = "FTP.SERVER_DELETE_ITEM";
     }
 
     /// <summary>
@@ -145,7 +146,13 @@ namespace ModengTerm.Base
         public static readonly Dictionary<string, string> VariableName2Value = new Dictionary<string, string>()
         {
             { "%SYS_DIR%", Environment.GetFolderPath(Environment.SpecialFolder.System) },
-            { "%CLI_DIR%", AppDomain.CurrentDomain.BaseDirectory },
+            // Sftp遇到的问题：
+            // InitialDirectory是软件运行目录，是通过%CLI_DIR%宏获取的
+            // %CLI_DIR%宏的实现方式是AppDomain.CurrentDomain.BaseDirectory，这个目录后面会带一个反斜杠
+            // 如果目录后面有反斜杠，Directory.GetParent会返回删除反斜杠后的目录，相当于返回的是同一个目录
+            // 会导致显示初始目录的时候，双击“返回上级目录项”没反应
+            // 解决方式就是删除最后一个反斜杠
+            { "%CLI_DIR%", AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\') },
             { "%SYS_FONT%", VTBaseUtils.GetDefaultFontFamilyName() }
         };
 
@@ -230,6 +237,8 @@ namespace ModengTerm.Base
         /// </summary>
         public static readonly List<MenuMetadata> FtpServerFileListMenus = new List<MenuMetadata>()
         {
+            new MenuMetadata("下载", FtpCommandKeys.SERVER_DOWNLOAD_ITEM),
+            new MenuMetadata("删除", FtpCommandKeys.SERVER_DELETE_ITEM),
             new MenuMetadata("刷新", FtpCommandKeys.SERVER_REFRESH_ITEMS)
         };
 

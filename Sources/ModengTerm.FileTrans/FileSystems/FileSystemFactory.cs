@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public static class FsClientFactory
+    public static class FileSystemFactory
     {
-        public static FsClientBase Create(FsClientOptions options)
+        public static FileSystem Create(FileSystemOptions options)
         {
             switch (options.Type)
             {
-                case FileSystemTypeEnum.Sftp: return new SshNetSftpClient();
-                case FileSystemTypeEnum.LocalFs: return new LocalFsClient();
+                case FileSystemTypeEnum.Sftp: return new SshNetSftpFileSystem();
+                case FileSystemTypeEnum.LocalFs: return new LocalFileSystem();
                 default:
                     throw new NotImplementedException();
             }

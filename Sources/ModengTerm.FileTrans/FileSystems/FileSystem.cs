@@ -12,11 +12,11 @@ namespace ModengTerm.FileTrans.Clients
     /// 文件系统管理客户端
     /// 提供文件的读取，删除，上传，下载功能
     /// </summary>
-    public abstract class FsClientBase
+    public abstract class FileSystem
     {
-        protected FsClientOptions options;
+        protected FileSystemOptions options;
 
-        public FsClientOptions Options
+        public FileSystemOptions Options
         {
             get { return this.options; }
             set
@@ -64,6 +64,13 @@ namespace ModengTerm.FileTrans.Clients
         public abstract void DeleteFile(string filePath);
 
         /// <summary>
+        /// 判断文件是否存在
+        /// </summary>
+        /// <param name="filePath">文件完整路径</param>
+        /// <returns></returns>
+        public abstract bool IsFileEixst(string filePath);
+
+        /// <summary>
         /// 删除目录
         /// </summary>
         /// <param name="directoryPath">要删除的目录完整路径</param>
@@ -83,7 +90,12 @@ namespace ModengTerm.FileTrans.Clients
         /// <param name="newPath"></param>
         public abstract void RenameDirectory(string oldPath, string newPath);
 
-
+        /// <summary>
+        /// 判断目录是否存在
+        /// </summary>
+        /// <param name="directoryPath">目录完整路径</param>
+        /// <returns></returns>
+        public abstract bool IsDirectoryExist(string directoryPath);
 
 
 
