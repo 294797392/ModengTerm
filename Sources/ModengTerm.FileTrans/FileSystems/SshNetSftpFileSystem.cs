@@ -148,14 +148,14 @@ namespace ModengTerm.FileTrans.Clients
             this.client.DeleteDirectory(directoryPath);
         }
 
-        public override void RenameFile(string filePath, string newName)
+        public override void RenameFile(string oldPath, string newPath)
         {
-            throw new NotImplementedException();
+            this.client.RenameFile(oldPath, newPath);
         }
 
-        public override void RenameDirectory(string directoryPath, string newName)
+        public override void RenameDirectory(string oldPath, string newPath)
         {
-            throw new NotImplementedException();
+            this.client.RenameFile(oldPath, newPath);
         }
 
         public override bool IsDirectoryExist(string directoryPath)

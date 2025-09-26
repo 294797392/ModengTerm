@@ -54,7 +54,8 @@ namespace ModengTerm.UserControls.FtpUserControls
 
         #region 实例变量
 
-        private ContextMenu itemContextMenu;
+        private ContextMenu fileItemContextMenu;
+        private ContextMenu fileListContextMenu;
         private FileListModes mode;
         private Dictionary<FileListModes, FrameworkElement> fileListViews;
         private IFileListView currentView;
@@ -71,17 +72,17 @@ namespace ModengTerm.UserControls.FtpUserControls
         /// <summary>
         /// 设置或获取文件列表右键菜单
         /// </summary>
-        public ContextMenu ItemContextMenu
+        public ContextMenu FileItemContextMenu
         {
             get
             {
-                return this.itemContextMenu;
+                return this.fileItemContextMenu;
             }
             set
             {
-                if (this.itemContextMenu != value)
+                if (this.fileItemContextMenu != value)
                 {
-                    this.itemContextMenu = value;
+                    this.fileItemContextMenu = value;
                     if (this.currentView != null)
                     {
                         this.ApplyContextMenu(this.currentView, value);
@@ -89,6 +90,20 @@ namespace ModengTerm.UserControls.FtpUserControls
                 }
             }
         }
+
+        public ContextMenu FileListContextMenu
+        {
+            get { return this.fileListContextMenu; }
+            set
+            {
+                if (this.fileListContextMenu != value)
+                {
+                    this.fileListContextMenu = value;
+                    ContentControlFileList.ContextMenu = value;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 获取该控件绑定的FsTreeVM
@@ -152,7 +167,7 @@ namespace ModengTerm.UserControls.FtpUserControls
 
                 IFileListView fileListView = frameworkElement as IFileListView;
                 fileListView.FtpSession = this.FtpSession;
-                this.ApplyContextMenu(fileListView, this.itemContextMenu);
+                this.ApplyContextMenu(fileListView, this.fileItemContextMenu);
             }
 
             ContentControlFileList.Content = frameworkElement;

@@ -17,6 +17,7 @@
         <converters:FileItemDisplaySizeConverter x:Key="FileItemDisplaySizeConverter"/>
         <converters:FsItemTypeNameConverter x:Key="FsItemTypeNameConverter"/>
         <converters:FsItemType2SizeVisibleConverter x:Key="FsItemType2SizeVisibleConverter"/>
+        <converters:FsItemType2LastUpdateTimeVisibleConverter x:Key="FsItemType2LastUpdateTimeVisibleConverter"/>
         <converters:FsItemIsHidden2ForegroundConverter x:Key="FsItemIsHidden2ForegroundConverter"/>
         <converters:FsItemStates2VisibleConverter x:Key="FsItemStates2VisibleConverter"/>
         <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
@@ -93,7 +94,9 @@
                 <DataGridTemplateColumn Header="最后修改日期" Width="150" CanUserSort="True" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=LastUpdateTime, StringFormat='yyyy/MM/dd hh:mm:ss'}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                            <TextBlock Text="{Binding Path=LastUpdateTime, StringFormat='yyyy/MM/dd hh:mm:ss'}" 
+                                       Visibility="{Binding Path=Type, Converter={StaticResource ResourceKey=FsItemType2LastUpdateTimeVisibleConverter}}"
+                                       Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

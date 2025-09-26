@@ -5,6 +5,7 @@ using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.FileTrans.Clients;
+using ModengTerm.Themes;
 using ModengTerm.UserControls.FtpUserControls;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Ftp;
@@ -84,6 +85,7 @@ namespace ModengTerm.UserControls.FtpUserControls
             Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_DOWNLOAD_ITEM, OnFtpDownloadServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_DELETE_ITEM, OnFtpDeleteServerItem);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Server);
             Client.RegisterCommand(FtpCommandKeys.SERVER_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Server);
         }
 
@@ -105,12 +107,17 @@ namespace ModengTerm.UserControls.FtpUserControls
             this.serverFileList = ftpSession.ServerFsTree;
 
             FileListUserControlClient.FtpSession = ftpSession;
-            FileListUserControlClient.ItemContextMenu = this.CreateFileItemContextMenu(clientFileList.ContextMenus);
-            FileListUserControlClient.ItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.FileListMenuItem_Click));
+            FileListUserControlClient.FileItemContextMenu = this.CreateContextMenu(clientFileList.ContextMenus);
+            FileListUserControlClient.FileItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
+            FileListUserControlClient.FileListContextMenu = this.CreateContextMenu(clientFileList.FileListContextMenus);
+            FileListUserControlClient.FileListContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
             FileListUserControlClient.SwitchMode(FileListModes.List);
+
             FileListUserControlServer.FtpSession = ftpSession;
-            FileListUserControlServer.ItemContextMenu = this.CreateFileItemContextMenu(serverFileList.ContextMenus);
-            FileListUserControlServer.ItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.FileListMenuItem_Click));
+            FileListUserControlServer.FileItemContextMenu = this.CreateContextMenu(serverFileList.ContextMenus);
+            FileListUserControlServer.FileItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
+            FileListUserControlServer.FileListContextMenu = this.CreateContextMenu(serverFileList.FileListContextMenus);
+            FileListUserControlServer.FileListContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
             FileListUserControlServer.SwitchMode(FileListModes.List);
 
             base.DataContext = ftpSession;
@@ -123,9 +130,12 @@ namespace ModengTerm.UserControls.FtpUserControls
         public void Close()
         {
             FileListUserControlClient.FtpSession = null;
-            FileListUserControlClient.ItemContextMenu.RemoveHandler(MenuItem.ClickEvent, this.FileListMenuItem_Click);
+            FileListUserControlClient.FileItemContextMenu.RemoveHandler(MenuItem.ClickEvent, this.DispatchMenuItemCommand);
+            FileListUserControlClient.FileListContextMenu.RemoveHandler(MenuItem.ClickEvent, this.DispatchMenuItemCommand);
+
             FileListUserControlServer.FtpSession = null;
-            FileListUserControlServer.ItemContextMenu.RemoveHandler(MenuItem.ClickEvent, this.FileListMenuItem_Click);
+            FileListUserControlServer.FileItemContextMenu.RemoveHandler(MenuItem.ClickEvent, this.DispatchMenuItemCommand);
+            FileListUserControlServer.FileListContextMenu.RemoveHandler(MenuItem.ClickEvent, this.DispatchMenuItemCommand);
 
             base.DataContext = null;
 
@@ -147,7 +157,7 @@ namespace ModengTerm.UserControls.FtpUserControls
 
         #region 实例方法
 
-        private ContextMenu CreateFileItemContextMenu(IEnumerable itemsSource)
+        private ContextMenu CreateContextMenu(IEnumerable itemsSource)
         {
             ContextMenu ctxMenu = new ContextMenu()
             {
@@ -197,7 +207,7 @@ namespace ModengTerm.UserControls.FtpUserControls
 
         #region 事件处理器
 
-        private void FileListMenuItem_Click(object sender, RoutedEventArgs e)
+        private void DispatchMenuItemCommand(object sender, RoutedEventArgs e)
         {
             MenuItemVM menuItemVm = (e.OriginalSource as FrameworkElement).DataContext as MenuItemVM;
             ClientUtils.DispatchCommand(menuItemVm);

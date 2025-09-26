@@ -21,7 +21,13 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="ContentControlFileList"/>
+        <ContentControl Grid.Row="0" x:Name="ContentControlFileList">
+            <ContentControl.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="刷新"/>
+                </ContextMenu>
+            </ContentControl.ContextMenu>
+        </ContentControl>
 
         <Grid Grid.Row="1" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>

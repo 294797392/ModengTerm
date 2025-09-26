@@ -16,11 +16,14 @@ namespace ModengTerm.Base
         public const string CLIENT_RENAME_ITEM = "FTP.CLIENT_RENAME_ITEM";
         public const string CLIENT_SHOW_ITEM_PROPERTY = "FTP.CLIENT_SHOW_ITEM_PROPERTY";
         public const string CLIENT_REFRESH_ITEMS = "FTP.CLIENT_REFRESH_ITEMS";
+        public const string CLIENT_NEW_FILE = "FTP.CLIENT_NEW_FILE";
+        public const string CLIENT_NEW_DIRECTORY = "FTP.CLIENT_NEW_DIRECTORY";
 
         public const string SERVER_OPEN_ITEM = "FTP.SERVER_OPEN_ITEM";
         public const string SERVER_DOWNLOAD_ITEM = "FTP.SERVER_DOWNLOAD_ITEM";
         public const string SERVER_REFRESH_ITEMS = "FTP.SERVER_REFRESH_ITEMS";
         public const string SERVER_DELETE_ITEM = "FTP.SERVER_DELETE_ITEM";
+        public const string SERVER_RENAME_ITEM = "FTP.SERVER_RENAME_ITEM";
     }
 
     /// <summary>
@@ -222,7 +225,7 @@ namespace ModengTerm.Base
         /// <summary>
         /// Ftp本地文件右键菜单列表
         /// </summary>
-        public static readonly List<MenuMetadata> FtpClientFileListMenus = new List<MenuMetadata>()
+        public static readonly List<MenuMetadata> FtpClientFileItemMenus = new List<MenuMetadata>()
         {
             new MenuMetadata("打开", FtpCommandKeys.CLIENT_OPEN_ITEM),
             new MenuMetadata("上传", FtpCommandKeys.CLIENT_UPLOAD_ITEM),
@@ -232,13 +235,27 @@ namespace ModengTerm.Base
             new MenuMetadata("刷新", FtpCommandKeys.CLIENT_REFRESH_ITEMS)
         };
 
+        public static readonly List<MenuMetadata> FtpCLientFileListMenus = new List<MenuMetadata>()
+        {
+            new MenuMetadata("刷新", FtpCommandKeys.CLIENT_REFRESH_ITEMS),
+            //new MenuMetadata("新建文件", FtpCommandKeys.CLIENT_NEW_FILE),
+            //new MenuMetadata("新建目录", FtpCommandKeys.CLIENT_NEW_DIRECTORY)
+        };
+
+
         /// <summary>
         /// Ftp服务器文件右键菜单列表
         /// </summary>
-        public static readonly List<MenuMetadata> FtpServerFileListMenus = new List<MenuMetadata>()
+        public static readonly List<MenuMetadata> FtpServerFileItemMenus = new List<MenuMetadata>()
         {
             new MenuMetadata("下载", FtpCommandKeys.SERVER_DOWNLOAD_ITEM),
             new MenuMetadata("删除", FtpCommandKeys.SERVER_DELETE_ITEM),
+            new MenuMetadata("重命名", FtpCommandKeys.SERVER_RENAME_ITEM),
+            new MenuMetadata("刷新", FtpCommandKeys.SERVER_REFRESH_ITEMS)
+        };
+
+        public static readonly List<MenuMetadata> FtpServerFileListMenus = new List<MenuMetadata>() 
+        {
             new MenuMetadata("刷新", FtpCommandKeys.SERVER_REFRESH_ITEMS)
         };
 

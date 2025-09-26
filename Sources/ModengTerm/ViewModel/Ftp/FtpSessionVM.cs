@@ -130,8 +130,10 @@ namespace ModengTerm.ViewModel.Ftp
             this.localFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
 
             // 加载树形列表右键菜单
-            this.serverFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileListMenus));
-            this.localFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpClientFileListMenus));
+            this.serverFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileItemMenus));
+            this.serverFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileListMenus));
+            this.localFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpClientFileItemMenus));
+            this.localFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpCLientFileListMenus));
 
             FileSystemOptions options = this.CreateOptions();
             FileSystemTransport transport = new FileSystemTransport();
@@ -469,6 +471,8 @@ namespace ModengTerm.ViewModel.Ftp
                     bool allSuccess = results.All(x => x);
 
                     progressWindow.Dispatcher.Invoke(progressWindow.Close);
+
+                    this.LoadFileListAsync(this.serverFileList, this.serverFileList.CurrentDirectory);
                 });
             };
             progressWindow.ShowDialog();
@@ -716,7 +720,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             FileSystemTransport fsTransport = null;
             string oldPath = fileItem.FullPath;
-            string newPath = Path.Combine(fileList.CurrentDirectory, fileItem.EditName);
+            string newPath = string.Format("{0}/{1}", fileList.CurrentDirectory, fileItem.EditName);
 
             if (fileList == this.localFileList)
             {

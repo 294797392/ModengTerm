@@ -62,6 +62,8 @@ namespace ModengTerm.ViewModel.Ftp
         /// </summary>
         public BindableCollection<MenuItemVM> ContextMenus { get; private set; }
 
+        public BindableCollection<MenuItemVM> FileListContextMenus { get; private set; }
+
         #endregion
 
         #region 公开接口
@@ -87,6 +89,7 @@ namespace ModengTerm.ViewModel.Ftp
         public FileListVM() 
         {
             this.ContextMenus = new BindableCollection<MenuItemVM>();
+            this.FileListContextMenus = new BindableCollection<MenuItemVM>();
         }
 
         #endregion
