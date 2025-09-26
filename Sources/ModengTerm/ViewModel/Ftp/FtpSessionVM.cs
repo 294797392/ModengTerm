@@ -128,6 +128,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             this.serverFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_SERVER_INITIAL_DIR);
             this.localFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
+            this.LoadLocalParentDirectories();
 
             // 加载树形列表右键菜单
             this.serverFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileItemMenus));
@@ -287,7 +288,7 @@ namespace ModengTerm.ViewModel.Ftp
                 }
                 else
                 {
-                    taskVm.Icon = IconUtils.GetIcon(fsInfo.FullPath);
+                    taskVm.Icon = IconUtils.GetFileIcon(fsInfo.FullPath);
                 }
 
                 tasks.Add(taskVm);
@@ -526,6 +527,18 @@ namespace ModengTerm.ViewModel.Ftp
 
         #endregion
 
+        private void LoadLocalParentDirectories()
+        {
+            this.localFileList.ParentDirectories.Add(new ParentDirectoryVM("桌面", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.DesktopDirectory)));
+            this.localFileList.ParentDirectories.Add(new ParentDirectoryVM("我的文档", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.MyDocuments)));
+
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                this.localFileList.ParentDirectories.Add(new ParentDirectoryVM(drive.Name, drive.Name));
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -636,7 +649,7 @@ namespace ModengTerm.ViewModel.Ftp
                     }
                     else
                     {
-                        fsItemVm.Icon = IconUtils.GetIcon(fsItem.FullPath);
+                        fsItemVm.Icon = IconUtils.GetFileIcon(fsItem.FullPath);
                     }
 
                     fileItems.Add(fsItemVm);

@@ -8,6 +8,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using System.IO;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ModengTerm.Base
 {
@@ -40,7 +41,6 @@ namespace ModengTerm.Base
         private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080;
         private const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
-
         #endregion
 
         private static SHFILEINFO sfi = new SHFILEINFO();
@@ -57,27 +57,20 @@ namespace ModengTerm.Base
             iconCache["folder"] = bitmapSource;
         }
 
-        /// <summary>
-        /// 根据文件扩展名获取文件对应的图标
-        /// </summary>
-        /// <param name="filePath">文件完整路径或者文件名</param>
-        /// <returns></returns>
-        public static BitmapSource GetIcon(string filePath)
+        private static BitmapSource GetIcon(uint dwAttribute, uint uFlags, string pszPath)
         {
-            string ext = Path.GetExtension(filePath);
-
             BitmapSource bitmapSource;
-            if (!iconCache.TryGetValue(ext, out bitmapSource))
+            if (!iconCache.TryGetValue(pszPath, out bitmapSource))
             {
                 lock (iconCache)
                 {
-                    if (!iconCache.TryGetValue(ext, out bitmapSource))
+                    if (!iconCache.TryGetValue(pszPath, out bitmapSource))
                     {
-                        SHGetFileInfo(ext, FILE_ATTRIBUTE_NORMAL, ref sfi, cbSizeFileInfo, SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON);
+                        SHGetFileInfo(pszPath, dwAttribute, ref sfi, cbSizeFileInfo, uFlags);
                         bitmapSource = Imaging.CreateBitmapSourceFromHIcon(sfi.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                         bitmapSource.Freeze();
                         DestroyIcon(sfi.hIcon);
-                        iconCache[ext] = bitmapSource;
+                        iconCache[pszPath] = bitmapSource;
                     }
                 }
             }
@@ -85,9 +78,31 @@ namespace ModengTerm.Base
             return bitmapSource;
         }
 
+        /// <summary>
+        /// 根据文件扩展名获取文件对应的图标
+        /// </summary>
+        /// <param name="filePath">文件完整路径或者文件名</param>
+        /// <returns></returns>
+        public static BitmapSource GetFileIcon(string filePath)
+        {
+            string ext = Path.GetExtension(filePath);
+            return GetIcon(FILE_ATTRIBUTE_NORMAL, SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON, ext);
+        }
+
         public static BitmapSource GetFolderIcon()
         {
             return iconCache["folder"];
+        }
+
+        public static BitmapSource GetFolderIcon(string folderPath)
+        {
+            return GetIcon(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY, SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON, folderPath);
+        }
+
+        public static BitmapSource GetSpecialFolderIcon(Environment.SpecialFolder specialFolder)
+        {
+            string folderPath = Environment.GetFolderPath(specialFolder);
+            return GetIcon(FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_DIRECTORY, SHGFI_ICON | SHGFI_SMALLICON, folderPath);
         }
     }
 }

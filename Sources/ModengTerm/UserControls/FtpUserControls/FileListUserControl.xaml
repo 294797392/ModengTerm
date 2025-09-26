@@ -17,11 +17,51 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="ContentControlFileList">
+        <!-- 目录导航 -->
+        <Grid Grid.Row="0">
+            <ListBox x:Name="ListBoxAddressbar" Style="{StaticResource ResourceKey=}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="15"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button Content="{Binding Path=Name}"/>
+                            <Button Content=">"/>
+
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+            
+            
+            <!--<ComboBox Height="25" VerticalAlignment="Center" ItemsSource="{Binding Path=ParentDirectories}" Style="{StaticResource ResourceKey=StyleComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
+                            <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>-->
+        </Grid>
+
+        <ContentControl Grid.Row="2" x:Name="ContentControlFileList">
             <ContentControl.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="刷新"/>
@@ -29,13 +69,13 @@
             </ContentControl.ContextMenu>
         </ContentControl>
 
-        <Grid Grid.Row="1" VerticalAlignment="Center">
+        <Grid Grid.Row="3" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="110"/>
             </Grid.ColumnDefinitions>
-            
+
             <TextBlock Grid.Column="1" Text="{Binding Path=TotalHiddens, StringFormat='一共有{0}个隐藏项目'}" Margin="0,0,10,0"/>
             <CheckBox Grid.Column="2" x:Name="CheckBoxToggleHiddenItem" Content="显示隐藏的项目" Checked="CheckBoxShowHiddenItems_CheckedChanged" Unchecked="CheckBoxShowHiddenItems_CheckedChanged"/>
 

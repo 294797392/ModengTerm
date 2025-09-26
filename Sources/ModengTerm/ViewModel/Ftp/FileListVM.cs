@@ -9,7 +9,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Ftp
 {
-    public class FsTreeContext : TreeViewModelContext
+    public class FileListContext : TreeViewModelContext
     {
         /// <summary>
         /// 获取是服务器树形列表还是客户端树形列表
@@ -17,7 +17,7 @@ namespace ModengTerm.ViewModel.Ftp
         public FtpRoleEnum Type { get; set; }
     }
 
-    public class FileListVM : TreeViewModel<FsTreeContext>
+    public class FileListVM : TreeViewModel<FileListContext>
     {
         #region 实例变量
 
@@ -28,6 +28,9 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 属性
 
+        /// <summary>
+        /// 当前显示的目录
+        /// </summary>
         public string CurrentDirectory
         {
             get { return this.currentDirectory; }
@@ -64,23 +67,10 @@ namespace ModengTerm.ViewModel.Ftp
 
         public BindableCollection<MenuItemVM> FileListContextMenus { get; private set; }
 
-        #endregion
-
-        #region 公开接口
-
         /// <summary>
-        /// 切换隐藏目录的显示状态
+        /// 父目录列表
         /// </summary>
-        /// <param name="isShow">是否显示隐藏目录</param>
-        public void ToggleHiddenItems(bool isShow) 
-        {
-            IEnumerable<FileItemVM> hiddenItems = this.Context.NodeList.Cast<FileItemVM>().Where(v => v.IsHidden);
-
-            foreach (FileItemVM hiddenItem in hiddenItems)
-            {
-                hiddenItem.IsVisible = isShow;
-            }
-        }
+        public BindableCollection<ParentDirectoryVM> ParentDirectories { get; private set; }
 
         #endregion
 
@@ -90,6 +80,25 @@ namespace ModengTerm.ViewModel.Ftp
         {
             this.ContextMenus = new BindableCollection<MenuItemVM>();
             this.FileListContextMenus = new BindableCollection<MenuItemVM>();
+            this.ParentDirectories = new BindableCollection<ParentDirectoryVM>();
+        }
+
+        #endregion
+
+        #region 公开接口
+
+        /// <summary>
+        /// 切换隐藏目录的显示状态
+        /// </summary>
+        /// <param name="isShow">是否显示隐藏目录</param>
+        public void ToggleHiddenItems(bool isShow)
+        {
+            IEnumerable<FileItemVM> hiddenItems = this.Context.NodeList.Cast<FileItemVM>().Where(v => v.IsHidden);
+
+            foreach (FileItemVM hiddenItem in hiddenItems)
+            {
+                hiddenItem.IsVisible = isShow;
+            }
         }
 
         #endregion
