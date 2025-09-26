@@ -6,12 +6,28 @@
         xmlns:local="clr-namespace:ModengTerm.Windows.Ftp"
         xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
         mc:Ignorable="d"
-        Title="TaskProgressWindow" Height="200" Width="450"
+        Title="TaskProgressWindow" Height="80" Width="400"
                  WindowStartupLocation="CenterScreen"
                  Style="{StaticResource ResourceKey=StyleMdWindow}">
+
+    <Window.Resources>
+        <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
-        
-        
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" VerticalAlignment="Center" Margin="20,0,0,0" Orientation="Horizontal">
+            <TextBlock Text="当前文件：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+            <TextBlock Text="{Binding Path=FilePath}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+        </StackPanel>
+
+        <ProgressBar Grid.Row="1" Height="20" Margin="10,5,10,5" IsIndeterminate="True"/>
+
     </Grid>
 </mcsext:MdWindow>

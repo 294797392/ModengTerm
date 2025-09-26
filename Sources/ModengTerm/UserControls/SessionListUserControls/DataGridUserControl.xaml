@@ -21,8 +21,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <DataGrid x:Name="DataGridSessionList" 
-                  ItemsSource="{Binding}" ColumnHeaderHeight="20" RowHeight="30" MouseDoubleClick="DataGridSessionList_MouseDoubleClick" 
+        <DataGrid x:Name="DataGridSessionList" ItemsSource="{Binding}" ColumnHeaderHeight="20" RowHeight="30" MouseDoubleClick="DataGridSessionList_MouseDoubleClick" 
                   Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.ItemContainerStyle>

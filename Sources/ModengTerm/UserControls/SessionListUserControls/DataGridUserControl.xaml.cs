@@ -5,6 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WPFToolkit.MVVM;
 using static ModengTerm.Windows.SessionListWindow;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ModengTerm.UserControls.SessionListUserControls
 {
@@ -53,12 +55,12 @@ namespace ModengTerm.UserControls.SessionListUserControls
 
                 case SessionTreeNodeTypeEnum.GobackGroup:
                     {
-                        this.CurrentGroup.Children.Remove(this.gobackVM);
+                        this.SessionTreeVM.Remove(this.gobackVM);
 
                         SessionGroupVM targetGroup = this.CurrentGroup.Parent as SessionGroupVM;
                         if (targetGroup != null)
                         {
-                            targetGroup.Children.Insert(0, this.gobackVM);
+                            targetGroup.Insert(0, this.gobackVM);
                             this.SetDataSource(targetGroup.Children);
                             this.CurrentGroup = targetGroup;
                         }
@@ -94,7 +96,7 @@ namespace ModengTerm.UserControls.SessionListUserControls
 
             if (this.CurrentGroup != null)
             {
-                this.CurrentGroup.Children.Insert(0, this.gobackVM);
+                this.CurrentGroup.Insert(0, this.gobackVM);
                 this.SetDataSource(this.CurrentGroup.Children);
             }
             else
@@ -108,7 +110,7 @@ namespace ModengTerm.UserControls.SessionListUserControls
             // 移除临时的返回上一级目录的节点
             if (this.CurrentGroup != null)
             {
-                this.CurrentGroup.Children.Remove(this.gobackVM);
+                this.SessionTreeVM.Remove(this.gobackVM);
             }
         }
 
@@ -140,15 +142,15 @@ namespace ModengTerm.UserControls.SessionListUserControls
         {
             if (this.CurrentGroup != null)
             {
-                this.CurrentGroup.Children.Remove(this.gobackVM);
+                this.SessionTreeVM.Remove(this.gobackVM);
             }
 
             this.SetDataSource(groupVM.Children);
-            groupVM.Children.Insert(0, this.gobackVM);
+            groupVM.Insert(0, this.gobackVM);
             this.CurrentGroup = groupVM as SessionGroupVM;
         }
 
-        private void SetDataSource(ObservableCollection<TreeNodeViewModel> itemsSource)
+        private void SetDataSource(IEnumerable<TreeNodeViewModel> itemsSource)
         {
             switch (this.listViewEnum)
             {

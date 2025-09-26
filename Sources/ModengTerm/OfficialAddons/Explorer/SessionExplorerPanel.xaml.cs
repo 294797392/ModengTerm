@@ -6,6 +6,7 @@ using ModengTerm.Base;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
 using System.Windows.Controls;
+using System.Linq;
 
 namespace ModengTerm.OfficialAddons.SessionExplorer
 {

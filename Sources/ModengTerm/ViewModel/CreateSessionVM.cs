@@ -233,7 +233,7 @@ namespace ModengTerm.ViewModel
                 // 配置项添加到树里
                 if (parent == null)
                 {
-                    this.PreferenceTreeVM.AddRootNode(pivm);
+                    this.PreferenceTreeVM.Add(pivm);
                 }
                 else
                 {

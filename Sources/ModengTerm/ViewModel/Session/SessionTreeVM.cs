@@ -124,7 +124,7 @@ namespace ModengTerm.ViewModel.Session
             SessionGroupVM parentGroup = selectedGroup.Parent as SessionGroupVM;
             if (parentGroup != null)
             {
-                parentGroup.Children.Remove(selectedGroup);
+                this.Remove(selectedGroup);
             }
 
             return selectedGroup;

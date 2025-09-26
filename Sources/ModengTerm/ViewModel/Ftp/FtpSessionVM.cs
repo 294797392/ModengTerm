@@ -49,6 +49,28 @@ namespace ModengTerm.ViewModel.Ftp
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FtpSessionVM");
 
+        /// <summary>
+        /// 定义要删除的服务器文件
+        /// </summary>
+        private class DeleteItem
+        {
+            /// <summary>
+            /// 完整路径
+            /// </summary>
+            public string FullPath { get; set; }
+
+            /// <summary>
+            /// 目录还是文件
+            /// </summary>
+            public FsItemTypeEnum Type { get; set; }
+
+            public DeleteItem(string fullPath, FsItemTypeEnum type)
+            {
+                this.FullPath = fullPath;
+                this.Type = type;
+            }
+        }
+
         #endregion
 
         #region 实例变量
@@ -187,21 +209,21 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="dstDir"></param>
         private void MoveClientFiles(List<FileItemVM> srcFsItems, string dstDir)
         {
-            foreach (FileItemVM fsItem in srcFsItems)
+            foreach (FileItemVM fileItem in srcFsItems)
             {
                 try
                 {
-                    if (fsItem.Type == FsItemTypeEnum.Directory)
+                    if (fileItem.Type == FsItemTypeEnum.Directory)
                     {
-                        Directory.Move(fsItem.FullPath, dstDir);
+                        Directory.Move(fileItem.FullPath, dstDir);
                     }
                     else
                     {
-                        string dstFilePath = Path.Combine(dstDir, fsItem.Name);
-                        File.Move(fsItem.FullPath, dstFilePath);
+                        string dstFilePath = Path.Combine(dstDir, fileItem.Name);
+                        File.Move(fileItem.FullPath, dstFilePath);
                     }
 
-                    this.localFileList.Roots.Remove(fsItem);
+                    this.localFileList.Remove(fileItem);
                 }
                 catch (Exception ex)
                 {
@@ -211,6 +233,8 @@ namespace ModengTerm.ViewModel.Ftp
         }
 
         #endregion
+
+        #region 上传/下载文件
 
         /// <summary>
         /// 传输文件
@@ -222,9 +246,9 @@ namespace ModengTerm.ViewModel.Ftp
             TaskTypeEnum directoryTask = upload ? TaskTypeEnum.CreateDirectory : TaskTypeEnum.CreateLocalDirectory;
             TaskTypeEnum fileTask = upload ? TaskTypeEnum.UploadFile : TaskTypeEnum.DownloadFile;
 
-            List<TaskTreeNodeVM> taskVms = this.CreateTasks(srcFileItems, targetDirectory, srcFsTransport, directoryTask, fileTask, this.taskTree.Context);
+            List<TaskTreeNodeVM> taskVms = this.CreateTasks(srcFileItems, targetDirectory, srcFsTransport, directoryTask, fileTask);
             List<AgentTask> agentTasks = this.CreateAgentTasks(null, taskVms);
-            taskVms.ForEach(v => taskTree.AddRootNode(v));
+            taskVms.ForEach(v => taskTree.Add(v));
             this.ftpAgent.EnqueueTask(agentTasks);
         }
 
@@ -238,7 +262,7 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="fileTask"></param>
         /// <param name="tvctx"></param>
         /// <returns></returns>
-        private List<TaskTreeNodeVM> CreateTasksRecursively(string srcDirectory, string targetDirectory, FileSystemTransport srcFsTransport, TaskTypeEnum directoryTask, TaskTypeEnum fileTask, TreeViewModelContext tvctx)
+        private List<TaskTreeNodeVM> CreateTasksRecursively(string srcDirectory, string targetDirectory, FileSystemTransport srcFsTransport, TaskTypeEnum directoryTask, TaskTypeEnum fileTask)
         {
             List<TaskTreeNodeVM> tasks = new List<TaskTreeNodeVM>();
 
@@ -246,7 +270,7 @@ namespace ModengTerm.ViewModel.Ftp
 
             foreach (FsItemInfo fsInfo in fsItems)
             {
-                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(tvctx)
+                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(this.taskTree.Context)
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = fsInfo.FullPath,
@@ -269,7 +293,7 @@ namespace ModengTerm.ViewModel.Ftp
                 if (taskVm.SourceItemType == FsItemTypeEnum.Directory)
                 {
                     taskVm.OpType = directoryTask;
-                    List<TaskTreeNodeVM> subTasks = this.CreateTasksRecursively(fsInfo.FullPath, taskVm.TargetFullPath, srcFsTransport, directoryTask, fileTask, tvctx);
+                    List<TaskTreeNodeVM> subTasks = this.CreateTasksRecursively(fsInfo.FullPath, taskVm.TargetFullPath, srcFsTransport, directoryTask, fileTask);
                     subTasks.ForEach(v => taskVm.Add(v));
                 }
                 else
@@ -291,7 +315,7 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="fileTask"></param>
         /// <param name="tvctx"></param>
         /// <returns></returns>
-        private List<TaskTreeNodeVM> CreateTasks(List<FileItemVM> srcFileItems, string targetDirectory, FileSystemTransport srcFsTransport, TaskTypeEnum directoryTask, TaskTypeEnum fileTask, TreeViewModelContext tvctx)
+        private List<TaskTreeNodeVM> CreateTasks(List<FileItemVM> srcFileItems, string targetDirectory, FileSystemTransport srcFsTransport, TaskTypeEnum directoryTask, TaskTypeEnum fileTask)
         {
             List<TaskTreeNodeVM> tasks = new List<TaskTreeNodeVM>();
 
@@ -303,7 +327,7 @@ namespace ModengTerm.ViewModel.Ftp
                     continue;
                 }
 
-                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(tvctx)
+                TaskTreeNodeVM taskVm = new TaskTreeNodeVM(this.taskTree.Context)
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = srcFileItem.FullPath,
@@ -318,7 +342,7 @@ namespace ModengTerm.ViewModel.Ftp
                 if (srcFileItem.Type == FsItemTypeEnum.Directory)
                 {
                     taskVm.OpType = directoryTask;
-                    List<TaskTreeNodeVM> subTasks = this.CreateTasksRecursively(srcFileItem.FullPath, taskVm.TargetFullPath, srcFsTransport, directoryTask, fileTask, tvctx);
+                    List<TaskTreeNodeVM> subTasks = this.CreateTasksRecursively(srcFileItem.FullPath, taskVm.TargetFullPath, srcFsTransport, directoryTask, fileTask);
                     subTasks.ForEach(v => taskVm.Add(v));
                 }
                 else
@@ -345,6 +369,8 @@ namespace ModengTerm.ViewModel.Ftp
 
             return agentTasks;
         }
+
+        #endregion
 
         private AgentTask CreateAgentTask(TaskTreeNodeVM taskVm)
         {
@@ -399,15 +425,65 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
+        #region 删除服务器目录和文件
+
+        /// <summary>
+        /// 删除服务器目录和文件
+        /// </summary>
+        /// <param name="fileItems">要删除的文件列表</param>
+        private void DeleteServerItems(List<DeleteItem> fileItems)
+        {
+            TaskProgressWindowVM vm = new TaskProgressWindowVM();
+            TaskProgressWindow progressWindow = new TaskProgressWindow();
+            progressWindow.Owner = Application.Current.MainWindow;
+            progressWindow.Title = "删除中...";
+            progressWindow.DataContext = vm;
+            progressWindow.Loaded += (sender, e) =>
+            {
+                // 等待窗口Loaded再进行删除
+                // 如果删除速度太快会导致删除完了窗口才显示出来，这样窗口就永远不会关闭了
+
+                Task.Factory.StartNew(() =>
+                {
+                    List<bool> results = new List<bool>();
+
+                    foreach (DeleteItem fileItem in fileItems)
+                    {
+                        bool success = this.DeleteServerItemsRecursively(fileItem.FullPath, fileItem.Type, vm);
+
+                        if (!success)
+                        {
+                            // 删除失败
+                            logger.ErrorFormat("删除失败");
+                        }
+                        else
+                        {
+                            // 删除成功
+                            logger.InfoFormat("删除成功");
+                        }
+
+                        results.Add(success);
+                    }
+
+                    // 是否所有的项目都被删除了
+                    bool allSuccess = results.All(x => x);
+
+                    progressWindow.Dispatcher.Invoke(progressWindow.Close);
+                });
+            };
+            progressWindow.ShowDialog();
+        }
+
         /// <summary>
         /// 递归删除服务器目录
         /// </summary>
         /// <param name="parentItem"></param>
         /// <returns></returns>
-        private bool DeleteServerItemsRecursively(string fullPath, FsItemTypeEnum fsType)
+        private bool DeleteServerItemsRecursively(string fullPath, FsItemTypeEnum fsType, TaskProgressWindowVM vm)
         {
             if (fsType != FsItemTypeEnum.Directory)
             {
+                vm.FilePath = fullPath;
                 return this.serverFsTransport.DeleteFile(fullPath);
             }
 
@@ -418,7 +494,7 @@ namespace ModengTerm.ViewModel.Ftp
                 if (subFile.Type == FsItemTypeEnum.Directory)
                 {
                     // 先删子目录
-                    if (!this.DeleteServerItemsRecursively(subFile.FullPath, subFile.Type))
+                    if (!this.DeleteServerItemsRecursively(subFile.FullPath, subFile.Type, vm))
                     {
                         return false;
                     }
@@ -426,6 +502,7 @@ namespace ModengTerm.ViewModel.Ftp
                 else
                 {
                     // 文件可以直接删除
+                    vm.FilePath = fullPath;
                     if (!this.serverFsTransport.DeleteFile(subFile.FullPath))
                     {
                         return false;
@@ -434,6 +511,7 @@ namespace ModengTerm.ViewModel.Ftp
             }
 
             // 删除父目录
+            vm.FilePath = fullPath;
             if (!this.serverFsTransport.DeleteDirectory(fullPath))
             {
                 return false;
@@ -441,6 +519,8 @@ namespace ModengTerm.ViewModel.Ftp
 
             return true;
         }
+
+        #endregion
 
         #endregion
 
@@ -481,7 +561,7 @@ namespace ModengTerm.ViewModel.Ftp
 
                 fileList.CurrentDirectory = directory;
 
-                List<FileItemVM> fsItemVms = new List<FileItemVM>();
+                List<FileItemVM> fileItems = new List<FileItemVM>();
 
                 string parentDirectory = string.Empty;
 
@@ -520,7 +600,7 @@ namespace ModengTerm.ViewModel.Ftp
                     fsItemVM.Type = FsItemTypeEnum.ParentDirectory;
                     fsItemVM.FullPath = parentDirectory;
                     fsItemVM.Icon = IconUtils.GetFolderIcon();
-                    fsItemVms.Add(fsItemVM);
+                    fileItems.Add(fsItemVM);
                 }
 
                 foreach (FsItemInfo fsItem in fsItems)
@@ -555,20 +635,20 @@ namespace ModengTerm.ViewModel.Ftp
                         fsItemVm.Icon = IconUtils.GetIcon(fsItem.FullPath);
                     }
 
-                    fsItemVms.Add(fsItemVm);
+                    fileItems.Add(fsItemVm);
                 }
 
-                fileList.TotalHiddens = fsItemVms.Count(v => v.IsHidden);
+                fileList.TotalHiddens = fileItems.Count(v => v.IsHidden);
 
                 App.Current.Dispatcher.Invoke(() =>
                 {
                     try
                     {
-                        fileList.ClearNodes();
+                        fileList.Clear();
 
-                        foreach (FileItemVM fsItemVm in fsItemVms)
+                        foreach (FileItemVM fileItem in fileItems)
                         {
-                            fileList.AddRootNode(fsItemVm);
+                            fileList.Add(fileItem);
                         }
                     }
                     catch (Exception ex)
@@ -623,9 +703,9 @@ namespace ModengTerm.ViewModel.Ftp
         /// <summary>
         /// 当提交编辑的时候触发
         /// </summary>
-        /// <param name="fsTree"></param>
+        /// <param name="fileList"></param>
         /// <param name="fileItem"></param>
-        internal bool OnCommitRename(FileListVM fsTree, FileItemVM fileItem)
+        internal bool OnCommitRename(FileListVM fileList, FileItemVM fileItem)
         {
             fileItem.State = FsItemStates.None;
 
@@ -636,9 +716,9 @@ namespace ModengTerm.ViewModel.Ftp
 
             FileSystemTransport fsTransport = null;
             string oldPath = fileItem.FullPath;
-            string newPath = Path.Combine(fsTree.CurrentDirectory, fileItem.EditName);
+            string newPath = Path.Combine(fileList.CurrentDirectory, fileItem.EditName);
 
-            if (fsTree == this.localFileList)
+            if (fileList == this.localFileList)
             {
                 fsTransport = this.localFsTransport;
             }
@@ -838,44 +918,8 @@ namespace ModengTerm.ViewModel.Ftp
                 return;
             }
 
-            TaskProgressWindowVM vm = new TaskProgressWindowVM();
-            TaskProgressWindow progressWindow = new TaskProgressWindow();
-            progressWindow.Owner = Application.Current.MainWindow;
-            progressWindow.DataContext = vm;
-            progressWindow.Loaded += (sender, e) =>
-            {
-                // 等待窗口Loaded再进行删除
-                // 如果删除速度太快会导致删除完了窗口才显示出来，这样窗口就永远不会关闭了
-
-                Task.Factory.StartNew(() =>
-                {
-                    List<bool> results = new List<bool>();
-
-                    foreach (FileItemVM fileItem in srcFsItems)
-                    {
-                        bool success = this.DeleteServerItemsRecursively(fileItem.FullPath, fileItem.Type);
-
-                        if (!success)
-                        {
-                            // 删除失败
-                            logger.ErrorFormat("删除失败");
-                        }
-                        else
-                        {
-                            // 删除成功
-                            logger.InfoFormat("删除成功");
-                        }
-
-                        results.Add(success);
-                    }
-
-                    // 是否所有的项目都被删除了
-                    bool allSuccess = results.All(x => x);
-
-                    progressWindow.Dispatcher.Invoke(progressWindow.Close);
-                });
-            };
-            progressWindow.ShowDialog();
+            List<DeleteItem> deleteItems = srcFsItems.Select(v => new DeleteItem(v.FullPath, v.Type)).ToList();
+            this.DeleteServerItems(deleteItems);
         }
 
         #endregion

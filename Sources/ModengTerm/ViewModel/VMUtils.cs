@@ -34,7 +34,7 @@ namespace ModengTerm.ViewModel
             if (includeRootNode)
             {
                 rootNode = new SessionGroupVM(context, 0, VTBaseConsts.RootGroup);
-                sessionTreeVM.AddRootNode(rootNode);
+                sessionTreeVM.Add(rootNode);
             }
 
             List<SessionGroup> groups = serviceAgent.GetSessionGroups();
@@ -49,7 +49,7 @@ namespace ModengTerm.ViewModel
                 }
                 else
                 {
-                    sessionTreeVM.AddRootNode(groupVM);
+                    sessionTreeVM.Add(groupVM);
                 }
 
                 LoadSessionGroupNode(groupVM, groups);
@@ -72,7 +72,7 @@ namespace ModengTerm.ViewModel
                         }
                         else
                         {
-                            sessionTreeVM.AddRootNode(sessionVM);
+                            sessionTreeVM.Add(sessionVM);
                         }
                     }
                     else

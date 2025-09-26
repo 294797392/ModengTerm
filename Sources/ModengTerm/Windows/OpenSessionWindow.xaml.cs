@@ -213,15 +213,7 @@ namespace ModengTerm.Windows
                             return;
                         }
 
-                        if (sessionVM.Parent != null)
-                        {
-                            sessionVM.Remove();
-                        }
-                        else
-                        {
-                            // 是根节点
-                            this.sessionTreeVM.Roots.Remove(sessionVM);
-                        }
+                        this.sessionTreeVM.Remove(sessionVM);
 
                         break;
                     }
@@ -303,7 +295,7 @@ namespace ModengTerm.Windows
             TreeNodeViewModel treeNodeViewModel;
             if (this.sessionTreeVM.TryGetNode(sessionGroup.ID.ToString(), out treeNodeViewModel))
             {
-                treeNodeViewModel.Remove();
+                this.sessionTreeVM.Remove(treeNodeViewModel);
             }
         }
 
@@ -314,7 +306,7 @@ namespace ModengTerm.Windows
             if (string.IsNullOrEmpty(sessionGroup.ParentId))
             {
                 // 说明是根节点
-                this.sessionTreeVM.AddRootNode(sessionGroupVM);
+                this.sessionTreeVM.Add(sessionGroupVM);
             }
             else
             {

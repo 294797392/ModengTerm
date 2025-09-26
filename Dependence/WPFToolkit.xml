@@ -2605,14 +2605,21 @@
             </summary>
             <param name="node">要增加的子节点</param>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Remove">
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Insert(System.Int32,WPFToolkit.MVVM.TreeNodeViewModel)">
             <summary>
-            从树形列表里移除自己
+            插入一个子节点
             </summary>
+            <param name="index">要插入的位置</param>
+            <param name="node">要插入的节点</param>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Clear">
             <summary>
             清除所有子节点
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Remove">
+            <summary>
+            从树形列表里移除自己
             </summary>
         </member>
         <member name="T:WPFToolkit.MVVM.TreeViewModel`1">
@@ -2641,13 +2648,26 @@
             构造方法
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.AddRootNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Add(WPFToolkit.MVVM.TreeNodeViewModel)">
             <summary>
             增加一个根节点
             </summary>
-            <param name="root">要增加的根节点</param>
+            <param name="node">要增加的根节点</param>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.ClearNodes">
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Insert(System.Int32,WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            插入根节点到指定位置
+            </summary>
+            <param name="index"></param>
+            <param name="node"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Remove(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            移除指定的子节点
+            </summary>
+            <param name="node">要移除的根节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Clear">
             <summary>
             删除所有节点
             包括清空缓存的节点
@@ -2961,36 +2981,6 @@
         <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
             <summary>
             InitializeComponent
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>
