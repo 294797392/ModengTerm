@@ -77,10 +77,10 @@ namespace ModengTerm.UserControls.FtpUserControls
             // 注册文件列表右键菜单事件处理器
             Client.RegisterCommand(FtpCommandKeys.CLIENT_OPEN_ITEM, OnFtpOpenClientItem);
             Client.RegisterCommand(FtpCommandKeys.CLIENT_UPLOAD_ITEM, OnFtpUploadClientItem);
-            Client.RegisterCommand(FtpCommandKeys.CLIENT_DELETE_ITEM, OnFtpDeleteItem, FtpRoleEnum.Client);
-            Client.RegisterCommand(FtpCommandKeys.CLIENT_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Client);
-            Client.RegisterCommand(FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY, OnFtpShowItemProperty, FtpRoleEnum.Client);
-            Client.RegisterCommand(FtpCommandKeys.CLIENT_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Client);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_DELETE_ITEM, OnFtpDeleteItem, FtpRoleEnum.Local);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Local);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_SHOW_ITEM_PROPERTY, OnFtpShowItemProperty, FtpRoleEnum.Local);
+            Client.RegisterCommand(FtpCommandKeys.CLIENT_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Local);
 
             Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_DOWNLOAD_ITEM, OnFtpDownloadServerItem);
@@ -107,6 +107,8 @@ namespace ModengTerm.UserControls.FtpUserControls
             this.serverFileList = ftpSession.ServerFsTree;
 
             FileListUserControlClient.FtpSession = ftpSession;
+            FileListUserControlClient.FileListVM = ftpSession.ClientFsTree;
+            FileListUserControlClient.FileSystemTransport = ftpSession.LocalFileSystemTransport;
             FileListUserControlClient.FileItemContextMenu = this.CreateContextMenu(clientFileList.ContextMenus);
             FileListUserControlClient.FileItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
             FileListUserControlClient.FileListContextMenu = this.CreateContextMenu(clientFileList.FileListContextMenus);
@@ -114,6 +116,8 @@ namespace ModengTerm.UserControls.FtpUserControls
             FileListUserControlClient.SwitchMode(FileListModes.List);
 
             FileListUserControlServer.FtpSession = ftpSession;
+            FileListUserControlServer.FileListVM = ftpSession.ServerFsTree;
+            FileListUserControlServer.FileSystemTransport = ftpSession.ServerFileSystemTransport;
             FileListUserControlServer.FileItemContextMenu = this.CreateContextMenu(serverFileList.ContextMenus);
             FileListUserControlServer.FileItemContextMenu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler(this.DispatchMenuItemCommand));
             FileListUserControlServer.FileListContextMenu = this.CreateContextMenu(serverFileList.FileListContextMenus);
@@ -178,7 +182,7 @@ namespace ModengTerm.UserControls.FtpUserControls
             FileListUserControl fileListUserControl = null;
             FileListVM fileListVM = null;
 
-            if (ftpRole == FtpRoleEnum.Client)
+            if (ftpRole == FtpRoleEnum.Local)
             {
                 fileListVM = ftpSession.ClientFsTree;
                 fileListUserControl = FileListUserControlClient;

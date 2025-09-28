@@ -14,7 +14,7 @@ namespace ModengTerm.ViewModel.Ftp
         /// <summary>
         /// 获取是服务器树形列表还是客户端树形列表
         /// </summary>
-        public FtpRoleEnum Type { get; set; }
+        public FtpRoleEnum Role { get; set; }
     }
 
     public class FileListVM : TreeViewModel<FileListContext>
@@ -68,9 +68,9 @@ namespace ModengTerm.ViewModel.Ftp
         public BindableCollection<MenuItemVM> FileListContextMenus { get; private set; }
 
         /// <summary>
-        /// 父目录列表
+        /// 地址栏ViewModel
         /// </summary>
-        public BindableCollection<ParentDirectoryVM> ParentDirectories { get; private set; }
+        public AddressbarVM Addressbar { get; private set; }
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace ModengTerm.ViewModel.Ftp
         {
             this.ContextMenus = new BindableCollection<MenuItemVM>();
             this.FileListContextMenus = new BindableCollection<MenuItemVM>();
-            this.ParentDirectories = new BindableCollection<ParentDirectoryVM>();
+            this.Addressbar = new AddressbarVM();
         }
 
         #endregion
@@ -93,7 +93,7 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="isShow">是否显示隐藏目录</param>
         public void ToggleHiddenItems(bool isShow)
         {
-            IEnumerable<FileItemVM> hiddenItems = this.Context.NodeList.Cast<FileItemVM>().Where(v => v.IsHidden);
+            IEnumerable<FileItemVM> hiddenItems = this.GetAllNodes<FileItemVM>().Where(v => v.IsHidden);
 
             foreach (FileItemVM hiddenItem in hiddenItems)
             {

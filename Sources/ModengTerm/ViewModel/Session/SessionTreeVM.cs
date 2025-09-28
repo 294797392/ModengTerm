@@ -57,7 +57,8 @@ namespace ModengTerm.ViewModel.Session
 
             if (enumerator == null)
             {
-                enumerator = Context.NodeList.GetEnumerator();
+                // TODO：GetAllNodes可能会乱序，需要一种方法直接对树形列表进行搜索
+                enumerator = this.GetAllNodes<TreeNodeViewModel>().GetEnumerator();
             }
 
             while (enumerator.MoveNext())

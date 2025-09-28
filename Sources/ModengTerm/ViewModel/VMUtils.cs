@@ -78,7 +78,7 @@ namespace ModengTerm.ViewModel
                     else
                     {
                         TreeNodeViewModel parentVM;
-                        if (!context.TryGetNode(session.GroupId, out parentVM))
+                        if (!sessionTreeVM.TryGetNode(session.GroupId, out parentVM))
                         {
                             logger.FatalFormat("没有找到Session对应的Gorup, {0},{1}", session.ID, session.GroupId);
                             continue;

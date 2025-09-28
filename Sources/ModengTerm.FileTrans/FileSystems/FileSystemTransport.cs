@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.FileTrans.DataModels;
+using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace ModengTerm.FileTrans.Clients
             this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
         }
 
-        public List<FsItemInfo> ListFiles(string directory)
+        public List<FsItemInfo> ListItems(string directory)
         {
             if (!this.CheckStatus())
             {
@@ -84,7 +85,7 @@ namespace ModengTerm.FileTrans.Clients
 
             try
             {
-                return this.fileSystem.ListFiles(directory);
+                return this.fileSystem.ListItems(directory);
             }
             catch (Exception ex)
             {

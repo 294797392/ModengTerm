@@ -26,7 +26,7 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
     /// <summary>
     /// ListModeUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class ListModeUserControl : UserControl, IFileListView, IDropHandler
+    public partial class ListModeUserControl : UserControl, IFileListView
     {
         #region 公开事件
 
@@ -136,6 +136,14 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
             textBox.PreviewTextInput -= this.TextBox_PreviewTextInput;
             textBox.Visibility = Visibility.Collapsed;
             fileItem.State = FsItemStates.None;
+        }
+
+        #endregion
+
+        #region IDragSource
+
+        public void StartDrag(DragInfo dragInfo)
+        {
         }
 
         #endregion

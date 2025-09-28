@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using WPFToolkit.DragDrop;
 
 namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
 {
     /// <summary>
     /// 定义文件列表页面的公开接口
     /// </summary>
-    public interface IFileListView
+    public interface IFileListView : IDropHandler, IDragSource
     {
         /// <summary>
         /// 获取每个项的Style

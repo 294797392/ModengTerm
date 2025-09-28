@@ -9,10 +9,14 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 namespace ModengTerm.Base
 {
-    public static class IconUtils
+    /// <summary>
+    /// 提供图标的帮助类
+    /// </summary>
+    public static class Icons
     {
         #region WinAPI
 
@@ -47,6 +51,11 @@ namespace ModengTerm.Base
         private static uint cbSizeFileInfo = (uint)Marshal.SizeOf(sfi);
         private static Dictionary<string, BitmapSource> iconCache = new Dictionary<string, BitmapSource>();
 
+        /// <summary>
+        /// 获取表示文件夹的图标
+        /// </summary>
+        public static BitmapSource Folder { get; private set; }
+
         public static void Initialize()
         {
             SHFILEINFO folderInfo = new SHFILEINFO();
@@ -54,7 +63,7 @@ namespace ModengTerm.Base
             BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHIcon(folderInfo.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             bitmapSource.Freeze();
             DestroyIcon(folderInfo.hIcon);
-            iconCache["folder"] = bitmapSource;
+            Icons.Folder = bitmapSource;
         }
 
         private static BitmapSource GetIcon(uint dwAttribute, uint uFlags, string pszPath)
@@ -87,11 +96,6 @@ namespace ModengTerm.Base
         {
             string ext = Path.GetExtension(filePath);
             return GetIcon(FILE_ATTRIBUTE_NORMAL, SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON, ext);
-        }
-
-        public static BitmapSource GetFolderIcon()
-        {
-            return iconCache["folder"];
         }
 
         public static BitmapSource GetFolderIcon(string folderPath)

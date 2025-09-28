@@ -92,7 +92,7 @@ namespace ModengTerm.FileTrans.Clients
             }
         }
 
-        public override List<FsItemInfo> ListFiles(string directory)
+        public override List<FsItemInfo> ListItems(string directory)
         {
             List<FsItemInfo> fsItems = new List<FsItemInfo>();
 

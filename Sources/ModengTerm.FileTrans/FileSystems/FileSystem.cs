@@ -1,4 +1,5 @@
 ﻿using ModengTerm.FileTrans.DataModels;
+using ModengTerm.Ftp.Enumerations;
 using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace ModengTerm.FileTrans.Clients
         /// 列出当前目录里的所有目录和文件
         /// </summary>
         /// <returns></returns>
-        public abstract List<FsItemInfo> ListFiles(string directory);
+        public abstract List<FsItemInfo> ListItems(string directory);
 
         /// <summary>
         /// 改变当前目录
@@ -96,9 +97,6 @@ namespace ModengTerm.FileTrans.Clients
         /// <param name="directoryPath">目录完整路径</param>
         /// <returns></returns>
         public abstract bool IsDirectoryExist(string directoryPath);
-
-
-
 
         #region 读写接口
 

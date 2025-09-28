@@ -2490,14 +2490,9 @@
             存储树形列表ViewModel共享的数据
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.NodeMap">
+        <member name="F:WPFToolkit.MVVM.TreeViewModelContext.nodeMap">
             <summary>
             存储所有节点列表
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.Roots">
-            <summary>
-            根节点列表
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.TreeViewModelContext.SelectedItem">
@@ -2515,36 +2510,24 @@
             当前选中的节点集合
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.NodeList">
-            <summary>
-            获取所有的节点
-            </summary>
-        </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModelContext.#ctor">
             <summary>
             构造函数
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.Add(WPFToolkit.MVVM.TreeNodeViewModel)">
-            <summary>
-            缓存TreeNode，方便以后查询
-            </summary>
-            <param name="node"></param>
-        </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.Remove(System.String)">
-            <summary>
-            删除一个缓存的树形节点
-            </summary>
-            <param name="nodeID"></param>
-        </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.Clear">
-            <summary>
-            清空所有节点
-            </summary>
-        </member>
         <member name="T:WPFToolkit.MVVM.TreeNodeViewModel">
             <summary>
             通用属性列表每个列表项的ViewModel
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.FirstNode">
+            <summary>
+            获取第一个根节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.LastNode">
+            <summary>
+            获取最后一个根节点
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Parent">
@@ -2612,6 +2595,28 @@
             <param name="index">要插入的位置</param>
             <param name="node">要插入的节点</param>
         </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.RemoveAt(System.Int32)">
+            <summary>
+            移除位于指定索引处的子节点
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.RemoveLast">
+            <summary>
+            移除最后一个元素
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.RemoveFirst">
+            <summary>
+            移除第一个元素
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Truncate(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            从node处开始删除后面的所有元素（包含node）
+            </summary>
+            <param name="node"></param>
+        </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.Clear">
             <summary>
             清除所有子节点
@@ -2626,6 +2631,16 @@
             <summary>
             通用树形列表ViewModel
             项目在开发的时候可以继承这个ViewModel，也可以直接使用该ViewModel
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModel`1.FirstNode">
+            <summary>
+            获取第一个根节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModel`1.LastNode">
+            <summary>
+            获取最后一个根节点
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.TreeViewModel`1.Roots">
@@ -2654,6 +2669,12 @@
             </summary>
             <param name="node">要增加的根节点</param>
         </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Add(System.Collections.Generic.IEnumerable{WPFToolkit.MVVM.TreeNodeViewModel})">
+            <summary>
+            增加多个根节点
+            </summary>
+            <param name="nodes"></param>
+        </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Insert(System.Int32,WPFToolkit.MVVM.TreeNodeViewModel)">
             <summary>
             插入根节点到指定位置
@@ -2666,6 +2687,28 @@
             移除指定的子节点
             </summary>
             <param name="node">要移除的根节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.RemoveAt(System.Int32)">
+            <summary>
+            移除位于指定索引处的子节点
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.RemoveLast">
+            <summary>
+            移除最后一个元素
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.RemoveFirst">
+            <summary>
+            移除第一个元素
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Truncate(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            从node处开始删除后面的所有元素（包含node）
+            </summary>
+            <param name="node"></param>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.Clear">
             <summary>
@@ -2680,6 +2723,13 @@
             <param name="nodeID">要获取的节点的ID</param>
             <param name="node">获取到的节点</param>
             <returns>是否存在节点</returns>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.GetAllNodes``1">
+            <summary>
+            获取指定类型的所有节点
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.ExpandNode(System.String)">
             <summary>

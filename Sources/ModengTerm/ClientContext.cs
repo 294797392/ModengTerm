@@ -34,7 +34,7 @@ namespace ModengTerm.Base
         protected override int OnInitialized()
         {
             // 初始化图标
-            IconUtils.Initialize();
+            Icons.Initialize();
 
             return ResponseCode.SUCCESS;
         }

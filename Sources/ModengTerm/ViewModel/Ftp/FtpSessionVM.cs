@@ -95,10 +95,14 @@ namespace ModengTerm.ViewModel.Ftp
         /// </summary>
         public FileListVM ClientFsTree { get { return this.localFileList; } }
 
+        public FileSystemTransport LocalFileSystemTransport { get { return this.localFsTransport; } }
+
         /// <summary>
         /// 服务器文件树形列表
         /// </summary>
         public FileListVM ServerFsTree { get { return this.serverFileList; } }
+
+        public FileSystemTransport ServerFileSystemTransport { get { return this.serverFsTransport; } }
 
         /// <summary>
         /// 当前所有在队列里的文件状态
@@ -121,20 +125,20 @@ namespace ModengTerm.ViewModel.Ftp
         protected override int OnOpen()
         {
             this.localFileList = new FileListVM();
-            this.localFileList.Context.Type = FtpRoleEnum.Client;
+            this.localFileList.Context.Role = FtpRoleEnum.Local;
             this.serverFileList = new FileListVM();
-            this.serverFileList.Context.Type = FtpRoleEnum.Server;
+            this.serverFileList.Context.Role = FtpRoleEnum.Server;
             this.taskTree = new TaskTreeVM();
 
+            // 初始化文件列表
             this.serverFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_SERVER_INITIAL_DIR);
-            this.localFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
-            this.LoadLocalParentDirectories();
-
-            // 加载树形列表右键菜单
             this.serverFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileItemMenus));
             this.serverFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileListMenus));
+            this.InitializeAddressbar(FtpRoleEnum.Server, this.serverFileList.CurrentDirectory);
+            this.localFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
             this.localFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpClientFileItemMenus));
             this.localFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpCLientFileListMenus));
+            this.InitializeAddressbar(FtpRoleEnum.Local, this.localFileList.CurrentDirectory);
 
             FileSystemOptions options = this.CreateOptions();
             FileSystemTransport transport = new FileSystemTransport();
@@ -269,7 +273,7 @@ namespace ModengTerm.ViewModel.Ftp
         {
             List<TaskTreeNodeVM> tasks = new List<TaskTreeNodeVM>();
 
-            List<FsItemInfo> fsItems = srcFsTransport.ListFiles(srcDirectory);
+            List<FsItemInfo> fsItems = srcFsTransport.ListItems(srcDirectory);
 
             foreach (FsItemInfo fsInfo in fsItems)
             {
@@ -284,11 +288,11 @@ namespace ModengTerm.ViewModel.Ftp
 
                 if (fsInfo.Type == FsItemTypeEnum.Directory)
                 {
-                    taskVm.Icon = IconUtils.GetFolderIcon();
+                    taskVm.Icon = Icons.Folder;
                 }
                 else
                 {
-                    taskVm.Icon = IconUtils.GetFileIcon(fsInfo.FullPath);
+                    taskVm.Icon = Icons.GetFileIcon(fsInfo.FullPath);
                 }
 
                 tasks.Add(taskVm);
@@ -492,7 +496,7 @@ namespace ModengTerm.ViewModel.Ftp
                 return this.serverFsTransport.DeleteFile(fullPath);
             }
 
-            List<FsItemInfo> subFiles = this.serverFsTransport.ListFiles(fullPath);
+            List<FsItemInfo> subFiles = this.serverFsTransport.ListItems(fullPath);
 
             foreach (FsItemInfo subFile in subFiles)
             {
@@ -527,15 +531,101 @@ namespace ModengTerm.ViewModel.Ftp
 
         #endregion
 
-        private void LoadLocalParentDirectories()
+        /// <summary>
+        /// 初始化地址栏
+        /// </summary>
+        /// <param name="ftpRole"></param>
+        /// <param name="directory">当前显示的目录</param>
+        private void InitializeAddressbar(FtpRoleEnum ftpRole, string directory)
         {
-            this.localFileList.ParentDirectories.Add(new ParentDirectoryVM("桌面", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.DesktopDirectory)));
-            this.localFileList.ParentDirectories.Add(new ParentDirectoryVM("我的文档", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.MyDocuments)));
+            FileListVM fileList = ftpRole == FtpRoleEnum.Local ? this.localFileList : this.serverFileList;
+            AddressbarVM adrb = fileList.Addressbar;
 
-            DriveInfo[] drives = DriveInfo.GetDrives();
-            foreach (DriveInfo drive in drives)
+            if (ftpRole == FtpRoleEnum.Local)
             {
-                this.localFileList.ParentDirectories.Add(new ParentDirectoryVM(drive.Name, drive.Name));
+                // Local只能是Windows系统，Windows系统使用磁盘作为根目录，可能有多个磁盘
+                // 所以再增加一个“此电脑”作为根节点，用来选择磁盘
+                DirectoryVM adri = new DirectoryVM()
+                {
+                    ID = Guid.NewGuid().ToString(),
+                    Name = "此电脑",
+                    FullPath = string.Empty,
+                };
+                adrb.DirectroyParts.Add(adri);
+            }
+
+            string[] strings = directory.Split(VTBaseConsts.SlashBackslashSplitters, StringSplitOptions.RemoveEmptyEntries);
+            string fullPath = string.Empty;
+
+            for (int i = 0; i < strings.Length; i++)
+            {
+                string dirPart = strings[i];
+
+                // 第一个dirPart是磁盘名称，如果要列举磁盘下的目录，需要在盘符后加斜杠，比如E:/
+                if (i == 0)
+                {
+                    if (ftpRole == FtpRoleEnum.Local)
+                    {
+                        fullPath = string.Format("{0}/", dirPart);
+                    }
+                    else
+                    {
+                        // TODO：如果Ftp服务器是Windows，需要确认/E:这个路径是否可以访问
+                        fullPath = string.Format("/{0}", dirPart);
+                    }
+                }
+                else
+                {
+                    fullPath = string.Format("{0}/{1}", fullPath, dirPart);
+                }
+
+                DirectoryVM adri = new DirectoryVM()
+                {
+                    ID = fullPath,
+                    Name = dirPart,
+                    FullPath = fullPath
+                };
+                adrb.DirectroyParts.Add(adri);
+
+                fullPath = adri.FullPath;
+            }
+
+            //this.localFileList.Addressbar.Add(new AddressbarVM("桌面", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.DesktopDirectory)));
+            //this.localFileList.Addressbar.Add(new AddressbarVM("我的文档", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.MyDocuments)));
+
+            //DriveInfo[] drives = DriveInfo.GetDrives();
+            //foreach (DriveInfo drive in drives)
+            //{
+            //    this.localFileList.Addressbar.Add(new AddressbarVM(drive.Name, drive.Name));
+            //}
+        }
+
+        private void LoadAddressbar(FileListVM fileList, FileItemVM dirItem, LoadAddressbarReasons actions)
+        {
+            AddressbarVM adrb = fileList.Addressbar;
+
+            switch (actions)
+            {
+                case LoadAddressbarReasons.OpenParentDirectory:
+                    {
+                        adrb.DirectroyParts.RemoveAt(adrb.DirectroyParts.Count - 1);
+                        break;
+                    }
+
+                case LoadAddressbarReasons.OpenSubDirectory:
+                    {
+                        DirectoryVM dir = new DirectoryVM()
+                        {
+                            ID = dirItem.FullPath,
+                            Name = dirItem.Name,
+                            FullPath = dirItem.FullPath
+                        };
+                        adrb.DirectroyParts.Add(dir);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -543,7 +633,7 @@ namespace ModengTerm.ViewModel.Ftp
 
         #region 公开接口
 
-        public void LoadFileListAsync(FileListVM fileList, string directory)
+        public void LoadFileListAsync(FileListVM fileList, string directory, Action callback = null)
         {
             Task.Factory.StartNew(() =>
             {
@@ -563,7 +653,7 @@ namespace ModengTerm.ViewModel.Ftp
                         localFs = true;
                     }
 
-                    fsItems = transport.ListFiles(directory);
+                    fsItems = transport.ListItems(directory);
                     if (fsItems == null)
                     {
                         // 此时上层会触发连接断开事件
@@ -609,68 +699,56 @@ namespace ModengTerm.ViewModel.Ftp
                     }
                 }
 
+                // 创建“返回上级目录”节点
                 if (!string.IsNullOrEmpty(parentDirectory))
                 {
-                    FileItemVM fsItemVM = new FileItemVM(fileList.Context);
-                    fsItemVM.ID = Guid.Empty;
-                    fsItemVM.Name = "..";
-                    fsItemVM.Type = FsItemTypeEnum.ParentDirectory;
-                    fsItemVM.FullPath = parentDirectory;
-                    fsItemVM.Icon = IconUtils.GetFolderIcon();
-                    fileItems.Add(fsItemVM);
+                    FileItemVM fileItem = new FileItemVM(fileList.Context);
+                    fileItem.ID = Guid.Empty;
+                    fileItem.Name = "..";
+                    fileItem.Type = FsItemTypeEnum.ParentDirectory;
+                    fileItem.FullPath = parentDirectory;
+                    fileItem.Icon = Icons.Folder;
+                    fileItems.Add(fileItem);
                 }
 
                 foreach (FsItemInfo fsItem in fsItems)
                 {
-                    FileItemVM fsItemVm = new FileItemVM(fileList.Context);
-                    fsItemVm.ID = fsItem.FullPath;
-                    fsItemVm.Name = fsItem.Name;
-                    fsItemVm.FullPath = fsItem.FullPath;
-                    fsItemVm.Size = fsItem.Size;
-                    fsItemVm.LastUpdateTime = fsItem.LastUpdateTime;
-                    fsItemVm.IsHidden = fsItem.IsHidden;
-                    fsItemVm.IsVisible = !fsItemVm.IsHidden;
-                    if (fsItem.Name == "..")
-                    {
-                        fsItemVm.Type = FsItemTypeEnum.ParentDirectory;
-                    }
-                    else
-                    {
-                        fsItemVm.Type = fsItem.Type;
-                    }
+                    FileItemVM fileItem = new FileItemVM(fileList.Context);
+                    fileItem.ID = fsItem.FullPath;
+                    fileItem.Name = fsItem.Name;
+                    fileItem.FullPath = fsItem.FullPath;
+                    fileItem.Size = fsItem.Size;
+                    fileItem.LastUpdateTime = fsItem.LastUpdateTime;
+                    fileItem.IsHidden = fsItem.IsHidden;
+                    fileItem.IsVisible = !fileItem.IsHidden;
+                    fileItem.Type = fsItem.Type;
 
                     if (fsItem.Type == FsItemTypeEnum.Directory)
                     {
-                        fsItemVm.Icon = IconUtils.GetFolderIcon();
+                        fileItem.Icon = Icons.Folder;
                     }
                     else if (fsItem.Type == FsItemTypeEnum.ParentDirectory)
                     {
-                        fsItemVm.Icon = IconUtils.GetFolderIcon();
+                        fileItem.Icon = Icons.Folder;
                     }
                     else
                     {
-                        fsItemVm.Icon = IconUtils.GetFileIcon(fsItem.FullPath);
+                        fileItem.Icon = Icons.GetFileIcon(fsItem.FullPath);
                     }
 
-                    fileItems.Add(fsItemVm);
+                    fileItems.Add(fileItem);
                 }
 
                 fileList.TotalHiddens = fileItems.Count(v => v.IsHidden);
 
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    try
-                    {
-                        fileList.Clear();
+                    fileList.Clear();
+                    fileList.Add(fileItems);
 
-                        foreach (FileItemVM fileItem in fileItems)
-                        {
-                            fileList.Add(fileItem);
-                        }
-                    }
-                    catch (Exception ex)
+                    if (callback != null)
                     {
-                        logger.Error("加载文件列表异常", ex);
+                        callback();
                     }
                 });
             });
@@ -687,12 +765,12 @@ namespace ModengTerm.ViewModel.Ftp
         /// <param name="dstFileList">要传输到的目标文件夹，如果为空，则表示当前目录</param>
         internal void TransferFile(FileListVM srcFileList, FileListVM dstFileList, List<FileItemVM> srcFileItems, string targetDirectory)
         {
-            FtpRoleEnum srcRole = srcFileList.Context.Type;
-            FtpRoleEnum dstRole = dstFileList.Context.Type;
+            FtpRoleEnum srcRole = srcFileList.Context.Role;
+            FtpRoleEnum dstRole = dstFileList.Context.Role;
 
-            if (srcRole == FtpRoleEnum.Client)
+            if (srcRole == FtpRoleEnum.Local)
             {
-                if (dstRole == FtpRoleEnum.Client)
+                if (dstRole == FtpRoleEnum.Local)
                 {
                     // 客户端 - 客户端
                     this.MoveClientFiles(srcFileItems, targetDirectory);
@@ -705,7 +783,7 @@ namespace ModengTerm.ViewModel.Ftp
             }
             else
             {
-                if (dstRole == FtpRoleEnum.Client)
+                if (dstRole == FtpRoleEnum.Local)
                 {
                     // 服务器 - 客户端
                     this.TransferFiles(srcFileItems, targetDirectory, this.serverFsTransport, false);
@@ -767,7 +845,7 @@ namespace ModengTerm.ViewModel.Ftp
         }
 
         /// <summary>
-        /// 当双击的时候触发
+        /// 当双击文件或者目录的时候触发
         /// </summary>
         /// <param name="fileList"></param>
         /// <param name="fileItem"></param>
@@ -781,9 +859,16 @@ namespace ModengTerm.ViewModel.Ftp
             switch (fileItem.Type)
             {
                 case FsItemTypeEnum.ParentDirectory:
+                    {
+                        this.LoadFileListAsync(fileList, fileItem.FullPath);
+                        this.LoadAddressbar(fileList, fileItem, LoadAddressbarReasons.OpenParentDirectory);
+                        break;
+                    }
+
                 case FsItemTypeEnum.Directory:
                     {
                         this.LoadFileListAsync(fileList, fileItem.FullPath);
+                        this.LoadAddressbar(fileList, fileItem, LoadAddressbarReasons.OpenSubDirectory);
                         break;
                     }
 
@@ -791,6 +876,7 @@ namespace ModengTerm.ViewModel.Ftp
                     break;
             }
         }
+
 
         internal void FtpOpenClientItem()
         {
@@ -819,7 +905,7 @@ namespace ModengTerm.ViewModel.Ftp
             FileListVM fileList = null;
             FileSystemTransport fsTransport = null;
 
-            if (ftpRole == FtpRoleEnum.Client)
+            if (ftpRole == FtpRoleEnum.Local)
             {
                 fileList = this.localFileList;
                 fsTransport = this.localFsTransport;
@@ -875,7 +961,7 @@ namespace ModengTerm.ViewModel.Ftp
         internal void FtpRefreshItems(FtpRoleEnum ftpRole)
         {
             FileListVM fileList = null;
-            if (ftpRole == FtpRoleEnum.Client)
+            if (ftpRole == FtpRoleEnum.Local)
             {
                 fileList = this.localFileList;
             }

@@ -12,12 +12,13 @@
              x:Name="UserControl1">
 
     <UserControl.Resources>
-
+        <toolkitconverters:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
+        <toolkitconverters:BooleanVisibilityConverter2 x:Key="BooleanVisibilityConverter2"/>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="3"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="25"/>
@@ -25,49 +26,96 @@
 
         <!-- 目录导航 -->
         <Grid Grid.Row="0">
-            <ListBox x:Name="ListBoxAddressbar" Style="{StaticResource ResourceKey=}">
+            <ListBox x:Name="ListBoxAddressbar" DataContext="{Binding Path=Addressbar}" ItemsSource="{Binding Path=DirectroyParts}">
+                <ListBox.Style>
+                    <Style TargetType="{x:Type ListBox}">
+                        <Setter Property="BorderBrush" Value="{x:Null}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBox}">
+                                    <Grid>
+                                        <Border/>
+                                        <ItemsPresenter/>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.Style>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="BorderBrush" Value="{x:Null}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <Grid>
+                                        <Border/>
+                                        <ContentPresenter/>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
                 <ListBox.ItemTemplate>
+                    
                     <DataTemplate>
+
+                        <DataTemplate.Resources>
+                            <Style x:Key="StyleButton" TargetType="{x:Type Button}">
+                                
+                            </Style>
+                        </DataTemplate.Resources>
+                        
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="15"/>
                             </Grid.ColumnDefinitions>
-                            
-                            <Button Content="{Binding Path=Name}"/>
-                            <Button Content=">"/>
+
+                            <Button Grid.Column="0" Content="{Binding Path=Name}" Click="ButtonJumpDirectory_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
+                            <Button Grid.Column="1" Content="&gt;" Click="ButtonShowPreviewDirectories_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
 
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-                
+
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            
-            
-            <!--<ComboBox Height="25" VerticalAlignment="Center" ItemsSource="{Binding Path=ParentDirectories}" Style="{StaticResource ResourceKey=StyleComboBox}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Path=Icon}" VerticalAlignment="Center" Stretch="None"/>
-                            <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>-->
+
+            <Popup x:Name="PopupPreviewDirectory" Placement="Bottom" StaysOpen="False">
+                <ListBox x:Name="ListBoxPreviewDirectory" SelectionChanged="ListBoxPreviewDirectory_SelectionChanged">
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding Path=Icon}"/>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Popup>
         </Grid>
 
-        <ContentControl Grid.Row="2" x:Name="ContentControlFileList">
-            <ContentControl.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="刷新"/>
-                </ContextMenu>
-            </ContentControl.ContextMenu>
-        </ContentControl>
+        <ContentControl Grid.Row="2" x:Name="ContentControlFileList"/>
 
         <Grid Grid.Row="3" VerticalAlignment="Bottom">
             <Grid.ColumnDefinitions>

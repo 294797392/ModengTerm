@@ -32,6 +32,11 @@ namespace ModengTerm.Base
     public static class VTBaseConsts
     {
         /// <summary>
+        /// 斜杠和反斜杠分隔符
+        /// </summary>
+        public static readonly char[] SlashBackslashSplitters = new char[] { '/', '\\' };
+
+        /// <summary>
         /// 显示为“根节点”
         /// 给用户选择
         /// </summary>
