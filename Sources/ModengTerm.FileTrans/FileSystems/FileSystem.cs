@@ -1,4 +1,4 @@
-﻿using ModengTerm.FileTrans.DataModels;
+﻿using ModengTerm.Ftp.DataModels;
 using ModengTerm.Ftp.Enumerations;
 using Newtonsoft.Json.Bson;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.Clients
+namespace ModengTerm.Ftp.FileSystems
 {
     /// <summary>
     /// 提供文件系统相关的接口

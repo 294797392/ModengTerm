@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit.Packaging;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.Enumerations;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Ftp;
 using Newtonsoft.Json.Linq;

@@ -2,13 +2,13 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.FileTrans.DataModels;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.DataModels;
+using ModengTerm.Ftp.Enumerations;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
 using System.Text;
 
-namespace ModengTerm.FileTrans.Clients
+namespace ModengTerm.Ftp.FileSystems
 {
     public class SshNetSftpFileSystem : FileSystem
     {

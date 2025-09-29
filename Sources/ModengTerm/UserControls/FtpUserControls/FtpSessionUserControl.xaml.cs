@@ -4,7 +4,6 @@ using ModengTerm.Addon;
 using ModengTerm.Addon.ClientBridges;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.FileTrans.Clients;
 using ModengTerm.Themes;
 using ModengTerm.UserControls.FtpUserControls;
 using ModengTerm.ViewModel;

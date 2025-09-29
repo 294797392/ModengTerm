@@ -1,14 +1,14 @@
 ﻿using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Ssh;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.Clients
+namespace ModengTerm.Ftp.FileSystems
 {
     public abstract class FileSystemOptions
     {

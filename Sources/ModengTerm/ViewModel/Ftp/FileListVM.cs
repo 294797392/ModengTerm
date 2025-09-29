@@ -1,5 +1,4 @@
-﻿using ModengTerm.FileTrans.Clients;
-using ModengTerm.Styles;
+﻿using ModengTerm.Styles;
 using System;
 using System.Collections.Generic;
 using System.Linq;

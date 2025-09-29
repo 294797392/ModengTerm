@@ -1,12 +1,12 @@
 ﻿using log4net.Filter;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.FileTrans.Clients;
 using ModengTerm.Ftp.Enumerations;
+using ModengTerm.Ftp.FileSystems;
 using Renci.SshNet.Common;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans
+namespace ModengTerm.Ftp
 {
     /// <summary>
     /// 负责把文件上传到服务器，或者从服务器下载文件
@@ -45,7 +45,7 @@ namespace ModengTerm.FileTrans
         private ManualResetEvent taskEvent;
         private List<AgentTask> taskList;
 
-        private Win32FileSystem localFs;
+        private FileSystem localFs;
         private Queue<FileSystem> clientQueue;
         private bool initOnce;
 
@@ -58,7 +58,7 @@ namespace ModengTerm.FileTrans
         /// <summary>
         /// 服务器文件系统客户端配置
         /// </summary>
-        public FileSystemOptions ClientOptions { get; set; }
+        public FileSystemOptions RemoteFileSystemOptions { get; set; }
 
         /// <summary>
         /// 上传线程数量
@@ -186,8 +186,8 @@ namespace ModengTerm.FileTrans
 
             if (client == null)
             {
-                client = FileSystemFactory.Create(this.ClientOptions);
-                client.Options = this.ClientOptions;
+                client = FileSystemFactory.Create(this.RemoteFileSystemOptions);
+                client.Options = this.RemoteFileSystemOptions;
                 if (client.Open() != ResponseCode.SUCCESS)
                 {
                     return null;

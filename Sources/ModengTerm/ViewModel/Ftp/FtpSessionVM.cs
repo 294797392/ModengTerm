@@ -11,11 +11,10 @@ using ModengTerm.Base.DataModels.Ssh;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Ssh;
 using ModengTerm.Base.Metadatas;
-using ModengTerm.FileTrans;
-using ModengTerm.FileTrans.Clients;
-using ModengTerm.FileTrans.DataModels;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp;
+using ModengTerm.Ftp.DataModels;
 using ModengTerm.Ftp.Enumerations;
+using ModengTerm.Ftp.FileSystems;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.ViewModel.Session;
 using ModengTerm.Windows.Ftp;
@@ -147,7 +146,7 @@ namespace ModengTerm.ViewModel.Ftp
             this.localFsTransport = this.CreateLocalFsTransport();
 
             this.ftpAgent = new FtpAgent();
-            this.ftpAgent.ClientOptions = options;
+            this.ftpAgent.RemoteFileSystemOptions = options;
             this.ftpAgent.Threads = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_THREADS);
             this.ftpAgent.UploadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_UPLOAD_BUFFER_SIZE) * 1024;
             this.ftpAgent.DownloadBufferSize = this.session.GetOption<int>(PredefinedOptions.FS_TRANS_DOWNLOAD_BUFFER_SIZE) * 1024;
@@ -202,9 +201,9 @@ namespace ModengTerm.ViewModel.Ftp
         {
             Win32FileSystemOptions localFsOptions = new Win32FileSystemOptions();
             localFsOptions.InitialDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
-            FileSystemTransport clientFsTransport = new FileSystemTransport();
-            clientFsTransport.OpenAsync(localFsOptions);
-            return clientFsTransport;
+            FileSystemTransport localFsTransport = new FileSystemTransport();
+            localFsTransport.OpenAsync(localFsOptions);
+            return localFsTransport;
         }
 
         #region 本地文件操作

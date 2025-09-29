@@ -1,9 +1,9 @@
 ﻿using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
 using ModengTerm.Base;
-using ModengTerm.FileTrans.Clients;
-using ModengTerm.FileTrans.DataModels;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.DataModels;
+using ModengTerm.Ftp.Enumerations;
+using ModengTerm.Ftp.FileSystems;
 using ModengTerm.UserControls.FtpUserControls.FileListUserControls;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Ftp;

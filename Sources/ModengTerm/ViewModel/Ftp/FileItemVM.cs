@@ -1,5 +1,4 @@
-﻿using ModengTerm.FileTrans.DataModels;
-using ModengTerm.FileTrans.Enumerations;
+﻿using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;

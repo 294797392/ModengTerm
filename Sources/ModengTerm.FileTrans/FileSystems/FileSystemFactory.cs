@@ -1,12 +1,12 @@
 ﻿using ModengTerm.Base.Enumerations;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.Clients
+namespace ModengTerm.Ftp.FileSystems
 {
     public static class FileSystemFactory
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.Enumerations
+namespace ModengTerm.Ftp.Enumerations
 {
     /// <summary>
     /// 文件系统客户端类型

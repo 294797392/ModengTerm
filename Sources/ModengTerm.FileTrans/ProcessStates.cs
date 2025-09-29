@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans
+namespace ModengTerm.Ftp
 {
     /// <summary>
     /// 定义任务的处理状态

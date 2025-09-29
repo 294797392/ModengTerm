@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Base.Enumerations;
-using ModengTerm.FileTrans.DataModels;
-using ModengTerm.FileTrans.Enumerations;
+using ModengTerm.Ftp.DataModels;
 using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.Clients
+namespace ModengTerm.Ftp.FileSystems
 {
     public class FileSystemTransport
     {

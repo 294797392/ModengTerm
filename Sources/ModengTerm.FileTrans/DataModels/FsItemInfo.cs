@@ -1,11 +1,11 @@
-﻿using ModengTerm.FileTrans.Enumerations;
+﻿using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.FileTrans.DataModels
+namespace ModengTerm.Ftp.DataModels
 {
     public class FsItemInfo
     {
