@@ -45,7 +45,7 @@ namespace ModengTerm.FileTrans
         private ManualResetEvent taskEvent;
         private List<AgentTask> taskList;
 
-        private LocalFileSystem localFs;
+        private Win32FileSystem localFs;
         private Queue<FileSystem> clientQueue;
         private bool initOnce;
 
@@ -96,8 +96,8 @@ namespace ModengTerm.FileTrans
             this.clientQueue = new Queue<FileSystem>();
             this.taskEvent = new ManualResetEvent(false);
             this.threadList = new List<Thread>();
-            this.localFs = new LocalFileSystem();
-            this.localFs.Options = new LocalFsClientOptions();
+            this.localFs = new Win32FileSystem();
+            this.localFs.Options = new Win32FileSystemOptions();
             this.localFs.Open();
         }
 

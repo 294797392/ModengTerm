@@ -25,8 +25,8 @@
         </Grid.RowDefinitions>
 
         <!-- 目录导航 -->
-        <Grid Grid.Row="0">
-            <ListBox x:Name="ListBoxAddressbar" DataContext="{Binding Path=Addressbar}" ItemsSource="{Binding Path=DirectroyParts}">
+        <Grid Grid.Row="0" DataContext="{Binding Path=Addressbar}">
+            <ListBox x:Name="ListBoxDirectroyChain" ItemsSource="{Binding Path=DirectroyChain}">
                 <ListBox.Style>
                     <Style TargetType="{x:Type ListBox}">
                         <Setter Property="BorderBrush" Value="{x:Null}"/>

@@ -245,7 +245,7 @@ namespace ModengTerm.UserControls.FtpUserControls
         }
 
         /// <summary>
-        /// 显示预览目录列表
+        /// 显示预览目录Popup列表
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -260,7 +260,14 @@ namespace ModengTerm.UserControls.FtpUserControls
                 List<FsItemInfo> fsItems = null;
                 try
                 {
-                    fsItems = this.fileSystemTransport.ListItems(toPreview.FullPath);
+                    if (toPreview.ID == VTBaseConsts.RootDirectoryChainId)
+                    {
+                        fsItems = this.fileSystemTransport.ListRootItems();
+                    }
+                    else
+                    {
+                        fsItems = this.fileSystemTransport.ListItems(toPreview.FullPath);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -312,12 +319,17 @@ namespace ModengTerm.UserControls.FtpUserControls
             DirectoryVM toJump = frameworkElement.DataContext as DirectoryVM;
             AddressbarVM adrb = this.fileList.Addressbar;
 
+            if (string.IsNullOrEmpty(toJump.FullPath))
+            {
+                return;
+            }
+
             this.ftpSession.LoadFileListAsync(this.fileList, toJump.FullPath, () => 
             {
                 DirectoryVM endRemove = PopupPreviewDirectory.Tag as DirectoryVM;
-                while (adrb.DirectroyParts[adrb.DirectroyParts.Count - 1] != endRemove)
+                while (adrb.DirectroyChain[adrb.DirectroyChain.Count - 1] != endRemove)
                 {
-                    adrb.DirectroyParts.RemoveAt(adrb.DirectroyParts.Count - 1);
+                    adrb.DirectroyChain.RemoveAt(adrb.DirectroyChain.Count - 1);
                 }
             });
         }
@@ -336,12 +348,12 @@ namespace ModengTerm.UserControls.FtpUserControls
                 AddressbarVM adrb = this.fileList.Addressbar;
 
                 DirectoryVM endRemove = PopupPreviewDirectory.Tag as DirectoryVM;
-                while (adrb.DirectroyParts[adrb.DirectroyParts.Count - 1] != endRemove)
+                while (adrb.DirectroyChain[adrb.DirectroyChain.Count - 1] != endRemove)
                 {
-                    adrb.DirectroyParts.RemoveAt(adrb.DirectroyParts.Count - 1);
+                    adrb.DirectroyChain.RemoveAt(adrb.DirectroyChain.Count - 1);
                 }
 
-                adrb.DirectroyParts.Add(selectedDirectory);
+                adrb.DirectroyChain.Add(selectedDirectory);
 
                 PopupPreviewDirectory.IsOpen = false;
             });

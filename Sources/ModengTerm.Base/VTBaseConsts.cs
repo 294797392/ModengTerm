@@ -36,6 +36,8 @@ namespace ModengTerm.Base
         /// </summary>
         public static readonly char[] SlashBackslashSplitters = new char[] { '/', '\\' };
 
+        public static readonly string RootDirectoryChainId = Guid.NewGuid().ToString();
+
         /// <summary>
         /// 显示为“根节点”
         /// 给用户选择

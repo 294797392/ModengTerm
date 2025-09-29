@@ -18,8 +18,8 @@ namespace ModengTerm.FileTrans.Enumerations
         Sftp,
 
         /// <summary>
-        /// 本地文件系统
+        /// Windows文件系统
         /// </summary>
-        LocalFs
+        Win32
     }
 }

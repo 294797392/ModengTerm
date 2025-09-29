@@ -15,13 +15,31 @@ namespace ModengTerm.ViewModel.Ftp
     /// </summary>
     public class AddressbarVM : ViewModelBase
     {
-        public BindableCollection<DirectoryVM> DirectroyParts { get; private set; }
+        private BitmapSource directoryIcon;
+
+        /// <summary>
+        /// 当前显示的目录的图标
+        /// </summary>
+        public BitmapSource DirectoryIcon
+        {
+            get { return this.directoryIcon; }
+            set
+            {
+                if (this.directoryIcon != value)
+                {
+                    this.directoryIcon = value;
+                    this.NotifyPropertyChanged("DirectoryIcon");
+                }
+            }
+        }
+
+        public BindableCollection<DirectoryVM> DirectroyChain { get; private set; }
 
         public BindableCollection<DirectoryVM> PreviewDirectories { get; private set; }
 
         public AddressbarVM()
         {
-            this.DirectroyParts = new BindableCollection<DirectoryVM>();
+            this.DirectroyChain = new BindableCollection<DirectoryVM>();
             this.PreviewDirectories = new BindableCollection<DirectoryVM>();
         }
     }

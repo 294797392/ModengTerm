@@ -15,7 +15,7 @@ namespace ModengTerm.FileTrans.Clients
             switch (options.Type)
             {
                 case FileSystemTypeEnum.Sftp: return new SshNetSftpFileSystem();
-                case FileSystemTypeEnum.LocalFs: return new LocalFileSystem();
+                case FileSystemTypeEnum.Win32: return new Win32FileSystem();
                 default:
                     throw new NotImplementedException();
             }

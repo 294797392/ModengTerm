@@ -12,6 +12,9 @@ namespace ModengTerm.FileTrans.Clients
 {
     public abstract class FileSystemOptions
     {
+        /// <summary>
+        /// 文件系统类型
+        /// </summary>
         public abstract FileSystemTypeEnum Type { get; }
 
         /// <summary>
@@ -21,7 +24,7 @@ namespace ModengTerm.FileTrans.Clients
         public string InitialDirectory { get; set; }
     }
 
-    public class SftpClientOptions : FileSystemOptions
+    public class SftpFileSystemOptions : FileSystemOptions
     {
         public override FileSystemTypeEnum Type => FileSystemTypeEnum.Sftp;
 
@@ -44,8 +47,8 @@ namespace ModengTerm.FileTrans.Clients
         public int ServerPort { get; set; }
     }
 
-    public class LocalFsClientOptions : FileSystemOptions
+    public class Win32FileSystemOptions : FileSystemOptions
     {
-        public override FileSystemTypeEnum Type => FileSystemTypeEnum.LocalFs;
+        public override FileSystemTypeEnum Type => FileSystemTypeEnum.Win32;
     }
 }

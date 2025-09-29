@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.FileTrans.Clients
 {
     /// <summary>
-    /// 文件系统管理客户端
+    /// 提供文件系统相关的接口
     /// 提供文件的读取，删除，上传，下载功能
     /// </summary>
     public abstract class FileSystem
@@ -45,6 +45,25 @@ namespace ModengTerm.FileTrans.Clients
         /// </summary>
         /// <returns></returns>
         public abstract List<FsItemInfo> ListItems(string directory);
+
+        /// <summary>
+        /// 把一个目录切分成多个目录
+        /// Windows：
+        /// 输入：C:/1/2/3/4
+        /// 输出：C:/, C:/1, C:/1/2, C:/1/2/3, C:/1/2/3/4
+        /// Linux：
+        /// 输入：/root/1/2/3
+        /// 输出：/root, /root/1, /root/1/2, /root/1/2/3
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <returns></returns>
+        public abstract List<FsItemInfo> GetDirectoryChains(string directory);
+
+        /// <summary>
+        /// 列出文件系统的根目录列表
+        /// </summary>
+        /// <returns></returns>
+        public abstract List<FsItemInfo> ListRootItems();
 
         /// <summary>
         /// 改变当前目录

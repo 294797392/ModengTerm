@@ -5,7 +5,6 @@ using ModengTerm.Base.ServiceAgents;
 using ModengTerm.FileTrans.DataModels;
 using ModengTerm.FileTrans.Enumerations;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
 using System.Text;
 
@@ -29,7 +28,7 @@ namespace ModengTerm.FileTrans.Clients
 
         public override int Open()
         {
-            SftpClientOptions clientOptions = this.options as SftpClientOptions;
+            SftpFileSystemOptions clientOptions = this.options as SftpFileSystemOptions;
 
             #region 初始化身份验证方式
 
@@ -126,6 +125,46 @@ namespace ModengTerm.FileTrans.Clients
             }
 
             return fsItems;
+        }
+
+        public override List<FsItemInfo> GetDirectoryChains(string directory)
+        {
+            List<FsItemInfo> fsItems = new List<FsItemInfo>();
+
+            string[] strings = directory.Split(VTBaseConsts.SlashBackslashSplitters, StringSplitOptions.RemoveEmptyEntries);
+            string fullPath = string.Empty;
+
+            for (int i = 0; i < strings.Length; i++)
+            {
+                string dirPart = strings[i];
+
+                if (i == 0)
+                {
+                    fullPath = string.Format("/{0}", dirPart);
+                }
+                else
+                {
+                    fullPath = string.Format("{0}/{1}", fullPath, dirPart);
+                }
+
+                FsItemInfo directoryItem = new FsItemInfo()
+                {
+                    Name = dirPart,
+                    FullPath = fullPath,
+                    Type = FsItemTypeEnum.Directory
+                };
+
+                fsItems.Add(directoryItem);
+
+                fullPath = directoryItem.FullPath;
+            }
+
+            return fsItems;
+        }
+
+        public override List<FsItemInfo> ListRootItems()
+        {
+            return this.ListItems("/");
         }
 
         public override void ChangeDirectory(string directory)

@@ -14,7 +14,7 @@ namespace ModengTerm.ViewModel.Ftp
         /// <summary>
         /// 服务器
         /// </summary>
-        Server,
+        Remote,
 
         /// <summary>
         /// 客户端

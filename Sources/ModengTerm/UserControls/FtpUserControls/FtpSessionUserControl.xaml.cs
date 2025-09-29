@@ -85,8 +85,8 @@ namespace ModengTerm.UserControls.FtpUserControls
             Client.RegisterCommand(FtpCommandKeys.SERVER_OPEN_ITEM, OnFtpOpenServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_DOWNLOAD_ITEM, OnFtpDownloadServerItem);
             Client.RegisterCommand(FtpCommandKeys.SERVER_DELETE_ITEM, OnFtpDeleteServerItem);
-            Client.RegisterCommand(FtpCommandKeys.SERVER_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Server);
-            Client.RegisterCommand(FtpCommandKeys.SERVER_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Server);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_RENAME_ITEM, OnFtpRenameItem, FtpRoleEnum.Remote);
+            Client.RegisterCommand(FtpCommandKeys.SERVER_REFRESH_ITEMS, OnFtpRefreshItems, FtpRoleEnum.Remote);
         }
 
         public FtpSessionUserControl()

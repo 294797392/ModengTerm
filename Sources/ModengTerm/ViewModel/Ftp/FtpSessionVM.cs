@@ -127,18 +127,16 @@ namespace ModengTerm.ViewModel.Ftp
             this.localFileList = new FileListVM();
             this.localFileList.Context.Role = FtpRoleEnum.Local;
             this.serverFileList = new FileListVM();
-            this.serverFileList.Context.Role = FtpRoleEnum.Server;
+            this.serverFileList.Context.Role = FtpRoleEnum.Remote;
             this.taskTree = new TaskTreeVM();
 
             // 初始化文件列表
             this.serverFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_SERVER_INITIAL_DIR);
             this.serverFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileItemMenus));
             this.serverFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpServerFileListMenus));
-            this.InitializeAddressbar(FtpRoleEnum.Server, this.serverFileList.CurrentDirectory);
             this.localFileList.CurrentDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
             this.localFileList.ContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpClientFileItemMenus));
             this.localFileList.FileListContextMenus.AddRange(VMUtils.CreateDefaultMenuItems(VTBaseConsts.FtpCLientFileListMenus));
-            this.InitializeAddressbar(FtpRoleEnum.Local, this.localFileList.CurrentDirectory);
 
             FileSystemOptions options = this.CreateOptions();
             FileSystemTransport transport = new FileSystemTransport();
@@ -156,6 +154,8 @@ namespace ModengTerm.ViewModel.Ftp
             this.ftpAgent.ProcessStateChanged += this.FtpAgent_ProcessStateChanged;
             this.ftpAgent.Initialize();
 
+            this.InitializeAddressbar(FtpRoleEnum.Local, this.localFileList.CurrentDirectory);
+            this.InitializeAddressbar(FtpRoleEnum.Remote, this.serverFileList.CurrentDirectory);
             this.LoadFileListAsync(this.localFileList, this.localFileList.CurrentDirectory);
 
             return ResponseCode.SUCCESS;
@@ -180,7 +180,7 @@ namespace ModengTerm.ViewModel.Ftp
             {
                 case SessionTypeEnum.Sftp:
                     {
-                        return new SftpClientOptions()
+                        return new SftpFileSystemOptions()
                         {
                             AuthenticationType = this.session.GetOption<SSHAuthTypeEnum>(PredefinedOptions.SSH_AUTH_TYPE),
                             UserName = this.session.GetOption<string>(PredefinedOptions.SSH_USER_NAME),
@@ -200,7 +200,7 @@ namespace ModengTerm.ViewModel.Ftp
 
         private FileSystemTransport CreateLocalFsTransport()
         {
-            LocalFsClientOptions localFsOptions = new LocalFsClientOptions();
+            Win32FileSystemOptions localFsOptions = new Win32FileSystemOptions();
             localFsOptions.InitialDirectory = this.session.GetOption<string>(PredefinedOptions.FS_GENERAL_CLIENT_INITIAL_DIR);
             FileSystemTransport clientFsTransport = new FileSystemTransport();
             clientFsTransport.OpenAsync(localFsOptions);
@@ -539,65 +539,27 @@ namespace ModengTerm.ViewModel.Ftp
         private void InitializeAddressbar(FtpRoleEnum ftpRole, string directory)
         {
             FileListVM fileList = ftpRole == FtpRoleEnum.Local ? this.localFileList : this.serverFileList;
+            FileSystemTransport fsTransport = ftpRole == FtpRoleEnum.Local ? this.localFsTransport : this.serverFsTransport;
             AddressbarVM adrb = fileList.Addressbar;
 
-            if (ftpRole == FtpRoleEnum.Local)
+            DirectoryVM rootDirectory = new DirectoryVM();
+            rootDirectory.ID = VTBaseConsts.RootDirectoryChainId;
+            rootDirectory.Name = ftpRole == FtpRoleEnum.Local ? "此电脑" : "远程电脑";
+            rootDirectory.FullPath = string.Empty;
+            adrb.DirectroyChain.Add(rootDirectory);
+
+            List<FsItemInfo> chain = fsTransport.GetDirectoryChains(directory);
+
+            foreach (FsItemInfo fsItem in chain)
             {
-                // Local只能是Windows系统，Windows系统使用磁盘作为根目录，可能有多个磁盘
-                // 所以再增加一个“此电脑”作为根节点，用来选择磁盘
-                DirectoryVM adri = new DirectoryVM()
+                DirectoryVM dirPart = new DirectoryVM()
                 {
-                    ID = Guid.NewGuid().ToString(),
-                    Name = "此电脑",
-                    FullPath = string.Empty,
+                    ID = fsItem.FullPath,
+                    Name = fsItem.Name,
+                    FullPath = fsItem.FullPath
                 };
-                adrb.DirectroyParts.Add(adri);
+                adrb.DirectroyChain.Add(dirPart);
             }
-
-            string[] strings = directory.Split(VTBaseConsts.SlashBackslashSplitters, StringSplitOptions.RemoveEmptyEntries);
-            string fullPath = string.Empty;
-
-            for (int i = 0; i < strings.Length; i++)
-            {
-                string dirPart = strings[i];
-
-                // 第一个dirPart是磁盘名称，如果要列举磁盘下的目录，需要在盘符后加斜杠，比如E:/
-                if (i == 0)
-                {
-                    if (ftpRole == FtpRoleEnum.Local)
-                    {
-                        fullPath = string.Format("{0}/", dirPart);
-                    }
-                    else
-                    {
-                        // TODO：如果Ftp服务器是Windows，需要确认/E:这个路径是否可以访问
-                        fullPath = string.Format("/{0}", dirPart);
-                    }
-                }
-                else
-                {
-                    fullPath = string.Format("{0}/{1}", fullPath, dirPart);
-                }
-
-                DirectoryVM adri = new DirectoryVM()
-                {
-                    ID = fullPath,
-                    Name = dirPart,
-                    FullPath = fullPath
-                };
-                adrb.DirectroyParts.Add(adri);
-
-                fullPath = adri.FullPath;
-            }
-
-            //this.localFileList.Addressbar.Add(new AddressbarVM("桌面", Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.DesktopDirectory)));
-            //this.localFileList.Addressbar.Add(new AddressbarVM("我的文档", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), IconUtils.GetSpecialFolderIcon(Environment.SpecialFolder.MyDocuments)));
-
-            //DriveInfo[] drives = DriveInfo.GetDrives();
-            //foreach (DriveInfo drive in drives)
-            //{
-            //    this.localFileList.Addressbar.Add(new AddressbarVM(drive.Name, drive.Name));
-            //}
         }
 
         private void LoadAddressbar(FileListVM fileList, FileItemVM dirItem, LoadAddressbarReasons actions)
@@ -608,7 +570,7 @@ namespace ModengTerm.ViewModel.Ftp
             {
                 case LoadAddressbarReasons.OpenParentDirectory:
                     {
-                        adrb.DirectroyParts.RemoveAt(adrb.DirectroyParts.Count - 1);
+                        adrb.DirectroyChain.RemoveAt(adrb.DirectroyChain.Count - 1);
                         break;
                     }
 
@@ -620,7 +582,7 @@ namespace ModengTerm.ViewModel.Ftp
                             Name = dirItem.Name,
                             FullPath = dirItem.FullPath
                         };
-                        adrb.DirectroyParts.Add(dir);
+                        adrb.DirectroyChain.Add(dir);
                         break;
                     }
 

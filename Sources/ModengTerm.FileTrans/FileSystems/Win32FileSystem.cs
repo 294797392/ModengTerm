@@ -4,6 +4,7 @@ using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.FileTrans.Clients
 {
-    public class LocalFileSystem : FileSystem
+    public class Win32FileSystem : FileSystem
     {
         #region WinAPI
 
@@ -66,7 +67,11 @@ namespace ModengTerm.FileTrans.Clients
 
         #endregion
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalFsClient");
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("Win32FileSystem");
+
+        #endregion
 
         #region 实例变量
 
@@ -120,6 +125,105 @@ namespace ModengTerm.FileTrans.Clients
                     Name = fileInfo.Name,
                     Type = FsItemTypeEnum.File,
                     IsHidden = fileInfo.Attributes.HasFlag(FileAttributes.Hidden)
+                };
+                fsItems.Add(fsItem);
+            }
+
+            return fsItems;
+        }
+
+        public override List<FsItemInfo> GetDirectoryChains(string directory)
+        {
+            List<FsItemInfo> fsItems = new List<FsItemInfo>();
+
+            string[] strings = directory.Split(VTBaseConsts.SlashBackslashSplitters, StringSplitOptions.RemoveEmptyEntries);
+            string fullPath = string.Empty;
+
+            for (int i = 0; i < strings.Length; i++)
+            {
+                string dirPart = strings[i];
+
+                // 第一个dirPart是磁盘名称，如果要列举磁盘下的目录，需要在盘符后加斜杠，比如E:/
+                if (i == 0)
+                {
+                    fullPath = string.Format("{0}/", dirPart);
+                }
+                else
+                {
+                    fullPath = string.Format("{0}/{1}", fullPath, dirPart);
+                }
+
+                FsItemInfo directoryItem = new FsItemInfo()
+                {
+                    Name = dirPart,
+                    FullPath = fullPath,
+                    Type = FsItemTypeEnum.Directory
+                };
+
+                fsItems.Add(directoryItem);
+
+                fullPath = directoryItem.FullPath;
+            }
+
+            return fsItems;
+        }
+
+        public override List<FsItemInfo> ListRootItems()
+        {
+            List<FsItemInfo> fsItems = new List<FsItemInfo>();
+
+            DriveInfo[] drives = DriveInfo.GetDrives();
+
+            foreach (DriveInfo drive in drives)
+            {
+                // 盘符
+                string symbol = drive.Name.TrimEnd('\\');
+                string name = drive.VolumeLabel;
+                if (string.IsNullOrEmpty(name))
+                {
+                    switch (drive.DriveType)
+                    {
+                        case DriveType.Fixed:
+                            {
+                                name = "本地磁盘";
+                                break;
+                            }
+
+                        case DriveType.Removable:
+                            {
+                                name = "可插拔存储器";
+                                break;
+                            }
+
+                        case DriveType.Ram:
+                            {
+                                name = "Ram磁盘";
+                                break;
+                            }
+
+                        case DriveType.CDRom:
+                            {
+                                name = "CD";
+                                break;
+                            }
+
+                        case DriveType.Unknown:
+                            {
+                                name = "未知磁盘";
+                                break;
+                            }
+
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+
+                FsItemInfo fsItem = new FsItemInfo()
+                {
+                    Name = string.Format("{0}({1})", name, symbol),
+                    FullPath = drive.RootDirectory.FullName,
+                    Type = FsItemTypeEnum.Directory,
+                    Size = drive.TotalFreeSpace
                 };
                 fsItems.Add(fsItem);
             }

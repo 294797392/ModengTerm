@@ -20,7 +20,7 @@ namespace ModengTerm.FileTrans.DataModels
         public string FullPath { get; set; }
 
         /// <summary>
-        /// 文件大小
+        /// 文件大小，单位字节
         /// </summary>
         public long Size { get; set; }
 

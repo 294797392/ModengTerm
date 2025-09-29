@@ -1,9 +1,12 @@
 ﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.FileTrans.DataModels;
+using ModengTerm.FileTrans.Enumerations;
 using ModengTerm.Ftp.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,6 +34,16 @@ namespace ModengTerm.FileTrans.Clients
 
         private FileSystem fileSystem;
         private SessionStatusEnum status;
+        private FileSystemOptions options;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 获取文件系统类型
+        /// </summary>
+        public FileSystemTypeEnum FileSystemType { get { return this.options.Type; } }
 
         #endregion
 
@@ -38,6 +51,8 @@ namespace ModengTerm.FileTrans.Clients
 
         public void OpenAsync(FileSystemOptions options)
         {
+            this.options = options;
+
             this.fileSystem = FileSystemFactory.Create(options);
             this.fileSystem.Options = options;
 
@@ -94,6 +109,37 @@ namespace ModengTerm.FileTrans.Clients
             }
         }
 
+        public List<FsItemInfo> GetDirectoryChains(string directory)
+        {
+            try
+            {
+                return this.fileSystem.GetDirectoryChains(directory);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetDirectoryChains异常", ex);
+                return null;
+            }
+        }
+
+        public List<FsItemInfo> ListRootItems()
+        {
+            if (!this.CheckStatus())
+            {
+                return null;
+            }
+
+            try
+            {
+                return this.fileSystem.ListRootItems();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ListFiles异常", ex);
+                return null;
+            }
+        }
+
         public bool ChangeDirectory(string directory)
         {
             if (!this.CheckStatus())
@@ -137,28 +183,28 @@ namespace ModengTerm.FileTrans.Clients
             }
         }
 
-        public bool DeleteFile(string filePath) 
+        public bool DeleteFile(string filePath)
         {
-            if (!this.CheckStatus()) 
+            if (!this.CheckStatus())
             {
                 return false;
             }
 
-            try 
+            try
             {
                 this.fileSystem.DeleteFile(filePath);
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logger.ErrorFormat("删除文件异常, {0}, {1}", filePath, ex);
                 return false;
             }
         }
 
-        public bool DeleteDirectory(string directoryPath) 
+        public bool DeleteDirectory(string directoryPath)
         {
-            if (!this.CheckStatus()) 
+            if (!this.CheckStatus())
             {
                 return false;
             }
@@ -168,7 +214,7 @@ namespace ModengTerm.FileTrans.Clients
                 this.fileSystem.DeleteDirectory(directoryPath);
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logger.ErrorFormat("删除目录异常, {0}, {1}", directoryPath, ex);
                 return false;
