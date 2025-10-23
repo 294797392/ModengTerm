@@ -26,7 +26,10 @@
 
         <!-- 目录导航 -->
         <Grid Grid.Row="0" DataContext="{Binding Path=Addressbar}">
-            <ListBox x:Name="ListBoxDirectroyChain" ItemsSource="{Binding Path=DirectroyChain}">
+
+            <Border Background="White" BorderBrush="#D9D9D9" BorderThickness="1"/>
+
+            <ListBox x:Name="ListBoxDirectroyChain" ItemsSource="{Binding Path=DirectroyChain}" Margin="0,1,0,1">
                 <ListBox.Style>
                     <Style TargetType="{x:Type ListBox}">
                         <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -47,15 +50,15 @@
 
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                        <Setter Property="Background" Value="{x:Null}"/>
                         <Setter Property="BorderBrush" Value="{x:Null}"/>
                         <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Margin" Value="0,0,0,0"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
                                     <Grid>
-                                        <Border/>
+                                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"/>
                                         <ContentPresenter/>
                                     </Grid>
                                 </ControlTemplate>
@@ -65,25 +68,57 @@
                 </ListBox.ItemContainerStyle>
 
                 <ListBox.ItemTemplate>
-                    
                     <DataTemplate>
 
                         <DataTemplate.Resources>
                             <Style x:Key="StyleButton" TargetType="{x:Type Button}">
-                                
+                                <Style.Triggers>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter Property="Padding" Value="7,2,5,0"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="Padding" Value="5,0,5,0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+
+                                            <Grid>
+                                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                                        Background="{TemplateBinding Background}"/>
+
+                                                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                                                                  Margin="{TemplateBinding Padding}"/>
+
+                                            </Grid>
+
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
                         </DataTemplate.Resources>
-                        
+
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="0" Content="{Binding Path=Name}" Click="ButtonJumpDirectory_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
-                            <Button Grid.Column="1" Content="&gt;" Click="ButtonShowPreviewDirectories_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
-
+                            <Button Grid.Column="0" x:Name="ButtonDirectoryName" Content="{Binding Path=Name}" Click="ButtonJumpDirectory_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
+                            <Button Grid.Column="1" x:Name="ButtonPreviewSubDirectory" Content="&gt;" Click="ButtonShowPreviewDirectories_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
                         </Grid>
+
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E5F3FF" TargetName="ButtonDirectoryName"/>
+                                <Setter Property="Background" Value="#E5F3FF" TargetName="ButtonPreviewSubDirectory"/>
+                                <Setter Property="BorderBrush" Value="#CCE8FF" TargetName="ButtonDirectoryName"/>
+                                <Setter Property="BorderBrush" Value="#CCE8FF" TargetName="ButtonPreviewSubDirectory"/>
+                            </Trigger>
+                        </DataTemplate.Triggers>
+
                     </DataTemplate>
                 </ListBox.ItemTemplate>
 
@@ -115,6 +150,7 @@
             </Popup>
         </Grid>
 
+        <!-- 文件列表 -->
         <ContentControl Grid.Row="2" x:Name="ContentControlFileList"/>
 
         <Grid Grid.Row="3" VerticalAlignment="Bottom">

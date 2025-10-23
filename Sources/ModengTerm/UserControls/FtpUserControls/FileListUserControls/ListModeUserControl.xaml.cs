@@ -140,10 +140,22 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
 
         #endregion
 
-        #region IDragSource
+        #region IDragHandler
 
         public void StartDrag(DragInfo dragInfo)
         {
+            FileListVM sourceFileList = (dragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
+
+            // 如果拖拽的项里包含“上级目录”，那么不允许拖拽
+            IEnumerable<FileItemVM> dragItems = dragInfo.SourceItems.Cast<FileItemVM>();
+            if (dragItems.FirstOrDefault(v => v.Type == FsItemTypeEnum.ParentDirectory) != null)
+            {
+                dragInfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            dragInfo.Data = dragItems;
+            dragInfo.Effects = DragDropEffects.Copy;
         }
 
         #endregion
@@ -152,13 +164,13 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
 
         public void OnDragOver(DropInfo dropInfo)
         {
-            FileListVM sourceFsTree = (dropInfo.DragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
-            FileListVM targetFsTree = (dropInfo.VisualTarget as FrameworkElement).DataContext as FileListVM;
+            FileListVM sourceFileList = (dropInfo.DragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
+            FileListVM targetFileList = (dropInfo.VisualTarget as FrameworkElement).DataContext as FileListVM;
 
             // 拖放到哪个节点
             FileItemVM dropItem = dropInfo.TargetItem as FileItemVM;
 
-            if (sourceFsTree == targetFsTree)
+            if (sourceFileList == targetFileList)
             {
                 if (dropItem == null)
                 {
@@ -181,22 +193,11 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
                 }
             }
 
-            if (dropInfo.Data is List<FileItemVM>)
+            IEnumerable<FileItemVM> dragItems = dropInfo.Data as IEnumerable<FileItemVM>;
+            if (dropInfo == null || dragItems.Contains(dropItem))
             {
-                List<FileItemVM> dragItems = dropInfo.Data as List<FileItemVM>;
-                if (dropInfo == null || dragItems.Contains(dropItem))
-                {
-                    dropInfo.Effects = DragDropEffects.None;
-                    return;
-                }
-            }
-            else if (dropInfo.Data is FileItemVM)
-            {
-                if (dropItem == dropInfo.Data)
-                {
-                    dropInfo.Effects = DragDropEffects.None;
-                    return;
-                }
+                dropInfo.Effects = DragDropEffects.None;
+                return;
             }
 
             dropInfo.Effects = DragDropEffects.Copy;
@@ -206,14 +207,6 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
         {
             FileListVM sourceFileList = (dropInfo.DragInfo.VisualSource as FrameworkElement).DataContext as FileListVM;
             FileListVM targetFileList = (dropInfo.VisualTarget as FrameworkElement).DataContext as FileListVM;
-
-            List<FileItemVM> dragItems = dropInfo.Data as List<FileItemVM>;
-            if (dragItems == null)
-            {
-                dragItems = new List<FileItemVM>();
-                FileItemVM fsItemVm = dropInfo.Data as FileItemVM;
-                dragItems.Add(fsItemVm);
-            }
 
             string targetDirectory = string.Empty;
 
@@ -250,7 +243,8 @@ namespace ModengTerm.UserControls.FtpUserControls.FileListUserControls
                 }
             }
 
-            this.FtpSession.TransferFile(sourceFileList, targetFileList, dragItems, targetDirectory);
+            IEnumerable<FileItemVM> dragItems = dropInfo.Data as IEnumerable<FileItemVM>;
+            this.FtpSession.TransferFile(sourceFileList, targetFileList, dragItems.ToList(), targetDirectory);
         }
 
         #endregion

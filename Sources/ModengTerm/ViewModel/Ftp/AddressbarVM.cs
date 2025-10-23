@@ -33,8 +33,14 @@ namespace ModengTerm.ViewModel.Ftp
             }
         }
 
+        /// <summary>
+        /// 当前显示的目录链
+        /// </summary>
         public BindableCollection<DirectoryVM> DirectroyChain { get; private set; }
 
+        /// <summary>
+        /// 在Popup窗口中预览的目录列表
+        /// </summary>
         public BindableCollection<DirectoryVM> PreviewDirectories { get; private set; }
 
         public AddressbarVM()

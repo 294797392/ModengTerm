@@ -33,6 +33,7 @@
         <DataGrid x:Name="DataGridFsList" ItemsSource="{Binding Path=Roots}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" 
                   dd:DragDrop.DropHandler="{Binding ElementName=UserControl1}"
+                  dd:DragDrop.DragHandler="{Binding ElementName=UserControl1}"
                   MouseDoubleClick="DataGridFsList_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.RowStyle>

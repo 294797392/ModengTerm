@@ -96,8 +96,6 @@ namespace ModengTerm.Terminal.Parsing
         private VTID vtid;
         private List<int> parameters;
 
-        private List<byte> unicodeText;
-
         /// <summary>
         /// Designate VT52 mode (DECANM)
         /// </summary>
@@ -143,8 +141,6 @@ namespace ModengTerm.Terminal.Parsing
         {
             this.isAnsiMode = true;
             this.isApplicationMode = false;
-
-            this.unicodeText = new List<byte>();
 
             this.oscString = new StringBuilder();
             this.oscParam = 0;
@@ -337,8 +333,6 @@ namespace ModengTerm.Terminal.Parsing
 
             this.vtid.Clear();
             this.parameters.Clear();
-
-            this.unicodeText.Clear();
 
             this.dcsStringHandler = null;
         }

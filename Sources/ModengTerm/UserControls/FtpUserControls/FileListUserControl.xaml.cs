@@ -316,20 +316,26 @@ namespace ModengTerm.UserControls.FtpUserControls
         private void ButtonJumpDirectory_Click(object sender, RoutedEventArgs e)
         {
             FrameworkElement frameworkElement = sender as FrameworkElement;
-            DirectoryVM toJump = frameworkElement.DataContext as DirectoryVM;
-            AddressbarVM adrb = this.fileList.Addressbar;
+            DirectoryVM targetDirectory = frameworkElement.DataContext as DirectoryVM;
+            AddressbarVM addressBarVM = this.fileList.Addressbar;
 
-            if (string.IsNullOrEmpty(toJump.FullPath))
+            if (string.IsNullOrEmpty(targetDirectory.FullPath))
             {
                 return;
             }
 
-            this.ftpSession.LoadFileListAsync(this.fileList, toJump.FullPath, () => 
+            // 跳转到最后一个目录，也就是当前目录，不做任何操作
+            if (addressBarVM.DirectroyChain.LastOrDefault() == targetDirectory)
             {
-                DirectoryVM endRemove = PopupPreviewDirectory.Tag as DirectoryVM;
-                while (adrb.DirectroyChain[adrb.DirectroyChain.Count - 1] != endRemove)
+                return;
+            }
+
+            this.ftpSession.LoadFileListAsync(this.fileList, targetDirectory.FullPath, () => 
+            {
+                DirectoryVM endRemove = targetDirectory;
+                while (addressBarVM.DirectroyChain[addressBarVM.DirectroyChain.Count - 1] != endRemove)
                 {
-                    adrb.DirectroyChain.RemoveAt(adrb.DirectroyChain.Count - 1);
+                    addressBarVM.DirectroyChain.RemoveAt(addressBarVM.DirectroyChain.Count - 1);
                 }
             });
         }
